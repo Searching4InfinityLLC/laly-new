@@ -58,14 +58,13 @@ await payload.create({
         blockType: 'paidHero',
         label: 'Digital Software Development',
         heading: 'We build the tools, you reap the benefits',
-        // Verbatim from the frame — the designer left /branding's pill row on this instance. Seeded
-        // as drawn rather than invented; one CMS edit once the real four are handed over.
-        pills: [{ label: 'Socials' }, { label: 'SEO' }, { label: 'OOH' }, { label: 'Events' }],
+        // Verbatim from the frame (3292:4652).
+        pills: [{ label: 'UX/UI' }, { label: '3D' }, { label: 'CRM' }, { label: 'Apps' }],
         description: {
           // No emphasis run on this hero, unlike the other two — one flat paragraph, so the bold
           // phrase and its tail are left blank and the section renders no <strong>.
           before:
-            'Most businesses rely on third-party software to meet their marketing goals, even if those tools aren’t a good fit. We develop custom software based on how your business works—and where it’s falling short. Maximize your efficiency while doing business your way.',
+            'Most businesses rely on third-party software to meet their marketing goals, even if those tools aren’t a good fit. We develop custom software based on how your business works—and where it’s falling short.',
         },
         button: { label: 'LET’S BEGIN' },
       },

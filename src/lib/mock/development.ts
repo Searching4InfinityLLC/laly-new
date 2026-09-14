@@ -16,15 +16,13 @@ export const development: DevelopmentContent = {
   hero: {
     label: 'Digital Software Development',
     heading: 'We build the tools, you reap the benefits',
-    // Verbatim from the frame (3292:4652). The designer left the /branding pill row on this instance
-    // — the four channel names are not development services. Shipped as drawn rather than invented;
-    // it is one CMS edit once the real four are handed over.
-    pills: ['Socials', 'SEO', 'OOH', 'Events'],
+    // Verbatim from the frame (3292:4652).
+    pills: ['UX/UI', '3D', 'CRM', 'Apps'],
     description: {
       // No emphasis run at all on this hero, unlike the other two — 3292:4657 is one flat paragraph
       // in New Spirit, so `emphasis`/`after` stay unset and ServiceHero skips the <strong>.
       before:
-        'Most businesses rely on third-party software to meet their marketing goals, even if those tools aren’t a good fit. We develop custom software based on how your business works—and where it’s falling short. Maximize your efficiency while doing business your way.',
+        'Most businesses rely on third-party software to meet their marketing goals, even if those tools aren’t a good fit. We develop custom software based on how your business works—and where it’s falling short.',
     },
     button: { label: 'LET’S BEGIN' },
   },
