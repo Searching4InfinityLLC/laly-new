@@ -277,17 +277,33 @@ export type HowWeHelpContent = {
   cards: HowWeHelpCard[]
 }
 
+// One "Our Method" row: the adjective and the paragraph that backs it. The "1—" is NOT here — it is
+// the row's position in the list, so reordering renumbers rather than stranding a 3 above a 2.
+export type MethodStep = {
+  title: string
+  body: string
+}
+
+// "Our Method" (Figma 3318:2717) — the darkest ground on the site, the usual label/heading/
+// description stack, then the rows. `heading` carries an authored break; the description does not.
+export type OurMethodContent = {
+  label: string
+  heading: string
+  description: string
+  steps: MethodStep[]
+}
+
 // The third service page (Figma 3292:4643), and the shortest of the three: the frame draws the hero,
-// How We Help, Pricing, FAQ, Contact and the closing band. Its own type rather than an alias of a
-// slice of BrandingContent, so the two can diverge as the rest of this page gets drawn.
+// How We Help, Our Method, Contact and the closing band — no Pricing and no FAQ, unlike the other
+// two service pages. Its own type rather than an alias of a slice of BrandingContent, so the two can
+// diverge as the rest of this page gets drawn.
 //
 // `contact` is deliberately absent here too: that section is read off the home doc so one edit moves
 // all three service pages.
 export type DevelopmentContent = {
   hero: PaidHeroContent
   howWeHelp: HowWeHelpContent
-  pricing: PricingContent
-  faq: FaqContent
+  ourMethod: OurMethodContent
   note: NoteContent
 }
 

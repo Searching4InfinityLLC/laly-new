@@ -8,8 +8,9 @@
  *
  * No uploads. The one image on /development is the hero's 20% photo wash, a static import.
  *
- * Five blocks: Figma 3292:4643 draws the hero, How We Help, Pricing, FAQ, Contact and the closing
- * band, and Contact is read off the home doc.
+ * Four blocks: Figma 3292:4643 draws the hero, How We Help, Our Method, Contact and the closing
+ * band, and Contact is read off the home doc. Unlike the other two service pages, the frame draws no
+ * Pricing and no FAQ.
  *
  * Copy below is duplicated verbatim from src/lib/mock/development.ts rather than imported: that
  * module is typed against @/lib/types via a tsconfig path bun does not resolve outside the Next
@@ -116,52 +117,34 @@ await payload.create({
         ],
       },
       {
-        // identical to the other two pages' pricing, copy included — its own rows so the three can
-        // diverge without a code change
-        blockType: 'pricing',
-        label: 'Pricing',
-        heading: 'Simple. Transparent.\nPerformance-based.',
-        tiers: [
+        // Figma 3318:2717 — this page's own block. Row numbering is the array order, not a field.
+        blockType: 'ourMethod',
+        label: 'our method',
+        heading: 'Don’t compromise\non quality',
+        description:
+          'Your business is unique, and making software work for your business requires a dedicated team with an expert touch. (Hint: that’s us!) Why settle for less?',
+        steps: [
           {
-            label: 'One-time Setup',
-            price: '$20,000',
-            items: [
-              { label: 'Business audit' },
-              { label: 'Custom Scaling Roadmap' },
-              { label: 'Full Website Build' },
-              { label: 'Campaign Architecture' },
-              { label: 'Tracking Infrastructure' },
-              { label: 'Call Handling Setup' },
-              { label: 'Reporting Dashboard' },
-            ],
+            title: 'Customized.',
+            body:
+              'We’re not following templates or offering a limited set of services. We’re building bespoke solutions for the real problems your business faces.',
           },
           {
-            label: 'Per Qualified Lead',
-            price: '$1,500',
-            badge: 'PAY AS THEY COME IN',
-            items: [
-              {
-                label:
-                  'Only qualified leads that pass our filter and match the criteria we agreed on.',
-              },
-              { label: 'You review every lead in your dashboard.' },
-              { label: 'Dispute any you disagree with.' },
-              { label: 'Pay as they come in.' },
-            ],
+            title: 'Functional.',
+            body:
+              'Every tool we create undergoes rigorous testing and quality control. Because we control the process from concept to execution, we know exactly how our software needs to work, and we ensure that it does.',
+          },
+          {
+            title: 'Clean.',
+            body:
+              'Our development team is dedicated to ensuring every tool is efficient and user-friendly, with a clean and professional interface. We handle the confusing stuff in the background so the front-facing product is easy to use.',
+          },
+          {
+            title: 'Needs-Based.',
+            body:
+              'Rest assured: we don’t just use tech for tech’s sake. We’re not looking to clutter your systems with redundant technology for the sake of trendiness. Instead, we’re finding the gaps in your process, and building software to fill them.',
           },
         ],
-        cta: { label: 'BOOK A CALL' },
-      },
-      {
-        blockType: 'faq',
-        label: 'FAQ',
-        heading: 'Frequently Asked Questions',
-        // The Figma FAQ is five lorem rows with one lorem answer — the copy has not been written.
-        // Seeded verbatim rather than invented, so nobody mistakes filler for approved copy.
-        items: Array.from({ length: 5 }, () => ({
-          question: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-          answer: 'This is subtext which appears after expanding the accordion.',
-        })),
       },
       {
         blockType: 'note',

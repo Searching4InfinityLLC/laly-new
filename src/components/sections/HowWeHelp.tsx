@@ -25,42 +25,49 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
     <section
       aria-label="How we help"
       // Figma frame: py 112, no side padding of its own (the two rows below set theirs). Mobile
-      // halves the band.
+      // (3292:4158) is pt 48 / pb 0 — the last card's own 48 closes the band, so a bottom pad here
+      // would double it.
       //
-      // No top keyline, though the frame draws one: ServiceHero already closes on the same 1px
+      // No top keyline, though both frames draw one: ServiceHero already closes on the same 1px
       // #544D49 rule, and both would render a 2px seam.
-      className="w-full bg-[#FCF7F3] py-14 md:py-28"
+      className="w-full bg-[#FCF7F3] pt-12 pb-0 md:py-28"
     >
       <div className="section-shell flex flex-col items-center gap-8 md:gap-10">
-        {/* Figma: px 208 at 1440. Mobile takes the page's own 20. */}
-        <div className="flex w-full flex-col gap-6 px-5 text-center sm:px-10 md:px-52">
+        {/* Figma: px 208 at 1440, 20 on the phone. */}
+        <div className="flex w-full flex-col gap-6 px-5 text-center md:px-52">
           {/* Brackets authored here rather than <BracketLabel>: that component spreads its brackets
               to the row's edges, and this label hugs the words the way the hero's does. */}
           <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
             [ {label} ]
           </p>
 
+          {/* The break is authored for the 64px desktop set only — the mobile frame (3292:4161)
+              is one flowing 40px paragraph, so the spans go inline below md and the join is a real
+              space rather than a second copy of the string. */}
           <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
-            {heading.split('\n').map((line) => (
-              <span key={line} className="block">
+            {heading.split('\n').map((line, i) => (
+              <span key={line} className="md:block">
+                {i > 0 && ' '}
                 {line}
               </span>
             ))}
           </h2>
 
+          {/* Same again: two authored clauses at 28px, one flowing paragraph at 20px. */}
           <p className="font-sans text-xl font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px]">
-            {/* the designer's breaks, not wraps — they split the sentence at its two clauses */}
-            {description.split('\n').map((line) => (
-              <span key={line} className="block">
+            {description.split('\n').map((line, i) => (
+              <span key={line} className="md:block">
+                {i > 0 && ' '}
                 {line}
               </span>
             ))}
           </p>
         </div>
 
-        {/* Figma: px 80, gap 12, three equal columns that stretch to the tallest. One column on a
-            phone — three 418px cards have nowhere to go at 390. */}
-        <div className="flex w-full flex-col gap-3 px-5 sm:px-10 md:flex-row md:items-stretch md:px-20">
+        {/* Figma: px 80, gap 12, three equal columns that stretch to the tallest. The phone
+            (3330:4616) stacks them full-bleed with no gap and no per-card rule — one hairline on the
+            stack and nothing between the cards, because the wash changing colour IS the separator. */}
+        <div className="flex w-full flex-col border-t border-[rgba(60,55,52,0.1)] md:flex-row md:items-stretch md:gap-3 md:border-t-0 md:px-20">
           {cards.map((card, i) => {
             const accent = HELP_ACCENTS[i % HELP_ACCENTS.length]
             const Widget = HELP_WIDGETS[i % HELP_WIDGETS.length]
@@ -68,18 +75,19 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
             return (
               <article
                 key={card.title}
-                // 1px hairline at 10% — the cards read as panes of the same sheet, not as chips
-                className="relative flex flex-1 flex-col gap-10 overflow-hidden border border-[rgba(60,55,52,0.1)] px-5 pt-6 pb-10"
+                // 1px hairline at 10% at md+ — the cards read as panes of the same sheet, not as
+                // chips. Mobile: pt 32 / pb 48, and the border belongs to the stack, not the card.
+                className="relative flex flex-1 flex-col gap-10 overflow-hidden px-5 pt-8 pb-12 md:border md:border-[rgba(60,55,52,0.1)] md:pt-6 md:pb-10"
                 style={{
                   backgroundImage: `linear-gradient(180deg, #FFFCF9 ${accent.stop}, ${accent.wash} 100%)`,
                 }}
               >
                 <GridBackdrop />
 
-                <div className="relative flex w-full flex-col gap-6">
-                  <div className="flex flex-col gap-3">
+                <div className="relative flex w-full flex-col gap-5 md:gap-6">
+                  <div className="flex flex-col gap-2 md:gap-3">
                     <p
-                      className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] opacity-80"
+                      className="font-mono text-xs font-normal uppercase leading-[1.4] tracking-[1px] opacity-80 md:text-sm"
                       style={{ color: accent.fg }}
                     >
                       {card.eyebrow}
@@ -121,7 +129,7 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
                           )}
                         </div>
                         <p
-                          className="min-w-0 flex-1 font-display text-lg font-normal leading-[1.25] tracking-[0.25px]"
+                          className="min-w-0 flex-1 font-display text-base font-normal leading-[1.25] tracking-[0.25px] md:text-lg"
                           style={{ color: accent.body }}
                         >
                           {step}
@@ -131,8 +139,8 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
                   </ol>
                 </div>
 
-                {/* Figma insets the mock 40px inside the card's own 20 */}
-                <div className="relative flex w-full flex-col items-center justify-center px-10">
+                {/* Figma insets the mock 40px inside the card's own 20; the phone insets it 20. */}
+                <div className="relative flex w-full flex-col items-center justify-center px-5 md:px-10">
                   <Widget />
                 </div>
               </article>

@@ -174,7 +174,7 @@ export interface Page {
    */
   slug: string;
   /**
-   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Pricing/FAQ/Note on development).
+   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Our Method/Note on development).
    */
   content: (
     | HeroBlock
@@ -194,6 +194,7 @@ export interface Page {
     | ChannelsBlock
     | CompoundBlock
     | HowWeHelpBlock
+    | OurMethodBlock
   )[];
   updatedAt: string;
   createdAt: string;
@@ -832,6 +833,38 @@ export interface HowWeHelpBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OurMethodBlock".
+ */
+export interface OurMethodBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are CSS.
+   */
+  label: string;
+  /**
+   * Press Enter for an authored line break.
+   */
+  heading: string;
+  /**
+   * One paragraph — it wraps to the column on its own.
+   */
+  description: string;
+  /**
+   * One row each, top to bottom. The “1—”, “2—” numbering comes from this order, so moving a row renumbers it.
+   */
+  steps: {
+    /**
+     * The adjective, full stop included — “Customized.”
+     */
+    title: string;
+    body: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ourMethod';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -959,6 +992,7 @@ export interface PagesSelect<T extends boolean = true> {
         channels?: T | ChannelsBlockSelect<T>;
         compound?: T | CompoundBlockSelect<T>;
         howWeHelp?: T | HowWeHelpBlockSelect<T>;
+        ourMethod?: T | OurMethodBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1338,6 +1372,24 @@ export interface HowWeHelpBlockSelect<T extends boolean = true> {
               text?: T;
               id?: T;
             };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OurMethodBlock_select".
+ */
+export interface OurMethodBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  description?: T;
+  steps?:
+    | T
+    | {
+        title?: T;
+        body?: T;
         id?: T;
       };
   id?: T;

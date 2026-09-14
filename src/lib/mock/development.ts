@@ -5,8 +5,9 @@ import type { DevelopmentContent } from '@/lib/types'
 // fail the build. src/lib/cms.ts falls back to these values a block at a time, so one malformed
 // block degrades its own section instead of the page.
 //
-// Five blocks: Figma 3292:4643 draws the hero, How We Help, Pricing, FAQ, Contact and the closing
-// band. Contact is read off the home doc, so it is not here.
+// Four blocks: Figma 3292:4643 draws the hero, How We Help, Our Method, Contact and the closing
+// band. Contact is read off the home doc, so it is not here — and unlike the other two service
+// pages, the frame draws no Pricing and no FAQ.
 //
 // Keep byte-identical to scripts/seed-development.ts, which writes the same copy into the doc — that
 // is what makes the CMS swap verifiable by diffing the rendered page.
@@ -61,51 +62,34 @@ export const development: DevelopmentContent = {
       },
     ],
   },
-  // Figma 3292:4806. Identical to /branding's and /paid-advertising's pricing block, copy included —
-  // kept as its own values rather than an import of either mock so the three pages can diverge
-  // without a refactor.
-  pricing: {
-    label: 'Pricing',
-    // the break after "Transparent." is authored, not a wrap
-    heading: 'Simple. Transparent.\nPerformance-based.',
-    tiers: [
+  // Figma 3318:2717. The "1—" numbering is the row's position, not a value — see OurMethod.tsx.
+  ourMethod: {
+    label: 'our method',
+    heading: 'Don’t compromise\non quality',
+    description:
+      'Your business is unique, and making software work for your business requires a dedicated team with an expert touch. (Hint: that’s us!) Why settle for less?',
+    steps: [
       {
-        label: 'One-time Setup',
-        price: '$20,000',
-        items: [
-          'Business audit',
-          'Custom Scaling Roadmap',
-          'Full Website Build',
-          'Campaign Architecture',
-          'Tracking Infrastructure',
-          'Call Handling Setup',
-          'Reporting Dashboard',
-        ],
+        title: 'Customized.',
+        body:
+          'We’re not following templates or offering a limited set of services. We’re building bespoke solutions for the real problems your business faces.',
       },
       {
-        label: 'Per Qualified Lead',
-        price: '$1,500',
-        badge: 'PAY AS THEY COME IN',
-        items: [
-          'Only qualified leads that pass our filter and match the criteria we agreed on.',
-          'You review every lead in your dashboard.',
-          'Dispute any you disagree with.',
-          'Pay as they come in.',
-        ],
+        title: 'Functional.',
+        body:
+          'Every tool we create undergoes rigorous testing and quality control. Because we control the process from concept to execution, we know exactly how our software needs to work, and we ensure that it does.',
+      },
+      {
+        title: 'Clean.',
+        body:
+          'Our development team is dedicated to ensuring every tool is efficient and user-friendly, with a clean and professional interface. We handle the confusing stuff in the background so the front-facing product is easy to use.',
+      },
+      {
+        title: 'Needs-Based.',
+        body:
+          'Rest assured: we don’t just use tech for tech’s sake. We’re not looking to clutter your systems with redundant technology for the sake of trendiness. Instead, we’re finding the gaps in your process, and building software to fill them.',
       },
     ],
-    cta: { label: 'BOOK A CALL' },
-  },
-  // Figma 3292:4826 — the same FAQ instance the other two service pages carry.
-  faq: {
-    label: 'FAQ',
-    heading: 'Frequently Asked Questions',
-    // ponytail: the Figma FAQ is five lorem rows with one lorem answer — the copy has not been
-    // written. Shipped verbatim rather than invented, so nobody mistakes filler for approved copy.
-    items: Array.from({ length: 5 }, () => ({
-      question: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-      answer: 'This is subtext which appears after expanding the accordion.',
-    })),
   },
   // Figma 3292:4851 — the same closing band the other two pages use, and on this frame the designer
   // left /paid-advertising's line rather than writing a development one. 458 is the Figma text

@@ -11,6 +11,7 @@ import type {
   HowWeHelpBlock,
   Media,
   NoteBlock,
+  OurMethodBlock,
   PaidHeroBlock,
   PositioningBlock,
   PricingBlock,
@@ -36,7 +37,9 @@ import type {
   HowWeHelpCard,
   HowWeHelpContent,
   MediaDoc,
+  MethodStep,
   NoteContent,
+  OurMethodContent,
   PaidContent,
   PaidHeroContent,
   PaidPanel,
@@ -515,10 +518,10 @@ export async function getBranding(): Promise<BrandingContent> {
 
 // --- /development --------------------------------------------------------------------------------
 
-// The shortest of the three service docs: four blocks, every one of them a shape another page
-// already uses (paidHero/pricing/faq/note), so there is nothing here to convert that isn't converted
-// above. It exists as its own loader rather than a `getService(slug)` because the three pages do not
-// hold the same set of blocks and each names its own — the slug is the only thing they share.
+// Four blocks: paidHero and note are shapes other pages already use, howWeHelp and ourMethod are
+// this page's own. No pricing and no faq — the frame does not draw them here. It exists as its own
+// loader rather than a `getService(slug)` because the three pages do not hold the same set of blocks
+// and each names its own — the slug is the only thing they share.
 //
 // Contact is NOT here — like the other two, it is read off the home doc so one edit moves all three.
 // Colour and mock are not read here: both come from the card's index in the rendered row (see
@@ -537,6 +540,17 @@ export function toHowWeHelpContent(block: HowWeHelpBlock): HowWeHelpContent | nu
   return { label: block.label, heading: block.heading, description: block.description, cards }
 }
 
+// The "1—" numbering is the row's index at render time, so nothing here carries it.
+export function toOurMethodContent(block: OurMethodBlock): OurMethodContent | null {
+  const steps = (block.steps ?? [])
+    .map((s): MethodStep | null => (s.title && s.body ? { title: s.title, body: s.body } : null))
+    .filter(isPresent)
+
+  if (!block.label || !block.heading || !block.description || steps.length === 0) return null
+
+  return { label: block.label, heading: block.heading, description: block.description, steps }
+}
+
 export async function getDevelopment(): Promise<DevelopmentContent> {
   try {
     const blocks = await findBlocks('development')
@@ -544,8 +558,7 @@ export async function getDevelopment(): Promise<DevelopmentContent> {
     const hero = blocks.find((b) => b.blockType === 'paidHero')
     // This page's own block — nothing else in the project renders it.
     const howWeHelp = blocks.find((b) => b.blockType === 'howWeHelp')
-    const pricing = blocks.find((b) => b.blockType === 'pricing')
-    const faq = blocks.find((b) => b.blockType === 'faq')
+    const ourMethod = blocks.find((b) => b.blockType === 'ourMethod')
     const note = blocks.find((b) => b.blockType === 'note')
 
     const slug = 'development'
@@ -557,8 +570,12 @@ export async function getDevelopment(): Promise<DevelopmentContent> {
         howWeHelp && toHowWeHelpContent(howWeHelp),
         development.howWeHelp,
       ),
-      pricing: orMock(slug, 'pricing', pricing && toPricingContent(pricing), development.pricing),
-      faq: orMock(slug, 'faq', faq && toFaqContent(faq), development.faq),
+      ourMethod: orMock(
+        slug,
+        'ourMethod',
+        ourMethod && toOurMethodContent(ourMethod),
+        development.ourMethod,
+      ),
       note: orMock(slug, 'note', note && toNoteContent(note), development.note),
     }
   } catch (err) {

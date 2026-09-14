@@ -69,3 +69,49 @@ export const HowWeHelpBlock: Block = {
     },
   ],
 }
+
+// Mirrors OurMethodContent + MethodStep in src/lib/types.ts.
+export const OurMethodBlock: Block = {
+  slug: 'ourMethod',
+  interfaceName: 'OurMethodBlock',
+  labels: { singular: 'Our Method', plural: 'Our Method' },
+  fields: [
+    {
+      name: 'label',
+      type: 'text',
+      required: true,
+      admin: { description: 'Bare text. The [ brackets ] and uppercasing are CSS.' },
+    },
+    {
+      name: 'heading',
+      type: 'textarea',
+      required: true,
+      admin: { description: 'Press Enter for an authored line break.' },
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      required: true,
+      admin: { description: 'One paragraph — it wraps to the column on its own.' },
+    },
+    {
+      name: 'steps',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      admin: {
+        description:
+          'One row each, top to bottom. The “1—”, “2—” numbering comes from this order, so moving a row renumbers it.',
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+          admin: { description: 'The adjective, full stop included — “Customized.”' },
+        },
+        { name: 'body', type: 'textarea', required: true },
+      ],
+    },
+  ],
+}

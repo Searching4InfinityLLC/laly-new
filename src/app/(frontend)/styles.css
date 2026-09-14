@@ -976,3 +976,38 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     transition: none;
   }
 }
+
+/* "Our Method" (/development, Figma OurMethod-Default / -Hover / -Hover-2). Three variants: the
+   default has every row white at full strength, and each hover variant lights ONE adjective lilac
+   while every OTHER row drops to 60%. So the list is what dims — the hovered row simply stays put —
+   which is one rule on the parent and one on the child, no state and no client component.
+
+   (hover: hover) is also the mobile spec: on a touch screen there is no pointer to follow, so the
+   rows stay at the default the frame draws. */
+@media (hover: hover) {
+  .method-row,
+  .method-row h3 {
+    transition:
+      opacity 200ms ease-out,
+      color 200ms ease-out;
+  }
+  .method-list:hover .method-row {
+    opacity: 0.6;
+  }
+  .method-list .method-row:hover {
+    opacity: 1;
+  }
+  /* color/accent-2/80 — the only place this tint appears outside the How We Help cards */
+  .method-list .method-row:hover h3 {
+    color: #eec3ea;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the dim and the tint still land, they just arrive instantly — they are the affordance, not the
+     motion */
+  .method-row,
+  .method-row h3 {
+    transition: none;
+  }
+}
