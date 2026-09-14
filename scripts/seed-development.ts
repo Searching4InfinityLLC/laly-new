@@ -8,8 +8,8 @@
  *
  * No uploads. The one image on /development is the hero's 20% photo wash, a static import.
  *
- * Four blocks, not eight: Figma 3292:4643 draws the hero, Pricing, FAQ, Contact and the closing band
- * and nothing between them, and Contact is read off the home doc.
+ * Five blocks: Figma 3292:4643 draws the hero, How We Help, Pricing, FAQ, Contact and the closing
+ * band, and Contact is read off the home doc.
  *
  * Copy below is duplicated verbatim from src/lib/mock/development.ts rather than imported: that
  * module is typed against @/lib/types via a tsconfig path bun does not resolve outside the Next
@@ -67,6 +67,53 @@ await payload.create({
             'Most businesses rely on third-party software to meet their marketing goals, even if those tools aren’t a good fit. We develop custom software based on how your business works—and where it’s falling short.',
         },
         button: { label: 'LET’S BEGIN' },
+      },
+      {
+        // Figma 3304:1848 — this page's own block. Colour and the product mock at each card's foot
+        // come from the column, not from the row data.
+        blockType: 'howWeHelp',
+        label: 'How We Help',
+        heading: 'Smart solutions for your\nbiggest obstacles',
+        description:
+          'Every project is different\u2014they face different problems, and require different solutions.\nThat\u2019s why we get acquainted with the client first, then start building.',
+        cards: [
+          {
+            eyebrow: 'SYSTEMS',
+            title: 'Are you losing leads due\nto inefficiency?',
+            steps: [
+              {
+                text: 'One client was struggling to get business from first-time leads because third-party booking platforms were placing a heavier financial strain on the customer end.',
+              },
+              {
+                text: 'We helped them build their own booking platform, addressing this issue at the source to maximize long-term success.',
+              },
+            ],
+          },
+          {
+            eyebrow: 'DATA',
+            title: 'Do you know where your customers come from?',
+            steps: [
+              {
+                text: 'One client needed help visualizing the return on marketing investments because they couldn\u2019t identify where their highest-quality leads were coming from.',
+              },
+              {
+                text: 'We built an automated lead tracking system, showing crucial customer interaction data at a glance. This project served as the foundation for the robust analytics dashboard we now offer to all active clients.',
+              },
+            ],
+          },
+          {
+            eyebrow: 'AUTOMATION',
+            title: 'How much time do you waste in day-to-day upkeep?',
+            steps: [
+              {
+                text: 'One client was wasting time in office taking calls that weren\u2019t actually going to lead to new business, taking valuable time away from the most valuable leads.',
+              },
+              {
+                text: 'We helped automate their intake process, with a system that intelligently directs low-value leads to a receptionist trained on their brand voice, while forwarding high-value cases directly to the client. This has allowed them field more calls without compromising on regular availability and consistent brand expression.',
+              },
+            ],
+          },
+        ],
       },
       {
         // identical to the other two pages' pricing, copy included — its own rows so the three can

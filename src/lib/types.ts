@@ -256,16 +256,36 @@ export type BrandingContent = {
 
 // --- /development --------------------------------------------------------------------------------
 
+// One "How We Help" card: a client problem and what we built for it. `title` carries the designer's
+// own line break; `steps` are the two numbered paragraphs — the problem, then the fix.
+//
+// No colour and no widget here. The design runs lilac/olive/amber left to right with one specific
+// mock per column, so both come from the card's position in the row (HELP_ACCENTS / HELP_WIDGETS),
+// the same rule BADGE_COLORS follows on /home.
+export type HowWeHelpCard = {
+  eyebrow: string
+  title: string
+  steps: string[]
+}
+
+// "How We Help" (Figma 3304:1848) — cream ground, the usual label/heading/description stack, then
+// three case-study cards across. Heading and description both carry authored breaks.
+export type HowWeHelpContent = {
+  label: string
+  heading: string
+  description: string
+  cards: HowWeHelpCard[]
+}
+
 // The third service page (Figma 3292:4643), and the shortest of the three: the frame draws the hero,
-// Pricing, FAQ, Contact and the closing band and nothing else — the sections between the hero and
-// Pricing that /paid-advertising and /branding have have not been designed yet. So this is four
-// blocks, every one of them already a shape another page uses. Its own type rather than an alias of
-// a slice of BrandingContent, so the two can diverge as the middle of this page gets drawn.
+// How We Help, Pricing, FAQ, Contact and the closing band. Its own type rather than an alias of a
+// slice of BrandingContent, so the two can diverge as the rest of this page gets drawn.
 //
 // `contact` is deliberately absent here too: that section is read off the home doc so one edit moves
 // all three service pages.
 export type DevelopmentContent = {
   hero: PaidHeroContent
+  howWeHelp: HowWeHelpContent
   pricing: PricingContent
   faq: FaqContent
   note: NoteContent

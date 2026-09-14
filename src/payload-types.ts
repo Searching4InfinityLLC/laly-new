@@ -174,7 +174,7 @@ export interface Page {
    */
   slug: string;
   /**
-   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/Pricing/FAQ/Note on development).
+   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Pricing/FAQ/Note on development).
    */
   content: (
     | HeroBlock
@@ -193,6 +193,7 @@ export interface Page {
     | SystemBlock
     | ChannelsBlock
     | CompoundBlock
+    | HowWeHelpBlock
   )[];
   updatedAt: string;
   createdAt: string;
@@ -789,6 +790,48 @@ export interface CompoundBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowWeHelpBlock".
+ */
+export interface HowWeHelpBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are CSS.
+   */
+  label: string;
+  /**
+   * Press Enter for an authored line break.
+   */
+  heading: string;
+  /**
+   * Press Enter for the break — the two clauses are set on their own lines.
+   */
+  description: string;
+  /**
+   * Left to right. Position picks the card’s colour and which product mock sits at its foot — reordering here reorders both.
+   */
+  cards: {
+    /**
+     * One word above the question — SYSTEMS, DATA, AUTOMATION.
+     */
+    eyebrow: string;
+    /**
+     * The client’s question. Press Enter for an authored line break.
+     */
+    title: string;
+    /**
+     * Numbered in order: the problem, then what we built.
+     */
+    steps: {
+      text: string;
+      id?: string | null;
+    }[];
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'howWeHelp';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -915,6 +958,7 @@ export interface PagesSelect<T extends boolean = true> {
         system?: T | SystemBlockSelect<T>;
         channels?: T | ChannelsBlockSelect<T>;
         compound?: T | CompoundBlockSelect<T>;
+        howWeHelp?: T | HowWeHelpBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1270,6 +1314,30 @@ export interface CompoundBlockSelect<T extends boolean = true> {
         period?: T;
         title?: T;
         body?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowWeHelpBlock_select".
+ */
+export interface HowWeHelpBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  description?: T;
+  cards?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        steps?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
         id?: T;
       };
   id?: T;

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import heroBg from '../../../../public/development/hero.webp'
 import Contact from '@/components/sections/Contact'
 import { Faq } from '@/components/sections/Faq'
+import HowWeHelp from '@/components/sections/HowWeHelp'
 import Note from '@/components/sections/Note'
 import { Pricing } from '@/components/sections/Pricing'
 import { ServiceHero } from '@/components/sections/ServiceHero'
@@ -19,16 +20,13 @@ export const revalidate = 3600
 
 // Figma 3292:4643 — where Strategy's "The Power of Technology" card points.
 //
-// The shortest of the three service pages, and deliberately so: the frame draws the hero, Pricing,
-// FAQ, Contact and the closing band and NOTHING between the hero and Pricing. The sections that
-// /paid-advertising and /branding fill that gap with have not been designed for this page yet, so
-// nothing stands in for them — the route exists and is navigable, and the middle gets added when the
-// frames land.
+// Still the shortest of the three service pages: hero, How We Help, Pricing, FAQ, Contact, closing
+// band. The frame also draws an "OurMethod" section (3318:2717) between How We Help and the rest
+// that has not been built yet.
 //
-// Every block here is one another page already draws (paidHero/pricing/faq/note), so this page adds
-// no components and no CMS blocks — only the 'development' doc that carries its own rows. Copy comes
-// from that doc, falling back per block to src/lib/mock/development.ts (see getDevelopment in
-// src/lib/cms.ts).
+// Every block but How We Help is one another page already draws (paidHero/pricing/faq/note). Copy
+// comes from the 'development' doc, falling back per block to src/lib/mock/development.ts (see
+// getDevelopment in src/lib/cms.ts).
 //
 // The hero photo is a static import, as on /branding: it is the layout's 20% wash rather than
 // artwork an editor would swap.
@@ -54,9 +52,14 @@ export default async function DevelopmentPage() {
         objectPosition="object-center"
       />
 
+      {/* Figma 3304:1848 — the three case-study cards. Opens on the 1px keyline the hero closes on,
+          so it butts straight against it. */}
+      <SectionFade>
+        <HowWeHelp content={development.howWeHelp} />
+      </SectionFade>
+
       {/* Figma 3292:4806 — identical to the Pricing block on the other two service pages, carrying
-          this doc's own rows. It opens on the same 0.5px keyline, so it butts against the hero the
-          way "What you get" does on /paid-advertising. */}
+          this doc's own rows. */}
       <SectionFade>
         <Pricing content={development.pricing} />
       </SectionFade>

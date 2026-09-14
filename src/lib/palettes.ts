@@ -30,3 +30,15 @@ export const PILL_COLORS = ['#A2A11C', '#CBB1C9', '#FF8A88', '#F5C882'] as const
 // whole way, so this is that flat version. Same 90deg stops in Figma either way.
 export const EMBER_WASH =
   'linear-gradient(90deg, rgba(28,25,23,0.25) 35%, rgba(85,47,42,0.25) 65%, rgba(141,68,60,0.25) 85%, rgba(255,111,97,0.25) 100%)'
+
+// /development "How We Help" cards (Figma 3304:1853). One entry per column, and the column is what
+// picks it — the design runs lilac/olive/amber left to right the way BADGE_COLORS runs its trio, so
+// this is layout and the CMS stores no accent field. Cycles, so a fourth card starts over.
+//
+// `stop` is where the card's #FFFCF9 top gives way to the wash: the amber card holds the cream
+// longer because its copy runs three lines deeper.
+export const HELP_ACCENTS = [
+  { wash: '#E2C5DF', stop: '30%', fg: '#443B43', body: '#716370', badge: '#716370', rail: '#CBB1C9' },
+  { wash: '#B5B449', stop: '30%', fg: '#313008', body: '#57570F', badge: '#807F0D', rail: '#B5B449' },
+  { wash: '#F2BA63', stop: '45%', fg: '#302514', body: '#614A28', badge: '#795D32', rail: '#C7964A' },
+] as const

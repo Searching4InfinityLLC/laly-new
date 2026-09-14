@@ -8,6 +8,7 @@ import type {
   FaqBlock,
   GuaranteeBlock,
   HeroBlock,
+  HowWeHelpBlock,
   Media,
   NoteBlock,
   PaidHeroBlock,
@@ -32,6 +33,8 @@ import type {
   GuaranteeContent,
   HeroContent,
   HomeContent,
+  HowWeHelpCard,
+  HowWeHelpContent,
   MediaDoc,
   NoteContent,
   PaidContent,
@@ -518,11 +521,29 @@ export async function getBranding(): Promise<BrandingContent> {
 // hold the same set of blocks and each names its own — the slug is the only thing they share.
 //
 // Contact is NOT here — like the other two, it is read off the home doc so one edit moves all three.
+// Colour and mock are not read here: both come from the card's index in the rendered row (see
+// HELP_ACCENTS / HELP_WIDGETS), so this maps copy and nothing else.
+export function toHowWeHelpContent(block: HowWeHelpBlock): HowWeHelpContent | null {
+  const cards = (block.cards ?? [])
+    .map((c): HowWeHelpCard | null => {
+      const steps = (c.steps ?? []).map((s) => s.text).filter(isPresent)
+      if (!c.eyebrow || !c.title || steps.length === 0) return null
+      return { eyebrow: c.eyebrow, title: c.title, steps }
+    })
+    .filter(isPresent)
+
+  if (!block.label || !block.heading || !block.description || cards.length === 0) return null
+
+  return { label: block.label, heading: block.heading, description: block.description, cards }
+}
+
 export async function getDevelopment(): Promise<DevelopmentContent> {
   try {
     const blocks = await findBlocks('development')
     // Shares paidHero with the other two service pages: ServiceHero draws all three off it.
     const hero = blocks.find((b) => b.blockType === 'paidHero')
+    // This page's own block — nothing else in the project renders it.
+    const howWeHelp = blocks.find((b) => b.blockType === 'howWeHelp')
     const pricing = blocks.find((b) => b.blockType === 'pricing')
     const faq = blocks.find((b) => b.blockType === 'faq')
     const note = blocks.find((b) => b.blockType === 'note')
@@ -530,6 +551,12 @@ export async function getDevelopment(): Promise<DevelopmentContent> {
     const slug = 'development'
     return {
       hero: orMock(slug, 'paidHero', hero && toPaidHeroContent(hero), development.hero),
+      howWeHelp: orMock(
+        slug,
+        'howWeHelp',
+        howWeHelp && toHowWeHelpContent(howWeHelp),
+        development.howWeHelp,
+      ),
       pricing: orMock(slug, 'pricing', pricing && toPricingContent(pricing), development.pricing),
       faq: orMock(slug, 'faq', faq && toFaqContent(faq), development.faq),
       note: orMock(slug, 'note', note && toNoteContent(note), development.note),

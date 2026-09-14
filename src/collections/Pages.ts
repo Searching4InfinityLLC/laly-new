@@ -3,6 +3,7 @@ import { revalidatePages } from '../lib/revalidate'
 import { AboutBlock } from '../blocks/about'
 import { ChannelsBlock, CompoundBlock, PositioningBlock, SystemBlock } from '../blocks/branding'
 import { ContactBlock } from '../blocks/contact'
+import { HowWeHelpBlock } from '../blocks/development'
 import { HeroBlock } from '../blocks/hero'
 import { NoteBlock } from '../blocks/note'
 import {
@@ -76,7 +77,7 @@ export const Pages: CollectionConfig = {
       minRows: 1,
       admin: {
         description:
-          'Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/Pricing/FAQ/Note on development).',
+          'Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Pricing/FAQ/Note on development).',
       },
       blocks: [
         HeroBlock,
@@ -95,6 +96,7 @@ export const Pages: CollectionConfig = {
         SystemBlock,
         ChannelsBlock,
         CompoundBlock,
+        HowWeHelpBlock,
       ],
     },
   ],
