@@ -1004,8 +1004,9 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
 }
 
 /* The touch half of the same affordance (Figma 3332:4906 — row 1 lilac, rows 2-4 at 60%). There is
-   no pointer to follow, so MethodScrollSpy picks the row from scroll position and marks it
-   data-active; everything below is the hover block with :hover swapped for that attribute.
+   no pointer to follow, so MethodScrollSpy lights whichever row straddles the middle of the viewport
+   and marks it data-active; everything below is the hover block with :hover swapped for that
+   attribute.
 
    Gated on [data-scroll-spy], which the component only sets once it is running: with JS off, or
    before hydration, no row is dimmed and the list reads at the frame's default rather than sitting

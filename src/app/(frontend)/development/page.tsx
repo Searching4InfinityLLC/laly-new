@@ -64,11 +64,10 @@ export default async function DevelopmentPage() {
         <OurMethod content={development.ourMethod} />
       </SectionFade>
 
-      {/* Drives Our Method's rows on touch, where there is no pointer to hover them, plus the
-          floating switch between its two trigger lines. Mounted out here rather than inside the
-          section because the switch is `fixed` and SectionFade ramps its subtree's opacity — inside,
-          the switch would be invisible until the band had faded in. It finds the list itself, so it
-          adds nothing to the page's layout from here. */}
+      {/* Drives Our Method's rows on touch, where there is no pointer to hover them. Renders
+          nothing — it finds the list itself and marks the row crossing the middle of the viewport,
+          so it is mounted here rather than inside the section only to keep it out of SectionFade's
+          opacity ramp, which would delay the first highlight until the band had faded in. */}
       <MethodScrollSpy />
 
       {/* Figma draws Contact identically to the other two pages', so it reads the same home doc. */}
