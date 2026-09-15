@@ -26,14 +26,15 @@ export default function OurMethod({ content }: { content: OurMethodContent }) {
       // band reads as a floor under it.
       className="relative w-full overflow-hidden bg-[#151414] py-12 md:py-28"
     >
-      {/* Same scanline texture the two dark /branding sections use, at this frame's own 4%. Figma
-          ships its own 18MB JPEG of it; /branding/overlay.webp is that texture already re-encoded,
-          so this is one asset for three sections rather than a third copy of the same noise. */}
+      {/* Figma 3318:2717 fills this band with grain, not the scanline texture /branding/overlay.webp
+          carries — that one reads as horizontal rules at any opacity, which is not the frame.
+          ComOurMethod.png is the frame's own export: #151414 with the grain already burned in at
+          its authored strength, so it renders at full opacity over the matching bg colour. */}
       <img
-        src="/branding/overlay.webp"
+        src="/ComOurMethod.png"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover opacity-[0.04]"
+        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
       />
 
       <div className="relative flex flex-col items-center gap-10">

@@ -1003,11 +1003,40 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
 }
 
+/* The touch half of the same affordance (Figma 3332:4906 — row 1 lilac, rows 2-4 at 60%). There is
+   no pointer to follow, so MethodScrollSpy picks the row from scroll position and marks it
+   data-active; everything below is the hover block with :hover swapped for that attribute.
+
+   Gated on [data-scroll-spy], which the component only sets once it is running: with JS off, or
+   before hydration, no row is dimmed and the list reads at the frame's default rather than sitting
+   at 60% with nothing ever lighting it. */
+@media (hover: none) {
+  .method-list[data-scroll-spy] .method-row,
+  .method-list[data-scroll-spy] .method-row h3 {
+    transition:
+      opacity 200ms ease-out,
+      color 200ms ease-out;
+  }
+  .method-list[data-scroll-spy] .method-row {
+    opacity: 0.6;
+  }
+  .method-list[data-scroll-spy] .method-row[data-active] {
+    opacity: 1;
+  }
+  .method-list[data-scroll-spy] .method-row[data-active] h3 {
+    color: #eec3ea;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* the dim and the tint still land, they just arrive instantly — they are the affordance, not the
-     motion */
-  .method-row,
-  .method-row h3 {
+     motion. Covers the scroll-driven rows too: the highlight moving row to row is the point, the
+     200ms crossfade between them is not. The scroll-driven selectors carry an attribute, so these
+     have to be written at the same weight to win. */
+  .method-list .method-row,
+  .method-list .method-row h3,
+  .method-list[data-scroll-spy] .method-row,
+  .method-list[data-scroll-spy] .method-row h3 {
     transition: none;
   }
 }

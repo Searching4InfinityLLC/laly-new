@@ -3,6 +3,7 @@ import heroBg from '../../../../public/development/hero.webp'
 import Contact from '@/components/sections/Contact'
 import HowWeHelp from '@/components/sections/HowWeHelp'
 import Note from '@/components/sections/Note'
+import MethodScrollSpy from '@/components/sections/MethodScrollSpy'
 import OurMethod from '@/components/sections/OurMethod'
 import { ServiceHero } from '@/components/sections/ServiceHero'
 import { SectionFade } from '@/components/ui/SectionFade'
@@ -62,6 +63,13 @@ export default async function DevelopmentPage() {
       <SectionFade>
         <OurMethod content={development.ourMethod} />
       </SectionFade>
+
+      {/* Drives Our Method's rows on touch, where there is no pointer to hover them, plus the
+          floating switch between its two trigger lines. Mounted out here rather than inside the
+          section because the switch is `fixed` and SectionFade ramps its subtree's opacity — inside,
+          the switch would be invisible until the band had faded in. It finds the list itself, so it
+          adds nothing to the page's layout from here. */}
+      <MethodScrollSpy />
 
       {/* Figma draws Contact identically to the other two pages', so it reads the same home doc. */}
       <SectionFade>
