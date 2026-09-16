@@ -1001,6 +1001,12 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   .method-list .method-row:hover h3 {
     color: #eec3ea;
   }
+  /* Client note: the lit row's paragraph goes to Medium (Neue Haas 65) as well. A weight swap
+     snaps — static webfonts have no in-between to transition through — and Medium sets a touch
+     wider, so a line can rewrap by a word on the way in. Both are inherent to the ask. */
+  .method-list .method-row:hover p {
+    font-weight: 500;
+  }
 }
 
 /* The touch half of the same affordance (Figma 3332:4906 — row 1 lilac, rows 2-4 at 60%). There is
@@ -1026,6 +1032,9 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
   .method-list[data-scroll-spy] .method-row[data-active] h3 {
     color: #eec3ea;
+  }
+  .method-list[data-scroll-spy] .method-row[data-active] p {
+    font-weight: 500;
   }
 }
 
