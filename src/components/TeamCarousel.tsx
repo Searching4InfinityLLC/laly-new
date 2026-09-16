@@ -227,11 +227,14 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             keyline, no fill, Fira Mono 18/125%. That lands the 35px height the designer asked for.
             Padding is the shared Button's own default, so only the label size is overridden here.
             No bg override any more — outlineInverse's hover tint needs the slot free.
-            Instance-only; button styles are deliberately not uniform across the page. */}
+            Instance-only; button styles are deliberately not uniform across the page.
+            HIDDEN (client note): the Our Story page doesn't exist yet. `hidden!` rather than
+            deleting, so restoring it is removing that one class — the `!` is needed because Button
+            sets its own display. */}
         <Button
           variant="outlineInverse"
           href={story.href}
-          className="border-[1px]! border-[#FCF7F3]! text-[#FCF7F3]! shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]! [&>span]:text-lg! [&>span]:leading-[1.25]!"
+          className="hidden! border-[1px]! border-[#FCF7F3]! text-[#FCF7F3]! shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]! [&>span]:text-lg! [&>span]:leading-[1.25]!"
         >
           {story.label}
         </Button>

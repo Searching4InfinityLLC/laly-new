@@ -24,10 +24,20 @@ export default function Strategy({ content }: { content: StrategyContent }) {
   return (
     <section
       aria-label="Strategy"
-      // Figma desktop: 112 top+bottom, 48 sides, ground #292624
-      className="w-full bg-[#292624] py-16 md:py-28"
+      // Figma desktop (2017:5084): 112 top+bottom, 48 sides. Ground is #151414 with grain at 4% —
+      // not the #292624 this used to be. The cards are 20% glass now, so the band IS their fill;
+      // on the old lighter ground they read washed-out.
+      className="relative w-full overflow-hidden bg-[#151414] py-16 md:py-28"
     >
-      <InView className="section-shell px-5 text-center sm:px-10 md:px-12">
+      {/* Same grain as Our Method on /development, off the same export: #151414 with the noise
+          burned in at the frame's strength, so it sits at full opacity over the matching colour. */}
+      <img
+        src="/ComOurMethod.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
+      />
+      <InView className="section-shell relative px-5 text-center sm:px-10 md:px-12">
         <BracketLabel className="mx-auto mb-5 w-44 text-[#ff6d6a] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
@@ -59,13 +69,13 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               // lights up in its own accent. `active` alongside `hover` because Tailwind compiles
               // hover: into @media (hover: hover), so touch would never light it: :active fires on
               // the card as an ancestor of the pressed arrow link.
-              // Ground + stroke (client note, Figma 2017:5112): #151414 with a 1px #292624 keyline —
-              // the card sits a step DARKER than the band rather than lifting off it as the old
-              // #23201F did, and the stroke is what separates it. Padding 20/24 per the same frame.
+              // Ground, stroke, glass and hover glow all live in .strategy-card (styles.css) — see
+              // there for the Figma GLASS mapping and why the glow can't stay a Tailwind hover:shadow.
+              // Padding 20/24 per Figma 2017:5112.
               // `scale`, not a transform: the reveal animation owns `transform` with fill-mode
               // forwards, so a transform-based scale here would never win. Tailwind v4 emits the
               // standalone scale property, which composes with it.
-              className="group section-media-reveal relative flex min-w-0 flex-col gap-4 border border-[#292624] bg-[#151414] px-5 py-6 text-left transition-[box-shadow,scale] duration-300 ease-out hover:scale-105 hover:shadow-[0_0_20px_1px_color-mix(in_srgb,var(--card-fg)_25%,transparent)] active:scale-105 active:shadow-[0_0_20px_1px_color-mix(in_srgb,var(--card-fg)_25%,transparent)] md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
+              className="strategy-card group section-media-reveal relative flex min-w-0 flex-col gap-4 px-5 py-6 text-left transition-[box-shadow,scale] duration-300 ease-out hover:scale-105 active:scale-105 md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
               // --arrow-hover: the ring's hover colour for this card, unset when its accent has none
               // (see STRATEGY_ARROW_HOVER) so the var() fallback below keeps it at rest.
               style={

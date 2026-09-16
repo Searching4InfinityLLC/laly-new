@@ -1050,3 +1050,41 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     transition: none;
   }
 }
+
+/* Strategy cards (home, Figma 2017:5112). The frame gives each card a GLASS effect over a 20% fill:
+   frost 4, depth 20, light at -45deg (top-left) intensity 0.8, refraction 0.8, dispersion 0.5.
+   CSS has no refraction or dispersion, and over a flat dark grain there is nothing behind the card
+   for them to bend anyway — so this ports the parts that actually show:
+     frost 4        -> backdrop-filter: blur(4px)
+     light -45 @0.8 -> a 1px lit rim on the top and left inner edges, a shaded one bottom-right
+     depth 20       -> a 20px inner falloff, so the pane reads as having thickness
+   The 1px #292624 stroke is a real border (Figma strokeAlign INSIDE = border-box).
+
+   The hover glow moved here from Tailwind: box-shadow is one property, so a hover:shadow utility
+   would REPLACE the glass rim on hover rather than add to it. Both states are written out with
+   the rim first. Unlayered CSS also outranks Tailwind's utilities layer, which is the other reason
+   it can't be split across the two. */
+.strategy-card {
+  --glass:
+    inset 1px 1px 0 0 rgb(255 255 255 / 0.08),
+    inset -1px -1px 0 0 rgb(0 0 0 / 0.35),
+    inset 0 0 20px 0 rgb(0 0 0 / 0.25);
+  border: 1px solid #292624;
+  background-color: rgb(21 20 20 / 0.2);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: var(--glass);
+}
+@media (hover: hover) {
+  .strategy-card:hover {
+    box-shadow:
+      var(--glass),
+      0 0 20px 1px color-mix(in srgb, var(--card-fg) 25%, transparent);
+  }
+}
+/* :active outside the media query, same as the Tailwind version: touch never gets :hover */
+.strategy-card:active {
+  box-shadow:
+    var(--glass),
+    0 0 20px 1px color-mix(in srgb, var(--card-fg) 25%, transparent);
+}
