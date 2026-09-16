@@ -308,7 +308,7 @@ export interface StrategyBlock {
      */
     title: string;
     /**
-     * Capability pills. The star tint comes from the row position, not from here — all three cards share one accent trio.
+     * Capability pills, up to four. The star tint comes from the row position, not from here — every card runs the same green/lilac/pink/amber row.
      */
     badges: {
       label: string;

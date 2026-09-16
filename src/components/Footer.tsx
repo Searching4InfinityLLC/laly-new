@@ -23,8 +23,12 @@ export default function Footer() {
         {/* mobile: one column, 80 between the groups, 20 under. desktop: its own space-between row
             that fills the middle of the footer, 48 under. */}
         <div className="flex flex-col items-center gap-20 pb-5 md:flex-1 md:flex-row md:items-start md:justify-between md:gap-0 md:px-2 md:pb-12">
-        {/* 32 from the title to the list, 12 between links */}
-        <nav className="flex flex-col items-center gap-8 md:flex-1">
+        {/* 32 from the title to the list, 12 between links.
+            HIDDEN (client note): the pages it links to are not ready. display:none rather than
+            deleted, so bringing it back is swapping `hidden` for `flex` — and it leaves the
+            accessibility tree too, so nobody tabs to four links that go nowhere useful yet.
+            CONTACT keeps its md:flex-1 and simply centres in the space left. */}
+        <nav className="hidden flex-col items-center gap-8 md:flex-1">
           <p className="font-mono text-lg font-normal uppercase leading-[1.4] tracking-[0.2em] text-[#867A72]">[ Nav ]</p>
           <div className="flex flex-col items-center gap-3">
             {footer.nav.map((link) => (

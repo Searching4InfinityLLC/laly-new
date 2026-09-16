@@ -45,10 +45,11 @@ export const StrategyBlock: Block = {
           type: 'array',
           required: true,
           minRows: 1,
-          maxRows: 3,
+          // four across is what the frame draws (2017:5084); a fifth wraps and restarts the tints
+          maxRows: 4,
           admin: {
             description:
-              'Capability pills. The star tint comes from the row position, not from here — all three cards share one accent trio.',
+              'Capability pills, up to four. The star tint comes from the row position, not from here — every card runs the same green/lilac/pink/amber row.',
           },
           fields: [{ name: 'label', type: 'text', required: true }],
         },

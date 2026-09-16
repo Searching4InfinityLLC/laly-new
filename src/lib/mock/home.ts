@@ -99,9 +99,10 @@ export const home: HomeContent = {
       {
         title: 'The Power of Paid\nAdvertisement',
         badges: [
-          { label: 'Social Media Strategy', color: '#A2A11C' },
-          { label: 'Meta-Optimized Ads', color: '#F3E8F2' },
-          { label: 'Scalable Ads', color: '#F5C882' },
+          { label: 'Google Ads', color: '#A2A11C' },
+          { label: 'Bing Ads', color: '#CBB1C9' },
+          { label: 'Meta Ads', color: '#FF8A88' },
+          { label: 'Tik Tok', color: '#F5C882' },
         ],
         // \n = designer's desktop line breaks, hard at md+ and ignored below (see Strategy.tsx)
         hook: "If you're looking for a new stream of\nhigh-quality leads, this is for you.",
@@ -112,9 +113,10 @@ export const home: HomeContent = {
       {
         title: 'The Power of\nBranding',
         badges: [
-          { label: 'Brand Strategy', color: '#A2A11C' },
-          { label: 'Brand Book & Guidelines', color: '#F3E8F2' },
-          { label: 'Web Design', color: '#F5C882' },
+          { label: 'Socials', color: '#A2A11C' },
+          { label: 'SEO', color: '#CBB1C9' },
+          { label: 'OOH', color: '#FF8A88' },
+          { label: 'Events', color: '#F5C882' },
         ],
         hook: 'If your business depends on\nreferrals, this is for you.',
         body: 'Selling a service gets you one-time clients; selling a brand gets you loyal customers. Build and establish your brand on search engines, social media, and beyond, with a clear, recognizable offering that everyone remembers.',
@@ -124,9 +126,10 @@ export const home: HomeContent = {
       {
         title: 'The Power of\nTechnology',
         badges: [
-          { label: 'Custom Code', color: '#A2A11C' },
-          { label: 'API Integrations', color: '#F3E8F2' },
-          { label: 'Advanced Forms', color: '#F5C882' },
+          { label: 'UX/UI', color: '#A2A11C' },
+          { label: '3D', color: '#CBB1C9' },
+          { label: 'CRM', color: '#FF8A88' },
+          { label: 'Apps', color: '#F5C882' },
         ],
         hook: 'If your marketing efforts feel\ndisconnected from your business,\nthis is for you.',
         hookMobile: 'If your marketing efforts feel\ndisconnected from your\nbusiness, this is for you.',

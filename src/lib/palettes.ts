@@ -16,10 +16,25 @@ export const STRATEGY_ACCENTS = {
   olive: '#B5B449',
 } as const
 
-// Badge star tints, by position. Every pillar in the design runs this trio in this order, so the
+// The arrow ring's colour while its card is hovered, keyed by that card's accent. Not the accent
+// itself — the client picked a deeper step of each: lilac → #CBB1C9 (accent-2/30), amber → #C7964A
+// (secondary/40), olive → #807F0D (accent-1/20).
+// Keyed by the resolved hex because that is all a card carries by render time (ServicePillar.fg),
+// so this needs no CMS field. An accent with no entry keeps the resting #D1C1B7 on hover.
+export const STRATEGY_ARROW_HOVER: Partial<Record<string, string>> = {
+  [STRATEGY_ACCENTS.lilac]: '#CBB1C9',
+  [STRATEGY_ACCENTS.amber]: '#C7964A',
+  [STRATEGY_ACCENTS.olive]: '#807F0D',
+}
+
+// Badge star tints, by position. Every pillar in the design runs this row in this order, so the
 // tint is layout rather than per-badge content and doesn't belong in the CMS at all. Cycles, so a
-// fourth badge starts over rather than rendering an invisible star.
-export const BADGE_COLORS = ['#A2A11C', '#F3E8F2', '#F5C882'] as const
+// fifth badge starts over rather than rendering an invisible star.
+//
+// Four, not three: the Strategy frame (2017:5084) went to four pills a card and draws the same
+// green/lilac/pink/amber run the service heroes use — so these are PILL_COLORS' values. Kept as its
+// own name because it is a different design decision that happens to agree today.
+export const BADGE_COLORS = ['#A2A11C', '#CBB1C9', '#FF8A88', '#F5C882'] as const
 
 // /paid-advertising hero pills. Same deal as BADGE_COLORS — the tint follows the position in the
 // row, not the ad platform, so the CMS stores four labels and nothing else.
