@@ -1,7 +1,11 @@
 import type { OurMethodContent } from '@/lib/types'
 
-// Figma 3318:2717 — the dark band under "How We Help": the usual label/heading/description stack,
-// then four full-bleed rows, each one an adjective for the way we build.
+// Figma 3318:2717 — the dark band under "How We Help": label and heading, then four full-bleed rows,
+// each one an adjective for the way we build.
+//
+// No description paragraph, though the frame draws one under the heading: cut on review. The rows
+// already make the case, and the sentence above them only restated it — so it is gone from the
+// block too, not just hidden, leaving nothing in /admin that renders nowhere.
 //
 // The row is a two-column split at 1440 — number and adjective on the left half, the paragraph on
 // the right — and the adjective sits hard against the gutter because its half is justify-between.
@@ -16,7 +20,7 @@ import type { OurMethodContent } from '@/lib/types'
 // stays — two selectors in styles.css (.method-list / .method-row), so nothing here is stateful and
 // this stays a server component. Off on touch, which is also what the mobile frame draws.
 export default function OurMethod({ content }: { content: OurMethodContent }) {
-  const { label, heading, description, steps } = content
+  const { label, heading, steps } = content
 
   return (
     <section
@@ -53,10 +57,6 @@ export default function OurMethod({ content }: { content: OurMethodContent }) {
               </span>
             ))}
           </h2>
-
-          <p className="font-sans text-xl font-normal leading-[1.25] text-[#F7F1EE] md:text-[28px]">
-            {description}
-          </p>
         </div>
 
         {/* Full-bleed: the rules run the whole 1440, so this row list is outside the shell.

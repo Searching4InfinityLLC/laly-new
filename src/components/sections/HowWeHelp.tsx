@@ -141,7 +141,14 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
 
                 {/* Figma insets the mock 40px inside the card's own 20; the phone insets it 20. */}
                 <div className="relative flex w-full flex-col items-center justify-center px-5 md:px-10">
-                  <Widget />
+                  {/* Client note: 700-1151 is the stacked layout on a tablet-wide screen, where a
+                      mock stretched to the card reads as a banner rather than a product shot — so it
+                      holds at 600 and centres. Below 700 it is a phone and fills; at md+ it is a
+                      418px column and fills that. 700 + the 80px of card and wrapper padding is
+                      what guarantees 600 always fits. */}
+                  <div className="w-full min-[700px]:max-md:w-[600px]">
+                    <Widget />
+                  </div>
                 </div>
               </article>
             )

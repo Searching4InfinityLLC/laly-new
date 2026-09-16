@@ -77,7 +77,7 @@ export default async function DevelopmentPage() {
 
       {/* Same closing band as the other two, down to the 458px column that sets the break. */}
       <SectionFade>
-        <Note content={development.note} className="mx-auto max-w-[458px]" />
+        <Note content={development.note} className="mx-auto max-w-[458px]" ground="#151414" />
       </SectionFade>
     </main>
   )

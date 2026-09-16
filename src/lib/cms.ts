@@ -546,9 +546,9 @@ export function toOurMethodContent(block: OurMethodBlock): OurMethodContent | nu
     .map((s): MethodStep | null => (s.title && s.body ? { title: s.title, body: s.body } : null))
     .filter(isPresent)
 
-  if (!block.label || !block.heading || !block.description || steps.length === 0) return null
+  if (!block.label || !block.heading || steps.length === 0) return null
 
-  return { label: block.label, heading: block.heading, description: block.description, steps }
+  return { label: block.label, heading: block.heading, steps }
 }
 
 export async function getDevelopment(): Promise<DevelopmentContent> {

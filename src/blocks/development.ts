@@ -89,12 +89,6 @@ export const OurMethodBlock: Block = {
       admin: { description: 'Press Enter for an authored line break.' },
     },
     {
-      name: 'description',
-      type: 'textarea',
-      required: true,
-      admin: { description: 'One paragraph — it wraps to the column on its own.' },
-    },
-    {
       name: 'steps',
       type: 'array',
       required: true,

@@ -121,8 +121,6 @@ await payload.create({
         blockType: 'ourMethod',
         label: 'our method',
         heading: 'Don’t compromise\non quality',
-        description:
-          'Your business is unique, and making software work for your business requires a dedicated team with an expert touch. (Hint: that’s us!) Why settle for less?',
         steps: [
           {
             title: 'Customized.',

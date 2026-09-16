@@ -845,10 +845,6 @@ export interface OurMethodBlock {
    */
   heading: string;
   /**
-   * One paragraph — it wraps to the column on its own.
-   */
-  description: string;
-  /**
    * One row each, top to bottom. The “1—”, “2—” numbering comes from this order, so moving a row renumbers it.
    */
   steps: {
@@ -1384,7 +1380,6 @@ export interface HowWeHelpBlockSelect<T extends boolean = true> {
 export interface OurMethodBlockSelect<T extends boolean = true> {
   label?: T;
   heading?: T;
-  description?: T;
   steps?:
     | T
     | {

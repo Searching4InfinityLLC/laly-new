@@ -284,12 +284,11 @@ export type MethodStep = {
   body: string
 }
 
-// "Our Method" (Figma 3318:2717) — the darkest ground on the site, the usual label/heading/
-// description stack, then the rows. `heading` carries an authored break; the description does not.
+// "Our Method" (Figma 3318:2717) — the darkest ground on the site, label and heading, then the rows.
+// `heading` carries an authored break. No description: the frame's paragraph was cut on review.
 export type OurMethodContent = {
   label: string
   heading: string
-  description: string
   steps: MethodStep[]
 }
 
