@@ -45,7 +45,10 @@ export default function Strategy({ content }: { content: StrategyContent }) {
             </span>
           ))}
         </h2>
-        <p className="section-text-reveal mx-auto mt-6 max-w-[460px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#E7DCD4] 3xl:max-w-[560px]">
+        {/* 430 is Figma's own column (2017:5089) and what breaks the line before "to spend" — the old
+            460 fit "spend" too and orphaned "smarter.". whitespace-pre-line so an Enter typed in the
+            CMS is a real break as well; without an Enter the width alone sets the wrap. */}
+        <p className="section-text-reveal mx-auto mt-6 max-w-[430px] whitespace-pre-line font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#E7DCD4] 3xl:max-w-[560px]">
           {description}
         </p>
 

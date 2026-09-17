@@ -24,7 +24,7 @@ export const StrategyBlock: Block = {
       name: 'description',
       type: 'textarea',
       required: true,
-      admin: { description: 'One paragraph — it wraps to the column on its own.' },
+      admin: { description: 'Wraps to the column on its own. Press Enter to force a line break.' },
     },
     {
       name: 'cards',

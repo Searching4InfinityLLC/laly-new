@@ -93,7 +93,7 @@ export const home: HomeContent = {
   strategy: {
     label: 'Strategy',
     heading: 'How we help you grow.',
-    // no \n — the design's 2-line break is just where it lands at that width; max-w does that job
+    // no \n needed — the 430px column (Figma's) breaks it before "to spend"; an \n would force one
     description: 'You don’t need to spend more—you need to spend smarter.',
     cards: [
       {
