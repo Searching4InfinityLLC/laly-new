@@ -23,6 +23,8 @@
     "seed:branding": "bun scripts/seed-branding.ts",
     "//seed:development": "Seeds ONLY the development doc. No uploads — the one image on that page is a static import.",
     "seed:development": "bun scripts/seed-development.ts",
+    "//update:about": "Reorders the home About Us team and rewrites their role lines in place. Touches only that block's members; stops without writing if the names in the doc don't match.",
+    "update:about": "bun scripts/update-about-team.ts",
     "//check:slots": "Self-check for the booking availability engine (src/lib/slots.ts). Plain asserts, no test framework — run it after touching business hours, slot length or the race guard.",
     "check:slots": "bun scripts/check-slots.ts",
     "//seed:node": "Fallback runner on Node via Payload's own loader. Needed only if payload.config.ts ever imports @payloadcms/richtext-lexical again — its circular ESM deps break under bun.",

@@ -147,15 +147,16 @@ export const home: HomeContent = {
     description: 'Meet the friendly faces here to nurture\nyour brand’s growth.',
     // Photos are final; `role` is placeholder copy until the real lines land.
     // `role` is the info-bar line; the \n is the authored 2-line break (rendered via whitespace-pre-line).
+    // Order and role lines per the client's list. \n is the break inside the two-line info bar.
     members: [
       { photo: toMedia(cindy, 'Cindy Ripoll'), photoMobile: toMedia(cindyMobile, 'Cindy Ripoll'), name: 'Cindy Ripoll', role: 'The trusty team leader\nand your first point of contact.' },
-      { photo: toMedia(adam, 'Adam Jobson'), photoMobile: toMedia(adamMobile, 'Adam Jobson'), name: 'Adam Jobson', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(diya, 'Diya Afreen'), photoMobile: toMedia(diyaMobile, 'Diya Afreen'), name: 'Diya Afreen', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(fran, 'Francesca Sequani'), photoMobile: toMedia(franMobile, 'Francesca Sequani'), name: 'Francesca Sequani', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(harry, 'Harry Mussotte'), photoMobile: toMedia(harryMobile, 'Harry Mussotte'), name: 'Harry Mussotte', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(leo, 'Leo Sequani'), photoMobile: toMedia(leoMobile, 'Leo Sequani'), name: 'Leo Sequani', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(nicole, 'Nicole Cheer'), photoMobile: toMedia(nicoleMobile, 'Nicole Cheer'), name: 'Nicole Cheer', role: 'Role line placeholder —\nsecond line of the blurb.' },
-      { photo: toMedia(ramon, 'Ramon Ripoll'), photoMobile: toMedia(ramonMobile, 'Ramon Ripoll'), name: 'Ramon Ripoll', role: 'Role line placeholder —\nsecond line of the blurb.' },
+      { photo: toMedia(fran, 'Francesca Sequani'), photoMobile: toMedia(franMobile, 'Francesca Sequani'), name: 'Francesca Sequani', role: 'The operations master\nmaking everything run smoothly.' },
+      { photo: toMedia(ramon, 'Ramon Ripoll'), photoMobile: toMedia(ramonMobile, 'Ramon Ripoll'), name: 'Ramon Ripoll', role: 'The design wizard keeping\nyour brand’s look fresh.' },
+      { photo: toMedia(leo, 'Leo Sequani'), photoMobile: toMedia(leoMobile, 'Leo Sequani'), name: 'Leo Sequani', role: 'The adept innovator helping your\nbrand function—on and offline.' },
+      { photo: toMedia(adam, 'Adam Jobson'), photoMobile: toMedia(adamMobile, 'Adam Jobson'), name: 'Adam Jobson', role: 'The dedicated wordsmith\nmanaging your messaging.' },
+      { photo: toMedia(nicole, 'Nicole Cheer'), photoMobile: toMedia(nicoleMobile, 'Nicole Cheer'), name: 'Nicole Cheer', role: 'The social media guru keeping\nyour community engaged.' },
+      { photo: toMedia(harry, 'Harry Mussotte'), photoMobile: toMedia(harryMobile, 'Harry Mussotte'), name: 'Harry Mussotte', role: 'The pro videographer capturing\neye-catching content.' },
+      { photo: toMedia(diya, 'Diya Afreen'), photoMobile: toMedia(diyaMobile, 'Diya Afreen'), name: 'Diya Afreen', role: 'The ads expert maximizing\nyour conversion potential.' },
     ],
     story: { label: 'OUR STORY' },
   },
