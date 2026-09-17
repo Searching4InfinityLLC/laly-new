@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+/* Pointer on everything clickable, site-wide. Tailwind v4's preflight resets <button> to
+   cursor: default (v3 shipped pointer), so any button that didn't carry its own cursor-pointer —
+   carousel arrows, accordion rows, the rail picker, the MENU toggle — showed an arrow. One base rule
+   instead of a class on every control, so a new button can't miss it. <a href> already gets the
+   pointer from the browser, so links aren't listed.
+
+   In @layer base on purpose: it sits under the utilities, so a component can still opt a control
+   out with cursor-default / cursor-not-allowed. Disabled controls fall back to the default arrow —
+   the booking dialog's locked step tabs shouldn't promise a click they won't take. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary,
+  select:not(:disabled),
+  input[type='checkbox']:not(:disabled),
+  input[type='radio']:not(:disabled),
+  input[type='submit']:not(:disabled),
+  input[type='file']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 @theme {
   /* New Spirit (serif) = body/font-sans; Neue Haas Grotesk = headings/font-display */
   --font-sans: var(--font-new-spirit), Georgia, serif;
