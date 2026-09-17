@@ -1,3 +1,4 @@
+import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { OurMethodContent } from '@/lib/types'
 
 // Figma 3318:2717 — the dark band under "How We Help": label and heading, then four full-bleed rows,
@@ -35,11 +36,9 @@ export default function OurMethod({ content }: { content: OurMethodContent }) {
       <div className="relative flex flex-col items-center gap-10">
         {/* Figma: px 208 at 1440, 20 on the phone, inside the shell so it stops growing past 1600. */}
         <div className="section-shell flex w-full flex-col gap-6 px-5 text-center md:px-52">
-          {/* Brackets authored here rather than <BracketLabel>, same as the hero and How We Help:
-              that component spreads its brackets to the row's edges and this label hugs the words. */}
-          <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#FF6D6A] md:text-2xl">
-            [ {label} ]
-          </p>
+          {/* <BracketLabel>, same scroll-in as every other eyebrow on the site; brand pink on the
+              dark ground, as on Channels and Strategy. */}
+          <BracketLabel className="mx-auto w-52 text-[#FF6D6A] md:w-[360px]">{label}</BracketLabel>
 
           <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">
             {heading.split('\n').map((line) => (

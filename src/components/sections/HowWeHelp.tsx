@@ -1,3 +1,4 @@
+import { BracketLabel } from '@/components/ui/BracketLabel'
 import { GridBackdrop } from '@/components/ui/GridBackdrop'
 import { HELP_WIDGETS } from '@/components/sections/HelpWidgets'
 import { HELP_ACCENTS } from '@/lib/palettes'
@@ -35,11 +36,10 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
       <div className="section-shell flex flex-col items-center gap-8 md:gap-10">
         {/* Figma: px 208 at 1440, 20 on the phone. */}
         <div className="flex w-full flex-col gap-6 px-5 text-center md:px-52">
-          {/* Brackets authored here rather than <BracketLabel>: that component spreads its brackets
-              to the row's edges, and this label hugs the words the way the hero's does. */}
-          <p className="font-mono text-sm font-normal uppercase leading-[1.4] tracking-[1px] text-[#867A72] md:text-2xl">
-            [ {label} ]
-          </p>
+          {/* <BracketLabel> like every other section eyebrow on the site, so it gets the same
+              scroll-in: brackets swing out from the centre while the label wipes up. Width is the
+              w-52 / md:w-[360px] the other ~11-character eyebrows use ("the channels"). */}
+          <BracketLabel className="mx-auto w-52 text-[#867A72] md:w-[360px]">{label}</BracketLabel>
 
           {/* The break is authored for the 64px desktop set only — the mobile frame (3292:4161)
               is one flowing 40px paragraph, so the spans go inline below md and the join is a real

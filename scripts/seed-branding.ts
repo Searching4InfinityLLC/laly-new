@@ -151,7 +151,7 @@ await payload.create({
           {
             period: 'Months 6–12',
             title: 'Traction',
-            body: 'First organic rankings appear.\nSocial engagement compounds. Brand name searches begin increasing.\nDirect leads start flowing from organic search.',
+            body: 'First organic rankings appear.\nSocial engagement compounds.\nBrand name searches begin increasing.\nDirect leads start flowing from organic search.',
           },
           {
             period: 'Months 12–18',

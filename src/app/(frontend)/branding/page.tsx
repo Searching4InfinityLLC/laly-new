@@ -66,9 +66,10 @@ export default async function BrandingPage() {
         <Channels content={branding.channels} />
       </SectionFade>
 
-      <SectionFade>
-        <CompoundEffect content={branding.compound} />
-      </SectionFade>
+      {/* No <SectionFade> here, unlike its neighbours (client note): The Channels above is the same
+          #151414 grain ground, so ramping this band's opacity only reads as a dark-to-lighter flicker
+          across the seam rather than a reveal. Its own inner animations still run. */}
+      <CompoundEffect content={branding.compound} />
 
       <SectionFade>
         <Pricing content={branding.pricing} />

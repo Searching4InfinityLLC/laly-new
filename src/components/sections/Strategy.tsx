@@ -6,11 +6,11 @@ import { BracketLabel } from '@/components/ui/BracketLabel'
 import { InView } from '@/components/ui/InView'
 import type { StrategyContent } from '@/lib/types'
 
-// The "if you..." hook. Full strength at rest, 50% while its card is hovered (client note, all
+// The "if you..." hook. Full strength at rest, 65% while its card is hovered (client note, all
 // cards) — the lit title, arrow and glow carry the card then. group-active for touch, same reason
 // the glow uses :active. Both hook nodes (desktop + hookMobile) share this, so they dim together.
 const hookClass =
-  'font-sans text-2xl font-normal leading-[1.25] text-[#FCF7F3] transition-opacity duration-300 ease-out group-hover:opacity-50 group-active:opacity-50'
+  'font-sans text-2xl font-normal leading-[1.25] text-[#FCF7F3] transition-opacity duration-300 ease-out group-hover:opacity-65 group-active:opacity-65'
 
 const hardBreaks = (text: string) =>
   text.split('\n').map((line, i) => (
