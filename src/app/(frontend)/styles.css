@@ -1087,17 +1087,20 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
    out: they bend and colour-split what is BEHIND the pane, and behind it is flat dark grain, so
    they render as nothing here (and would need a Chromium-only SVG backdrop filter).
 
-   Overlay alphas are solved against the #151414 ground: black 0.29 takes (21,20,20) to (15,14,15);
-   white 0.025 takes it to (27,25,26). Gradients rather than inset box-shadows, because an inset
-   shadow's falloff can't differ per side — and it keeps box-shadow free for the hover glow. */
+   Both edges span the same 16px. The dark top-left is a linear wash, black 0.29 (takes the
+   (21,20,20) ground to (15,14,15)). The lit bottom-right is shaped differently on purpose: a linear
+   ramp puts its brightest row right on the border, and at any strength that row reads as a drawn
+   line. So the light swells in — 0.005 at the stroke, peaking at 0.012 four pixels inside, easing
+   out to nothing by 16px — which reads as light rounding a glass edge. Figma measures that side at
+   white 0.025 over ~22px; softened and fitted to the dark side's 16px on review. */
 .strategy-card {
   border: 1px solid #292624;
   background-color: rgb(21 20 20 / 0.2);
   background-image:
     linear-gradient(to bottom, rgb(0 0 0 / 0.29), transparent 16px),
     linear-gradient(to right, rgb(0 0 0 / 0.29), transparent 16px),
-    linear-gradient(to top, rgb(255 255 255 / 0.025), transparent 22px),
-    linear-gradient(to left, rgb(255 255 255 / 0.025), transparent 22px);
+    linear-gradient(to top, rgb(255 255 255 / 0.005) 0px, rgb(255 255 255 / 0.012) 4px, rgb(255 255 255 / 0.007) 8px, rgb(255 255 255 / 0.002) 12px, transparent 16px),
+    linear-gradient(to left, rgb(255 255 255 / 0.005) 0px, rgb(255 255 255 / 0.012) 4px, rgb(255 255 255 / 0.007) 8px, rgb(255 255 255 / 0.002) 12px, transparent 16px);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
