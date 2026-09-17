@@ -299,7 +299,7 @@ export interface StrategyBlock {
    */
   heading: string;
   /**
-   * One paragraph — it wraps to the column on its own.
+   * Wraps to the column on its own. Press Enter to force a line break.
    */
   description: string;
   cards: {
