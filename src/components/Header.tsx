@@ -34,12 +34,8 @@ export default function Header() {
         />
       </Link>
       {/* whole global, not just nav — the mobile dropdown also renders the socials and copyright.
-          HIDDEN (client note): the pages the menu links to are not ready. display:none on a wrapper
-          rather than unmounting, so restoring it is deleting `hidden`; the sheet only ever opens
-          from this toggle, so hiding the toggle hides the whole menu. */}
-      <div className="hidden">
-        <NavMenu {...header} />
-      </div>
+          Links are the three service pages (mock/globals.ts) — the only routes that exist yet. */}
+      <NavMenu {...header} />
     </header>
   )
 }

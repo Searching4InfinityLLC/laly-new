@@ -43,6 +43,23 @@ export default function Footer() {
           </div>
         </nav>
 
+        {/* Same treatment as NAV and CONTACT — title, 32 to the list, 12 between links. Sits where
+            NAV used to, so the desktop row reads logo | SERVICES | CONTACT | copyright. */}
+        <nav aria-label="Services" className="flex flex-col items-center gap-8 md:flex-1">
+          <p className="font-mono text-lg font-normal uppercase leading-[1.4] tracking-[0.2em] text-[#867A72]">[ Services ]</p>
+          <div className="flex flex-col items-center gap-3">
+            {footer.services.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="font-sans text-xl leading-[1.25] tracking-[-0.01em] text-[#262626] transition-opacity hover:opacity-60"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+
         <div className="flex flex-col items-center gap-8 md:flex-1">
           <p className="font-mono text-lg font-normal uppercase leading-[1.4] tracking-[0.2em] text-[#867A72]">[ Contact ]</p>
           <div className="flex flex-col items-center gap-3">

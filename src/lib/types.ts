@@ -367,6 +367,7 @@ export type HeaderContent = {
 // Footer global — logo + nav column + contact column + copyright line.
 export type FooterContent = {
   nav: Required<LinkField>[]
+  services: Required<LinkField>[] // the [ Services ] column
   email: string
   phone: string
   copyright: string
