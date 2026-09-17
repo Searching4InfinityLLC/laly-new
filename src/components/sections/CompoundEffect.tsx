@@ -2,7 +2,6 @@
 
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { EMBER_WASH } from '@/lib/palettes'
-import { OVERLAY_OPACITY } from '@/components/sections/Channels'
 import { InView } from '@/components/ui/InView'
 import { getLenis } from '@/lib/lenis'
 import { BracketLabel } from '@/components/ui/BracketLabel'
@@ -40,8 +39,9 @@ import type { CompoundContent } from '@/lib/types'
 // The rail's dots are two 28px svgs in Figma; they are a ring, a fill and a 4px dot, so they are
 // CSS here rather than two more files in /public.
 //
-// Same scanline texture over this ground as "The Channels", off the same file and at the same
-// opacity — see OVERLAY_OPACITY there for why it is not Figma's 1%.
+// Ground: .grain-ground (styles.css) — #151414 and the dark grain, same as The Channels above it
+// (Figma 2767:9349). The 1px #544D49 top keyline stays: it is the one rule the frame draws, and with
+// both sections now the same black it is what separates them.
 
 // The section takes the scroll once its top edge is within this much of a viewport of its resting
 // place, and does not re-arm until it has left again — otherwise handing back at the last phase
@@ -169,18 +169,8 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
       // is fixed and opaque — a plain 100vh here puts its own first 76px behind the bar. min-, not
       // fixed h: a phase card longer than the window still grows the section rather than spilling
       // out of it, and the padding stays for exactly that case.
-      className="relative w-full overflow-hidden border-t border-[#544D49] bg-[#292624] px-5 pt-12 pb-24 md:flex md:min-h-[calc(100vh-var(--header-h))] md:items-center md:py-28 md:pr-6 md:pl-28"
+      className="grain-ground relative w-full overflow-hidden border-t border-[#544D49] px-5 pt-12 pb-24 md:flex md:min-h-[calc(100vh-var(--header-h))] md:items-center md:py-28 md:pr-6 md:pl-28"
     >
-      {/* Decorative and absolutely positioned, so it stays out of the flex row the section becomes
-          at md+. */}
-      <img
-        src="/branding/overlay.webp"
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
-        style={{ opacity: OVERLAY_OPACITY }}
-      />
-
       <div className="relative mx-auto flex w-full max-w-[1304px] flex-col gap-12 md:flex-row md:items-center md:gap-16">
         {/* 538px is Figma's column. Centred on a phone, where the copy is the whole width; left
             against the card and rail once there is room for all three. Static the whole way

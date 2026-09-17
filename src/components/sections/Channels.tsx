@@ -19,8 +19,8 @@ import type { ChannelsContent } from '@/lib/types'
 // rather than copied and recoloured: the file is pink (#FF6D6A) because that is what the carousel
 // wants, and this frame draws it in warm grey. Same one-asset-many-tints trick as the hero pills.
 //
-// The scanline texture over the ground — /branding/overlay.webp, the frame's own export re-encoded
-// (Figma ships it as a 4096px 10.9MB JPEG). Full-bleed and object-cover, as the frame has it.
+// Ground: .grain-ground (styles.css) — #151414 and the site's dark grain, as Figma 2796:9847 now draws
+// it. It replaced the old #292624 + scanline overlay, whose rules read as lines across the band.
 //
 // ponytail: index state, two buttons and one translated track — no carousel library. Embla was on
 // the table; it would have bought drag, which the phone already gets from the browser's own
@@ -28,10 +28,6 @@ import type { ChannelsContent } from '@/lib/types'
 
 // 0 0 8px + 1px 8px 8px, both rgba(21,20,20,0.65) — Figma's own two-layer drop shadow
 const CARD_SHADOW = '0 0 8px 0 rgba(21,20,20,0.65), 1px 8px 8px 0 rgba(21,20,20,0.65)'
-
-// Figma sets the ground texture at 1%, and the client asked for whatever actually shows instead.
-// CompoundEffect imports this so the two dark sections match.
-export const OVERLAY_OPACITY = 0.01
 
 const ARROW_TINT = '#867A72' // color/neutral-variant/40 — the frame's own arrow colour
 
@@ -98,22 +94,12 @@ export function Channels({ content }: { content: ChannelsContent }) {
     <section
       aria-label={content.label}
       aria-roledescription="carousel"
-      // Figma frame: p 112, blocks 48 apart. Mobile (2807:10160): px 16 / py 48, blocks 40 apart,
-      // and it closes the section above on a keyline.
-      //
+      // Figma frame (2796:9847): p 112, blocks 48 apart, no keyline of its own. Mobile (2807:10160):
+      // px 16 / py 48, blocks 40 apart.
       //
       // The section's own reveal is the <SectionFade> the page wraps it in — nothing here.
-      className="relative w-full overflow-hidden border-t border-[#544D49] bg-[#292624] px-4 py-12 md:p-28"
+      className="grain-ground relative w-full overflow-hidden px-4 py-12 md:p-28"
     >
-      {/* Decorative, so empty alt and a plain <img>: it is a static file in /public at a fixed
-          opacity, with nothing for next/image to choose between. */}
-      <img
-        src="/branding/overlay.webp"
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
-        style={{ opacity: OVERLAY_OPACITY }}
-      />
 
       <div className="relative mx-auto flex w-full max-w-[1216px] flex-col items-center gap-10 md:gap-12">
         <div className="flex w-full flex-col items-center gap-6 text-center md:gap-8">
