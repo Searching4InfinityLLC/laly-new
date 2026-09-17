@@ -61,9 +61,11 @@ const texture = (img: StaticImageData) => ({
 // toWhatYouGetContent falls back to the mock if a panel is ever missing).
 const PANEL_WIDTHS = [510, 471, 458, 515]
 
-// Figma's card ground is a conic gradient at 50% layer opacity over solid #292624. The alphas below
-// are the design's own, halved — a source-over layer at 0.5 opacity is exactly its alphas halved, so
-// this is one background-image instead of a second stacked element.
+// Figma's card ground is a conic gradient at 50% layer opacity over solid #151414 (2488:827 — it was
+// #292624 before the section moved onto the grain ground). The alphas below are the design's own,
+// halved — a source-over layer at 0.5 opacity is exactly its alphas halved, so this is one
+// background-image instead of a second stacked element. The solid goes on as bg-[#151414] on the
+// card: it is what keeps the cards flat while the section behind them shows its grain.
 const STAT_BG =
   'conic-gradient(from 90deg, rgba(255,111,97,0.05) 0%, rgba(28,25,23,0.125) 35%, rgba(85,47,42,0.125) 65%, rgba(141,68,60,0.075) 85%, rgba(255,111,97,0.05) 100%)'
 
@@ -361,7 +363,8 @@ export default async function PaidAdvertisingPage() {
       <SectionFade>
         <section
           aria-label="Results"
-          className="w-full bg-[#292624] px-5 pt-12 pb-24 md:px-20 md:py-28"
+          // .grain-ground (styles.css): #151414 + the site's dark grain tile (Figma 2488:822)
+          className="grain-ground w-full px-5 pt-12 pb-24 md:px-20 md:py-28"
         >
           <InView className="mx-auto flex w-full max-w-[1280px] flex-col gap-16">
             <div className="flex flex-col gap-6 text-center">
@@ -379,7 +382,7 @@ export default async function PaidAdvertisingPage() {
                   key={stat.value}
                   // the inline animation-delay longhand beats the stylesheet's `animation` shorthand,
                   // which is what staggers these left→right — same numbers as Strategy's pillars
-                  className="section-media-reveal flex flex-col gap-4 rounded px-4 py-6 text-center"
+                  className="section-media-reveal flex flex-col gap-4 rounded bg-[#151414] px-4 py-6 text-center"
                   style={{ backgroundImage: STAT_BG, animationDelay: `${0.2 + i * 0.2}s` }}
                 >
                   <p className="font-sans text-[72px] leading-[1.25] tracking-[-0.5px] text-[#FF6D6A] md:text-[96px]">
