@@ -206,7 +206,12 @@ export const CompoundBlock: Block = {
           required: true,
           admin: { description: 'Every Enter you press is a real line break.' },
         },
-        { name: 'body', type: 'textarea', required: true },
+        {
+          name: 'body',
+          type: 'textarea',
+          required: true,
+          admin: { description: 'One bullet per line — every Enter starts a new bullet point.' },
+        },
       ],
     },
   ],

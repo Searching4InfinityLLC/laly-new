@@ -33,8 +33,13 @@ export default function Header() {
           className="logo-light absolute inset-0 h-7 w-30"
         />
       </Link>
-      {/* whole global, not just nav — the mobile dropdown also renders the socials and copyright */}
-      <NavMenu {...header} />
+      {/* whole global, not just nav — the mobile dropdown also renders the socials and copyright.
+          HIDDEN (client note): the pages the menu links to are not ready. display:none on a wrapper
+          rather than unmounting, so restoring it is deleting `hidden`; the sheet only ever opens
+          from this toggle, so hiding the toggle hides the whole menu. */}
+      <div className="hidden">
+        <NavMenu {...header} />
+      </div>
     </header>
   )
 }

@@ -28,18 +28,9 @@ export default function OurMethod({ content }: { content: OurMethodContent }) {
       // Figma frame: py 112, 48 on the phone (3332:4900); the rows set their own 40 at both
       // widths. #151414 is the darkest ground on the site — a step under the hero's #292624, so the
       // band reads as a floor under it.
-      className="relative w-full overflow-hidden bg-[#151414] py-12 md:py-28"
+      // .grain-ground (styles.css): #151414 under the site's dark grain tile — see there.
+      className="grain-ground relative w-full overflow-hidden py-12 md:py-28"
     >
-      {/* Figma 3318:2717 fills this band with grain, not the scanline texture /branding/overlay.webp
-          carries — that one reads as horizontal rules at any opacity, which is not the frame.
-          ComOurMethod.png is the frame's own export: #151414 with the grain already burned in at
-          its authored strength, so it renders at full opacity over the matching bg colour. */}
-      <img
-        src="/ComOurMethod.png"
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
-      />
 
       <div className="relative flex flex-col items-center gap-10">
         {/* Figma: px 208 at 1440, 20 on the phone, inside the shell so it stops growing past 1600. */}

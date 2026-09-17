@@ -146,22 +146,22 @@ await payload.create({
           {
             period: 'Months 1–6',
             title: 'Foundation',
-            body: 'Site optimization, content creation, social launch, OOH placements go live. Google begins indexing and recognizing your site. Brand awareness seeds planted.',
+            body: 'Site optimization.\nContent creation.\nSocial launch.\nOOH placements go live.\nGoogle begins indexing and recognizing your site.\nBrand awareness seeds planted.',
           },
           {
             period: 'Months 6–12',
             title: 'Traction',
-            body: 'First organic rankings appear. Social engagement compounds. Brand name searches begin increasing. Direct leads start flowing from organic search.',
+            body: 'First organic rankings appear.\nSocial engagement compounds. Brand name searches begin increasing.\nDirect leads start flowing from organic search.',
           },
           {
             period: 'Months 12–18',
             title: 'Momentum',
-            body: 'Organic traffic rival paid ad volume. Cost per acquisition drops. Referrals increase with community recognition and social proof. Ad dependency decreases.',
+            body: 'Organic traffic rival paid ad volume.\nCost per acquisition drops.\nReferrals increase with community recognition and social proof.\nAd dependency decreases.',
           },
           {
             period: 'Year 2+',
             title: 'Dominance',
-            body: 'Multi-channel acceleration in full effect. You own page one of search, the social media feed, and local recognition. Competitors can’t replicate 18 months of compounding in a single quarter.',
+            body: 'Multi-channel acceleration in full effect.\nYou own page one of search, the social media feed, and local recognition.\nCompetitors can’t replicate 18 months of compounding in a single quarter.',
           },
         ],
       },

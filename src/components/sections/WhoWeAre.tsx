@@ -68,11 +68,14 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                 <h3 className="font-display text-[36px] font-normal leading-[1.1] tracking-tight md:text-5xl 3xl:text-6xl">
                   {card.title}
                 </h3>
-                {/* on mobile the arrow's stretched ::before makes the whole card clickable */}
+                {/* on mobile the arrow's stretched ::before makes the whole card clickable.
+                    HIDDEN (client note, with EXPLORE below): the case-study pages aren't ready, so
+                    the card stops being a link too. `hidden!` beats the component's own inline-flex;
+                    restore by removing it. */}
                 <ArrowCircleButton
                   href={card.link.href}
                   label={card.link.label}
-                  className="md:hidden before:absolute before:inset-0 before:content-['']"
+                  className="hidden! md:hidden before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 
@@ -136,7 +139,8 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                     {card.stat.label}
                   </span>
                 </p>
-                <span className="hidden md:block">
+                {/* HIDDEN (client note): was `hidden md:block`; restore that to bring EXPLORE back */}
+                <span className="hidden">
                   {/* EXPLORE's own Figma spec — 1px #292624 keyline, Drop shadow/Small.
                       Instance-only: button styles are deliberately not uniform across the page. */}
                   <Button

@@ -221,7 +221,7 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
                   aria-current={selected ? 'step' : undefined}
                   // grow at md+ so the dot column is pinned to the rail's right edge on every row.
                   // Without it each label sizes to its own text and the dots zigzag.
-                  className={`flex h-full cursor-pointer flex-col whitespace-nowrap font-display text-sm font-bold tracking-[-0.5px] transition-colors md:grow md:text-right ${
+                  className={`flex h-full cursor-pointer flex-col whitespace-nowrap font-display text-sm font-bold tracking-[-0.5px] transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:grow md:text-right ${
                     // the first and last labels sit level with their own dot, not centred in a
                     // quarter of the rail, so the column ends flush with the copy beside it
                     i === 0
@@ -239,9 +239,14 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
                   {/* The end caps have no connector AND no spacer — an empty flex-1 span would still
                       claim half the row and float the first and last dots away from their labels. */}
                   {i > 0 && <span className="w-[2px] flex-1 bg-[#3C3734]" />}
+                  {/* Client note: the active circle fades in and out rather than snapping. 500ms on
+                      the phase cards' own curve (styles.css, .phase-stack) — shorter than their 900ms
+                      slide so the rail has already settled by the time the card lands, which is what
+                      makes the rail read as the thing driving the card. bg-transparent is explicit so
+                      the fill has a colour to fade FROM rather than none. */}
                   <span
-                    className={`flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                      selected ? 'border-[#FF6D6A] bg-[#FF6D6A]' : 'border-[#3C3734]'
+                    className={`flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+                      selected ? 'border-[#FF6D6A] bg-[#FF6D6A]' : 'border-[#3C3734] bg-transparent'
                     }`}
                   >
                     <span className="size-2 rounded-full bg-[#E7DCD4]" />
@@ -287,14 +292,25 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
                   {/* A phase with no copy yet renders the tab and an empty card rather than inventing
                       a headline for it. Fill in mock/branding.ts as the copy lands. */}
                   {phase.title && (
-                    <p className="w-full font-sans text-[40px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3]">
+                    <p className="w-full font-sans text-[40px] leading-[1.1] tracking-[-0.5px] text-[#FCF7F3]">
                       {hardBreaks(phase.title)}
                     </p>
                   )}
+                  {/* One bullet per line of the body (Figma 2739:8985). A textarea split on \n rather
+                      than an array field: the CMS shape stays what it was, and an editor writes a
+                      list the way they'd type one. Blank lines are dropped so a stray Enter can't
+                      render an empty bullet. Disc markers take the text colour, hung 30px in (the
+                      frame's ms-30). */}
                   {phase.body && (
-                    <p className="w-full font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-2xl">
-                      {phase.body}
-                    </p>
+                    <ul className="w-full list-disc pl-[30px] font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-2xl">
+                      {phase.body
+                        .split('\n')
+                        .map((line) => line.trim())
+                        .filter(Boolean)
+                        .map((line) => (
+                          <li key={line}>{line}</li>
+                        ))}
+                    </ul>
                   )}
                 </div>
               </div>

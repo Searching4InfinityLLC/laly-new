@@ -209,8 +209,10 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
 
       {/* info bar — dark ground: masked role line left, static Our Story button right.
           md+ padding is Figma's 24/6 (node 2017:5134); the 6 is what makes the bar 58 tall rather
-          than the 20 it used to carry. Mobile is unchanged — Figma only specs the desktop frame. */}
-      <div className="flex items-center justify-between gap-4 bg-[#292624] px-6 py-5 md:py-1.5">
+          than the 20 it used to carry. Mobile is unchanged — Figma only specs the desktop frame.
+          md+ vertical padding is 12, not Figma's 6 (client note): with Our Story hidden the button no
+          longer holds the bar at 58px, and 6 around the role line alone reads cramped. */}
+      <div className="flex items-center justify-between gap-4 bg-[#292624] px-6 py-5 md:py-3">
         <div className="min-w-0 flex-1">
           <MaskText
             current={members[current].role}

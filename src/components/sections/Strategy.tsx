@@ -6,7 +6,11 @@ import { BracketLabel } from '@/components/ui/BracketLabel'
 import { InView } from '@/components/ui/InView'
 import type { StrategyContent } from '@/lib/types'
 
-const hookClass = 'font-sans text-2xl font-normal leading-[1.25] text-[#FCF7F3]'
+// The "if you..." hook. Full strength at rest, 50% while its card is hovered (client note, all
+// cards) — the lit title, arrow and glow carry the card then. group-active for touch, same reason
+// the glow uses :active. Both hook nodes (desktop + hookMobile) share this, so they dim together.
+const hookClass =
+  'font-sans text-2xl font-normal leading-[1.25] text-[#FCF7F3] transition-opacity duration-300 ease-out group-hover:opacity-50 group-active:opacity-50'
 
 const hardBreaks = (text: string) =>
   text.split('\n').map((line, i) => (
@@ -27,28 +31,21 @@ export default function Strategy({ content }: { content: StrategyContent }) {
       // Figma desktop (2017:5084): 112 top+bottom, 48 sides. Ground is #151414 with grain at 4% —
       // not the #292624 this used to be. The cards are 20% glass now, so the band IS their fill;
       // on the old lighter ground they read washed-out.
-      className="relative w-full overflow-hidden bg-[#151414] py-16 md:py-28"
+      // .grain-ground (styles.css): #151414 under the site's dark grain tile — see there.
+      className="grain-ground relative w-full overflow-hidden py-16 md:py-28"
     >
-      {/* Same grain as Our Method on /development, off the same export: #151414 with the noise
-          burned in at the frame's strength, so it sits at full opacity over the matching colour. */}
-      <img
-        src="/ComOurMethod.png"
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
-      />
       <InView className="section-shell relative px-5 text-center sm:px-10 md:px-12">
         <BracketLabel className="mx-auto mb-5 w-44 text-[#ff6d6a] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#fffcf9] md:text-6xl xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-6xl xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
         </h2>
-        <p className="section-text-reveal mx-auto mt-6 max-w-[460px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#B5ADA7] 3xl:max-w-[560px]">
+        <p className="section-text-reveal mx-auto mt-6 max-w-[460px] font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#E7DCD4] 3xl:max-w-[560px]">
           {description}
         </p>
 
@@ -75,7 +72,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               // `scale`, not a transform: the reveal animation owns `transform` with fill-mode
               // forwards, so a transform-based scale here would never win. Tailwind v4 emits the
               // standalone scale property, which composes with it.
-              className="strategy-card group section-media-reveal relative flex min-w-0 flex-col gap-4 px-5 py-6 text-left transition-[box-shadow,scale] duration-300 ease-out hover:scale-105 active:scale-105 md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
+              className="strategy-card group section-media-reveal relative flex min-w-0 flex-col gap-4 px-5 py-6 text-left transition-[box-shadow,border-color,scale] duration-300 ease-out hover:scale-105 active:scale-105 md:row-span-4 md:grid md:min-h-[400px] md:grid-rows-subgrid md:gap-y-4 3xl:min-h-[460px] 3xl:gap-y-5 3xl:px-6 3xl:py-8"
               // --arrow-hover: the ring's hover colour for this card, unset when its accent has none
               // (see STRATEGY_ARROW_HOVER) so the var() fallback below keeps it at rest.
               style={
@@ -113,7 +110,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   Free to wrap now that cards don't share a row track. */}
               {/* items-start/content-start: the badge row is shared, so a card with one line of
                   badges still spans two — without this the pills stretch to fill it */}
-              <ul className="mt-2 flex flex-wrap content-start items-start gap-2">
+              <ul className="mt-2 flex flex-wrap content-start items-start gap-x-2 gap-y-1.5">
                 {card.badges.map((badge) => (
                   <li
                     key={badge.label}
@@ -122,7 +119,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                     /* 75% rides on the text colour, not the li: `opacity` here would take the star
                        mask and the pill ground down with it */
                     // ground: client note, #292624 at 50% (was a flat #2D2A28)
-                    className="flex shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[#292624]/50 px-2.5 py-1 font-sans text-xs leading-[1.25] text-[#F7F1EE]/75 shadow-[0_1px_2px_rgba(16,24,40,0.04)]"
+                    className="flex h-[23px] shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[#292624]/50 px-2.5 font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#F7F1EE]/75 shadow-[0_1px_2px_rgba(16,24,40,0.04)]"
                   >
                     {/* star.svg as a mask so one asset serves all three tints */}
                     <span
@@ -140,10 +137,14 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                         WebkitMaskPosition: 'center',
                       }}
                     />
-                    {/* Client note: icon and text centred on each other. The old +1px nudge (the
-                        font's line box is descent-heavy) put the label visibly below the star;
-                        plain flex centring is what they asked for. */}
-                    <span>{badge.label}</span>
+                    {/* Centred on the star by its letters, not its line box. New Spirit's line box
+                        carries far more descent than ascent, so flex-centring the box leaves the
+                        glyphs sitting high — and a fixed px nudge (tried both ways) is only right at
+                        one size. text-box trims the box to cap height and baseline, so what
+                        items-center centres IS the visible text. The pill is pinned to Figma's 23px
+                        (py-4 around a 15px line) because the trimmed box is shorter than that.
+                        Firefox ignores text-box and falls back to line-box centring — the old look. */}
+                    <span className="[text-box:trim-both_cap_alphabetic]">{badge.label}</span>
                   </li>
                 ))}
               </ul>
@@ -151,7 +152,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               {/* body-2/xl — New Spirit 400 / 24px / 125% */}
               {/* mt-4 on the card's 16 = the frame's 32 above the hook; nothing below it, so the
                   body follows at the card's own 16 (2017:5084) rather than the old 32 */}
-              <div className="mt-4 flex items-start justify-between gap-4">
+              <div className="mt-4 flex items-start justify-between gap-8">
                 {/* every break here is authored, never a wrap — the designer sets them by hand.
                     Card 3 is the only one whose mobile breaks differ, so hookMobile is optional and
                     the second node only exists when it's set. display:none keeps the hidden copy out
@@ -175,10 +176,12 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                 />
               </div>
 
-              {/* body/s — Neue Haas 450→400 / 16px / 125%, #FCF7F3 at 65%, dropping to 50% while the
-                  card is hovered (client note, all cards) so the lit title and arrow carry it.
-                  group-active for touch, same reason the glow uses active: */}
-              <p className="font-display text-base font-normal leading-[1.25] text-[#FCF7F3] opacity-65 transition-opacity duration-300 ease-out group-hover:opacity-50 group-active:opacity-50 md:self-end">
+              {/* Follows the hook at the card's 16 and stays there — not pinned to the card's foot
+                  (the old md:self-end). Figma 2017:5112 leaves the spare height as empty space
+                  under the body when a neighbour card is taller.
+                  body/s — Neue Haas 450→400 / 16px / 125%, #FCF7F3 at 65%. Static: the hover dim is
+                  the hook's (above), and the hover frames (2661:2798) keep this at 65%. */}
+              <p className="font-display text-base font-normal leading-[1.25] tracking-[0.25px] text-[#FCF7F3] opacity-65">
                 {card.body}
               </p>
             </article>

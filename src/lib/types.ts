@@ -319,7 +319,7 @@ export type CompoundContent = {
 export type CompoundPhase = {
   period: string // the rail label, and the tab above the card
   title?: string
-  body?: string
+  body?: string // one bullet per line (Figma 2739:8985 lists each phase's points)
 }
 
 // "The Channels" — label/heading over a one-card carousel, arrows either side. One slide per channel;

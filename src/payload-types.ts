@@ -782,6 +782,9 @@ export interface CompoundBlock {
      * Every Enter you press is a real line break.
      */
     title: string;
+    /**
+     * One bullet per line — every Enter starts a new bullet point.
+     */
     body: string;
     id?: string | null;
   }[];

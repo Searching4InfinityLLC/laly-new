@@ -1051,40 +1051,69 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   }
 }
 
-/* Strategy cards (home, Figma 2017:5112). The frame gives each card a GLASS effect over a 20% fill:
-   frost 4, depth 20, light at -45deg (top-left) intensity 0.8, refraction 0.8, dispersion 0.5.
-   CSS has no refraction or dispersion, and over a flat dark grain there is nothing behind the card
-   for them to bend anyway — so this ports the parts that actually show:
-     frost 4        -> backdrop-filter: blur(4px)
-     light -45 @0.8 -> a 1px lit rim on the top and left inner edges, a shaded one bottom-right
-     depth 20       -> a 20px inner falloff, so the pane reads as having thickness
-   The 1px #292624 stroke is a real border (Figma strokeAlign INSIDE = border-box).
+/* Strategy cards (home, Figma 2017:5112). The frame gives each card Figma's GLASS effect (frost 4,
+   depth 20, light -45deg @80%, refraction 80, dispersion 50, splay 0) over a 20% #151414 fill. CSS
+   has no glass material, so this reproduces what the effect RENDERS on this ground, measured off
+   Figma's own export by sampling pixel runs edge-to-centre across an empty stretch of the card:
 
-   The hover glow moved here from Tailwind: box-shadow is one property, so a hover:shadow utility
-   would REPLACE the glass rim on hover rather than add to it. Both states are written out with
-   the rim first. Unlayered CSS also outranks Tailwind's utilities layer, which is the other reason
-   it can't be split across the two. */
+     top + left inner edge   #0f0e0f at the stroke, easing to the #151414 ground over ~16px
+     bottom + right          #1b191a at the stroke, easing to #151414 over ~22px
+     centre                  #151415 — the ground, grain frosted flat
+     stroke                  1px #292624
+
+   Frost -> backdrop blur. Light + depth -> the four edge washes. Refraction and dispersion are left
+   out: they bend and colour-split what is BEHIND the pane, and behind it is flat dark grain, so
+   they render as nothing here (and would need a Chromium-only SVG backdrop filter).
+
+   Overlay alphas are solved against the #151414 ground: black 0.29 takes (21,20,20) to (15,14,15);
+   white 0.025 takes it to (27,25,26). Gradients rather than inset box-shadows, because an inset
+   shadow's falloff can't differ per side — and it keeps box-shadow free for the hover glow. */
 .strategy-card {
-  --glass:
-    inset 1px 1px 0 0 rgb(255 255 255 / 0.08),
-    inset -1px -1px 0 0 rgb(0 0 0 / 0.35),
-    inset 0 0 20px 0 rgb(0 0 0 / 0.25);
   border: 1px solid #292624;
   background-color: rgb(21 20 20 / 0.2);
+  background-image:
+    linear-gradient(to bottom, rgb(0 0 0 / 0.29), transparent 16px),
+    linear-gradient(to right, rgb(0 0 0 / 0.29), transparent 16px),
+    linear-gradient(to top, rgb(255 255 255 / 0.025), transparent 22px),
+    linear-gradient(to left, rgb(255 255 255 / 0.025), transparent 22px);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
-  box-shadow: var(--glass);
 }
+/* Hover (Figma 2661:2798 / 2661:2811 / 2661:2824): a tight 8px glow in the card's own accent at
+   65%, no spread, and the stroke gone — the glow takes over as the card's edge. The frames use
+   #E2C5DF / #DFA854 / #B5B449; the last two are the accents exactly, and the lilac is three units
+   off #E5CBE2 on each channel, so the glow mixes from --card-fg rather than carrying a second
+   colour table. border-color, not border: removing the border would shift the layout by a pixel. */
 @media (hover: hover) {
   .strategy-card:hover {
-    box-shadow:
-      var(--glass),
-      0 0 20px 1px color-mix(in srgb, var(--card-fg) 25%, transparent);
+    border-color: transparent;
+    box-shadow: 0 0 8px 0 color-mix(in srgb, var(--card-fg) 65%, transparent);
   }
 }
 /* :active outside the media query, same as the Tailwind version: touch never gets :hover */
 .strategy-card:active {
-  box-shadow:
-    var(--glass),
-    0 0 20px 1px color-mix(in srgb, var(--card-fg) 25%, transparent);
+  border-color: transparent;
+  box-shadow: 0 0 8px 0 color-mix(in srgb, var(--card-fg) 65%, transparent);
 }
+
+/* The dark grain ground (Figma: solid #151414 + a TV-static stock photo at 4%, image hash
+   99a6b34e…, used on Strategy, Our Method, The System, the footers and more).
+
+   Figma's source is a 3651x2054, 19.2 MB JPEG. At 4% over #151414 it contributes ~10 grey levels
+   of noise and nothing else, so /grain.webp is that composite rebuilt for the web:
+     - photo scaled by 0.5 — the factor Figma's cover-fit applies inside a ~1440x1000-1136 frame,
+       so the grain is the size Figma renders it
+     - a 512px centre crop, greyscale (the photo's colour noise is invisible at 4%), composited
+       over #151414, lossless WebP: 83 KB, 10 colours
+     - opacity 4.5%, not 4%: dropping the colour noise dropped some grain, and 4.5% lands the
+       measured grain back on Figma's (stddev 1.45 vs 1.50, mean 20.44 vs 20.52 on 0-255)
+   Tiled rather than cover-fit: the texture has no low-frequency content (32px block means vary by
+   0.06 of a level), so the tile edges are no steeper than any two neighbouring pixels and the
+   repeat never shows. It also keeps the grain the same size on every section, whatever its height.
+   Lossy WebP was tried and rejected: q80 is 9 KB but flattens the grain by two-thirds and darkens
+   the ground a level, which seams against flat #151414 neighbours. */
+.grain-ground {
+  background: #151414 url('/grain.webp') repeat;
+  background-size: 512px 512px;
+}
+
