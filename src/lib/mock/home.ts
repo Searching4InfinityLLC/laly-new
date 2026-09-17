@@ -100,7 +100,7 @@ export const home: HomeContent = {
         title: 'The Power of Paid\nAdvertisement',
         badges: [
           { label: 'Google Ads', color: '#A2A11C' },
-          { label: 'Bing Ads', color: '#CBB1C9' },
+          { label: 'Bing Ads', color: '#CBB1C9', hideOnMobile: true }, // client note: off on mobile
           { label: 'Meta Ads', color: '#FF8A88' },
           { label: 'Tik Tok', color: '#F5C882' },
         ],
@@ -175,7 +175,7 @@ export const home: HomeContent = {
     ],
   },
   note: {
-    // the break before the closing line is the design; the rest wraps to the container
-    body: 'We’re looking for business owners who are passionate about nurturing their brand growth. As passionate as we are about our work, we can only provide services to a limited number of clients—that’s how we ensure every brand gets the attentive focus it deserves.\nGet in touch to be considered.',
+    // \n\n = the empty line Figma sets above the closing line (2039:5835); the rest wraps to the container
+    body: 'We’re looking for business owners who are passionate about nurturing their brand growth. As passionate as we are about our work, we can only provide services to a limited number of clients—that’s how we ensure every brand gets the attentive focus it deserves.\n\nGet in touch to be considered.',
   },
 }

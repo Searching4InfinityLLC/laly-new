@@ -51,7 +51,15 @@ export const StrategyBlock: Block = {
             description:
               'Capability pills, up to four. The star tint comes from the row position, not from here — every card runs the same green/lilac/pink/amber row.',
           },
-          fields: [{ name: 'label', type: 'text', required: true }],
+          fields: [
+            { name: 'label', type: 'text', required: true },
+            {
+              name: 'hideOnMobile',
+              type: 'checkbox',
+              defaultValue: false,
+              admin: { description: 'Hide this pill on phones and tablets — where four pills crowd the card.' },
+            },
+          ],
         },
         {
           name: 'hook',

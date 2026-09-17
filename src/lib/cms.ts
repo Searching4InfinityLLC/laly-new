@@ -151,7 +151,11 @@ export function toStrategyContent(block: StrategyBlock): StrategyContent | null 
         .filter((b) => b.label)
         // Tint by position, not by row data: all three pillars run the same trio in the same order,
         // so it's layout. Modulo so a fourth badge starts the trio over instead of going invisible.
-        .map((b, i) => ({ label: b.label, color: BADGE_COLORS[i % BADGE_COLORS.length] }))
+        .map((b, i) => ({
+          label: b.label,
+          color: BADGE_COLORS[i % BADGE_COLORS.length],
+          hideOnMobile: b.hideOnMobile || undefined,
+        }))
 
       if (!c.title || !c.hook || !c.body || !c.link?.label || badges.length === 0) return null
 

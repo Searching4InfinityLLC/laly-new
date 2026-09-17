@@ -122,7 +122,11 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                     /* 75% rides on the text colour, not the li: `opacity` here would take the star
                        mask and the pill ground down with it */
                     // ground: client note, #292624 at 50% (was a flat #2D2A28)
-                    className="flex h-[23px] shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[#292624]/50 px-2.5 font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#F7F1EE]/75 shadow-[0_1px_2px_rgba(16,24,40,0.04)]"
+                    // hideOnMobile (CMS checkbox): gone below md, where the cards stack. The star
+                    // tint is set by position before this, so hiding a pill doesn't recolour the rest.
+                    className={`flex h-[23px] shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[#292624]/50 px-2.5 font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#F7F1EE]/75 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${
+                      badge.hideOnMobile ? 'max-md:hidden' : ''
+                    }`}
                   >
                     {/* star.svg as a mask so one asset serves all three tints */}
                     <span

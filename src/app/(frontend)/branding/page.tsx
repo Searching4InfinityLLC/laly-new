@@ -50,8 +50,10 @@ export default async function BrandingPage() {
       <SectionFade>
         <ScratchBand label="Brand versus paid ads" scratchLabel={branding.positioning.scratchLabel}>
           {branding.positioning.body.before}
-          {/* Neue Haas 65 Medium at 24 against the 28px serif — medium here, where the heroes go bold */}
-          <strong className="font-display text-2xl font-medium tracking-[0.25px]">
+          {/* Neue Haas 65 Medium at 24 against the 28px serif — medium here, where the heroes go bold.
+              max-md:block (client note): on a phone "Brand owns it." drops to its own line under
+              "Paid ads rent attention." instead of wrapping mid-phrase; one line again at md+. */}
+          <strong className="font-display text-2xl font-medium tracking-[0.25px] max-md:block">
             {branding.positioning.body.emphasis}
           </strong>
           {branding.positioning.body.after}

@@ -57,7 +57,7 @@ export type WhoWeAreContent = {
 // colour, so the accent trio is data, not CSS.
 export type ServicePillar = {
   title: string
-  badges: { label: string; color: string }[]
+  badges: { label: string; color: string; hideOnMobile?: boolean }[]
   // \n in hook/title is a hard break the designer set by hand, not a wrap. hookMobile is only set
   // when the mobile breaks differ from desktop's; absent -> hook serves both.
   hook: string

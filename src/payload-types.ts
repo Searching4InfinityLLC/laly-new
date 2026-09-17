@@ -312,6 +312,10 @@ export interface StrategyBlock {
      */
     badges: {
       label: string;
+      /**
+       * Hide this pill on phones and tablets — where four pills crowd the card.
+       */
+      hideOnMobile?: boolean | null;
       id?: string | null;
     }[];
     /**
@@ -1062,6 +1066,7 @@ export interface StrategyBlockSelect<T extends boolean = true> {
           | T
           | {
               label?: T;
+              hideOnMobile?: T;
               id?: T;
             };
         hook?: T;
