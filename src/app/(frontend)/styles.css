@@ -207,6 +207,29 @@ html.lenis body {
    loader unmounts. */
 html:has(> body > .loader) {
   overflow: clip;
+  /* The strip under iOS's toolbar that even 100lvh can't reach — the bottom safe area, outside the
+     layout viewport (no viewport-fit=cover here, deliberately: that would re-inset the whole site).
+     Safari paints it with the root background, so the root follows the loader's own timeline: its
+     ground until the swap wipe at 2.1s (bottom-up, so the bottom goes first), the wipe colour until
+     the exit at 3.4s, then back to normal as the exit uncovers the page from the bottom. */
+  --loader-root-ground: #fcf7f3;
+  --loader-root-wipe: #ff6d6a;
+  animation: loader-root 3.4s step-end;
+}
+@media (prefers-color-scheme: dark) {
+  html:has(> body > .loader) {
+    --loader-root-ground: #ff6d6a;
+    --loader-root-wipe: #292624;
+  }
+}
+@keyframes loader-root {
+  0% {
+    background-color: var(--loader-root-ground);
+  }
+  61.765% {
+    /* 2.1s of 3.4s */
+    background-color: var(--loader-root-wipe);
+  }
 }
 .loader-bar {
   transform-origin: left;
