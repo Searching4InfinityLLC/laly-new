@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { CARD_DARK_PALETTES } from '@/lib/palettes'
 import { MediaImage } from '@/components/Media/Image'
+import { AutoplayVideo } from '@/components/ui/AutoplayVideo'
 import { ArrowCircleButton } from '@/components/ui/ArrowCircleButton'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { Button } from '@/components/ui/Button'
@@ -99,13 +100,9 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               >
                 {card.video ? (
                   // muted+playsInline so mobile autoplays inline; the still doubles as the poster
-                  <video
+                  <AutoplayVideo
                     src={card.video}
                     poster={card.image.url}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
                     preload="metadata"
                     aria-label={card.image.alt}
                     /* block — a <video> is inline by default, so it leaves a baseline gap that

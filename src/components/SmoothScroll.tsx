@@ -23,6 +23,11 @@ export function SmoothScroll() {
     window.scrollTo(0, 0)
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    // Touch: skip too. Lenis leaves touch scrolling native anyway (syncTouch off), but it still hangs
+    // non-passive touchstart/touchmove listeners on the window, so iOS waits on the main thread
+    // before every swipe — scroll felt dead whenever JS was busy. Every getLenis() caller is
+    // null-safe, and CompoundEffect's hold is desktop-only.
+    if (window.matchMedia('(pointer: coarse)').matches) return
 
     const lenis = new Lenis()
     // published for CompoundEffect, which stops the page while its phases play
