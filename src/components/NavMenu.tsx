@@ -88,9 +88,13 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
           No bottom-0: the region only has to clip ABOVE the sheet, so it hugs the sheet's height.
           Pinned to the bottom edge, iOS 26 Safari took it for a bottom bar — a full-width fixed box
           touching the edge — and painted a solid tint behind its floating toolbar instead of letting
-          the page scroll under the glass. */}
+          the page scroll under the glass.
+          overflow-CLIP, not hidden: hidden makes this a scroll container, and iOS picks the box a
+          swipe scrolls before it checks pointer-events — so every swipe starting in this band (the
+          sheet's height, under the bar, menu shut) tried to scroll the empty region and the page
+          sat still. clip cuts identically without being scrollable. */}
       <div
-        className="pointer-events-none fixed inset-x-0 top-19 z-40 overflow-hidden"
+        className="pointer-events-none fixed inset-x-0 top-19 z-40 overflow-clip"
         inert={!open}
       >
         {/* Figma 3039:2055 — panel padding 20, groups 48 apart, and the sheet closes on the
