@@ -23,6 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${fontVariables} anim-heading-fade anim-sections-media`}
     >
+      <head>
+        {/* Before first paint, not in SmoothScroll's effect: the intro is laid out at the top of the
+            document (Loader.tsx), so a reload that restored mid-page would open with it off screen. */}
+        <script dangerouslySetInnerHTML={{ __html: "history.scrollRestoration='manual'" }} />
+      </head>
       <body className="relative min-h-screen antialiased font-sans">
         <SmoothScroll />
         <Loader />

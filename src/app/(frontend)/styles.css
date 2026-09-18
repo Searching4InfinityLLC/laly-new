@@ -198,8 +198,15 @@ html.lenis body {
   --loader-wipe: #ff6d6a;
   --loader-wipe-mark: #292624;
   --loader-grid: block;
+  --loader-toolbar: calc(100lvh - 100svh); /* what the browser's toolbars cover (Loader.tsx) */
   --expo-in-out: cubic-bezier(0.87, 0, 0.13, 1);
   animation: loader-wipe 1.2s var(--expo-in-out) 3.4s both;
+}
+/* The intro is laid out as page content at the document top (Loader.tsx), so the page must not
+   scroll out from under it — from first paint, before Loader's JS lock lands. Lifts itself when the
+   loader unmounts. */
+html:has(> body > .loader) {
+  overflow: clip;
 }
 .loader-bar {
   transform-origin: left;

@@ -61,14 +61,20 @@ export function Loader() {
   if (done) return null
 
   return (
-    <div ref={ref} aria-hidden className="loader fixed -inset-px z-[10000] flex items-center justify-center">
+    // Absolute at the top of the document, 100lvh tall — NOT fixed. iOS 26 Safari paints a solid tint
+    // behind its floating toolbar whenever a fixed box touches the bottom edge (this one did, bar
+    // track and all). Page content is allowed under the glass, so the loader is laid out as content:
+    // the page is scroll-locked at the top while it runs, and lvh reaches down behind the toolbar.
+    // What must be SEEN (butterfly centre, label, bar) is placed against svh — the visible area —
+    // via --loader-toolbar = lvh - svh (0 wherever the two are equal, i.e. desktop).
+    <div ref={ref} aria-hidden className="loader absolute inset-x-0 top-0 z-[10000] h-lvh">
       {/* the wipe ground; its own butterfly copy rides inside it so the swap reads as the butterfly
           changing colour under the wipe line (Karo duplicates its text the same way). Colours are
           theme tokens on .loader in styles.css. */}
-      <div className="loader-pink absolute -inset-px z-[3] flex items-center justify-center bg-(--loader-wipe)">
+      <div className="loader-pink absolute -inset-px z-[3] flex items-center justify-center bg-(--loader-wipe) pb-(--loader-toolbar)">
         <Butterfly className="text-(--loader-wipe-mark)" />
       </div>
-      <div className="loader-cream relative z-[1] flex w-full items-center justify-center self-stretch bg-(--loader-ground)">
+      <div className="loader-cream absolute -inset-px z-[1] flex items-center justify-center bg-(--loader-ground) pb-(--loader-toolbar)">
         {/* light theme only: grid holds full strength to ~70% down, then softens to nothing */}
         <div
           className="grid-backdrop absolute inset-0"
@@ -80,7 +86,7 @@ export function Loader() {
         <Butterfly className="relative text-(--loader-mark)" />
       </div>
       {/* Figma: Fira 16/1.4, 1px tracking, 24px over a 14px bar */}
-      <div className="loader-bottom absolute inset-x-0 bottom-0 z-[2] flex flex-col items-center">
+      <div className="loader-bottom absolute inset-x-0 bottom-(--loader-toolbar) z-[2] flex flex-col items-center">
         {/* the site's own eyebrow mechanic — brackets swing out, word wipes up */}
         <BracketLabel className="mb-6 w-30 text-(--loader-label) text-[16px]! tracking-[1px]!">Loading</BracketLabel>
         <div className="h-3.5 self-stretch bg-(--loader-track)">
