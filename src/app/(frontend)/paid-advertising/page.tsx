@@ -275,7 +275,6 @@ export default async function PaidAdvertisingPage() {
           edges rather than on every panel: Figma gives each panel its own b/l/r, which doubles up to
           2px wherever two panels meet. */}
       <SectionThemeSequence
-        focusFirst
         sections={[
           { id: 'what-you-get', tone: 'cream', texture: 'grid', content: (
             <section

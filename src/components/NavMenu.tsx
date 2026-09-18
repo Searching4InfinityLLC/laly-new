@@ -82,11 +82,15 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
           everything above it. It has to be a separate box because NavMenu renders INSIDE <header> —
           the header is a z-50 stacking context, so nothing in here can paint behind its cream bar,
           and a plain z-index would not have hidden the sheet.
-          pointer-events-none on the region, auto on the sheet: the region covers the whole viewport
-          below the bar and would otherwise swallow every click on the page with the menu shut.
-          `inert` keeps the links out of the tab order and off screen readers while closed. */}
+          pointer-events-none on the region, auto on the sheet: the region spans the width below the
+          bar and would otherwise swallow clicks on the page with the menu shut.
+          `inert` keeps the links out of the tab order and off screen readers while closed.
+          No bottom-0: the region only has to clip ABOVE the sheet, so it hugs the sheet's height.
+          Pinned to the bottom edge, iOS 26 Safari took it for a bottom bar — a full-width fixed box
+          touching the edge — and painted a solid tint behind its floating toolbar instead of letting
+          the page scroll under the glass. */}
       <div
-        className="pointer-events-none fixed inset-x-0 top-19 bottom-0 z-40 overflow-hidden"
+        className="pointer-events-none fixed inset-x-0 top-19 z-40 overflow-hidden"
         inert={!open}
       >
         {/* Figma 3039:2055 — panel padding 20, groups 48 apart, and the sheet closes on the
