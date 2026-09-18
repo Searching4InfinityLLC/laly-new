@@ -1358,6 +1358,32 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   transition: background-color 350ms ease-in-out, border-color 300ms ease-out,
     box-shadow 300ms ease-out, scale 300ms ease-out;
 }
+/* Paid Advertising results cards. Light ground is Figma 3501:3224's conic, drawn straight on the
+   card over the cream section. Dark ground (2488:827) is #151414 plus that design's conic at 50% layer
+   opacity (alphas halved), on a ::before that tracks the section's scroll-driven dark progress.
+   Outside a .section-theme the fallback of 1 keeps the original dark card. */
+.results-stat {
+  position: relative;
+  isolation: isolate;
+  background-image: conic-gradient(from 90deg, rgba(255, 177, 164, 0.2) 0%, rgba(255, 252, 249, 0.25) 35%,
+    rgba(255, 233, 228, 0.565) 65%, rgba(255, 215, 207, 0.2) 85%, rgba(255, 177, 164, 0.2) 100%);
+}
+.results-stat::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background-color: #151414;
+  background-image: conic-gradient(from 90deg, rgba(255, 111, 97, 0.05) 0%, rgba(28, 25, 23, 0.125) 35%,
+    rgba(85, 47, 42, 0.125) 65%, rgba(141, 68, 60, 0.075) 85%, rgba(255, 111, 97, 0.05) 100%);
+  opacity: var(--section-dark-progress, 1);
+}
+.results-stat-label {
+  color: color-mix(in srgb, #3c3734, #fcf7f3 calc(var(--section-dark-progress, 1) * 100%));
+}
+
 /* Scratch band (ScratchCover.tsx). Original: dark cover over the cream band. The 'focus-scratch' scroll
    theme inverts it — cream cover over a dark band (Figma 3501:3270 / 3501:3275) — until the band
    reaches the intersection line, then fades back to the original on the theme's own 350ms. The

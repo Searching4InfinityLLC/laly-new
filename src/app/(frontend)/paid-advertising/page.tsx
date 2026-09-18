@@ -60,13 +60,9 @@ const texture = (img: StaticImageData) => ({
 // toWhatYouGetContent falls back to the mock if a panel is ever missing).
 const PANEL_WIDTHS = [510, 471, 458, 515]
 
-// Figma's card ground is a conic gradient at 50% layer opacity over solid #151414 (2488:827 — it was
-// #292624 before the section moved onto the grain ground). The alphas below are the design's own,
-// halved — a source-over layer at 0.5 opacity is exactly its alphas halved, so this is one
-// background-image instead of a second stacked element. The solid goes on as bg-[#151414] on the
-// card: it is what keeps the cards flat while the section behind them shows its grain.
-const STAT_BG =
-  'conic-gradient(from 90deg, rgba(255,111,97,0.05) 0%, rgba(28,25,23,0.125) 35%, rgba(85,47,42,0.125) 65%, rgba(141,68,60,0.075) 85%, rgba(255,111,97,0.05) 100%)'
+// Stat card grounds live in styles.css (.results-stat): the light conic (3501:3224) sits on the card,
+// the dark one (2488:827) on a ::before that fades with the section's --section-dark-progress, so the
+// cards follow the black→cream scroll switch instead of staying black on a cream ground.
 
 // Figma draws an arrow button in each panel's top-right at opacity 0 — a link that does not exist
 // yet. Not rendered: an invisible control is worse than an absent one.
@@ -379,15 +375,15 @@ export default async function PaidAdvertisingPage() {
                       key={stat.value}
                       // the inline animation-delay longhand beats the stylesheet's `animation` shorthand,
                       // which is what staggers these left→right — same numbers as Strategy's pillars
-                      className="section-media-reveal flex flex-col gap-4 rounded bg-[#151414] px-4 py-6 text-center"
-                      style={{ backgroundImage: STAT_BG, animationDelay: `${0.2 + i * 0.2}s` }}
+                      className="results-stat section-media-reveal flex flex-col gap-4 rounded px-4 py-6 text-center"
+                      style={{ animationDelay: `${0.2 + i * 0.2}s` }}
                     >
                       <p className="font-sans text-[72px] leading-[1.25] tracking-[-0.5px] text-[#FF6D6A] md:text-[96px]">
                         {stat.value}
                       </p>
                       {/* the authored \n is a desktop break only — mobile (2234:3929) lets the same copy
                           wrap to the card, and a newline collapses to a space under whitespace-normal */}
-                      <p className="whitespace-normal font-sans text-xl leading-[1.25] text-[#FCF7F3] opacity-85 md:whitespace-pre-line md:text-[28px]">
+                      <p className="results-stat-label whitespace-normal font-sans text-xl leading-[1.25] opacity-85 md:whitespace-pre-line md:text-[28px]">
                         {stat.label}
                       </p>
                     </div>
