@@ -21,6 +21,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { PAID_FAQ } from '../src/lib/mock/paid-faq'
 import { revalidatePages } from '../src/lib/revalidate'
 
 // fileURLToPath, not bun's import.meta.dir — keeps this runnable under both `bun run seed` and the
@@ -215,12 +216,8 @@ await payload.create({
         blockType: 'faq',
         label: 'FAQ',
         heading: 'Frequently Asked Questions',
-        // The Figma FAQ is five lorem rows with one lorem answer — the copy has not been written.
-        // Seeded verbatim rather than invented, so nobody mistakes filler for approved copy.
-        items: Array.from({ length: 5 }, () => ({
-          question: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-          answer: 'This is subtext which appears after expanding the accordion.',
-        })),
+        // imported, not duplicated: paid-faq.ts has no .webp imports, so bun can load it
+        items: PAID_FAQ,
       },
       {
         blockType: 'note',

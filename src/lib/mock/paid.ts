@@ -4,6 +4,7 @@ import dashboardShot from '../../../public/paid-advertising/dashboard.webp'
 import refundShot from '../../../public/paid-advertising/refund.webp'
 import websiteShot from '../../../public/paid-advertising/website.webp'
 import type { MediaDoc, PaidContent } from '@/lib/types'
+import { PAID_FAQ } from './paid-faq'
 
 // Fallback for the Pages 'paid-advertising' doc, block by block — same contract as mock/home.ts, and
 // the same reason: the page prerenders at build time, so an empty or unreachable database has to
@@ -109,12 +110,7 @@ export const paid: PaidContent = {
   faq: {
     label: 'FAQ',
     heading: 'Frequently Asked Questions',
-    // ponytail: the Figma FAQ is five lorem rows with one lorem answer — the copy has not been
-    // written. Shipped verbatim rather than invented, so nobody mistakes filler for approved copy.
-    items: Array.from({ length: 5 }, () => ({
-      question: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit?',
-      answer: 'This is subtext which appears after expanding the accordion.',
-    })),
+    items: PAID_FAQ,
   },
   note: {
     // the break after "have" is the design's — 458px is Figma's text width

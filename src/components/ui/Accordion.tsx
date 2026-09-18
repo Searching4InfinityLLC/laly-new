@@ -59,7 +59,13 @@ export function Accordion({ question, answer, id, className = '' }: Props) {
         <div className="overflow-hidden">
           {/* body-2/m — New Spirit 18 / 125% / #867A72, both widths. The top margin rides inside the
               clipped box so it collapses with the panel instead of leaving a gap when closed. */}
-          <p className="mt-4 font-sans text-lg leading-[1.25] theme-ink text-[var(--panel-muted,#867A72)] md:mt-5">{answer}</p>
+          {/* a blank line in the CMS answer is a paragraph break; mt-4 on the first doubles as the
+              top gap, the rest space off each other */}
+          {answer.split('\n\n').map((p) => p.trim()).filter(Boolean).map((para) => (
+            <p key={para} className="mt-4 font-sans text-lg leading-[1.25] theme-ink text-[var(--panel-muted,#867A72)] md:mt-5">
+              {para}
+            </p>
+          ))}
         </div>
       </div>
     </div>

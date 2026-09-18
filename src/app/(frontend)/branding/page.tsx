@@ -4,7 +4,6 @@ import { BrandSystem } from '@/components/sections/BrandSystem'
 import { Channels } from '@/components/sections/Channels'
 import { CompoundEffect } from '@/components/sections/CompoundEffect'
 import Contact from '@/components/sections/Contact'
-import { Faq } from '@/components/sections/Faq'
 import Note from '@/components/sections/Note'
 import { Pricing } from '@/components/sections/Pricing'
 import { ScratchBand } from '@/components/sections/ScratchBand'
@@ -27,7 +26,8 @@ export const revalidate = 3600
 // Copy comes from the Pages 'branding' doc, falling back per block to src/lib/mock/branding.ts (see
 // src/blocks/branding.ts and getBranding in src/lib/cms.ts). Four of the eight blocks are this
 // page's own; the hero, Pricing, FAQ and the closing band are the same blocks /paid-advertising
-// uses, carrying this doc's own rows.
+// uses, carrying this doc's own rows. The FAQ block stays in the doc but is not rendered (client
+// note) — re-add the `faq` row to the sequence below to bring it back.
 //
 // The hero photo is the exception on this page — a static import, because it is the layout's 20%
 // wash rather than artwork an editor would swap.
@@ -65,7 +65,6 @@ export default async function BrandingPage() {
           { id: 'channels', tone: 'dark', content: <Channels content={branding.channels} /> },
           { id: 'compound', tone: 'dark', content: <CompoundEffect content={branding.compound} /> },
           { id: 'pricing', tone: 'cream', content: <Pricing content={branding.pricing} /> },
-          { id: 'faq', tone: 'cream', texture: 'grid', content: <Faq content={branding.faq} /> },
         ]}
         contact={<SectionFade><Contact content={contact} /></SectionFade>}
       />

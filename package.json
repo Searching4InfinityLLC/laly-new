@@ -25,6 +25,8 @@
     "seed:development": "bun scripts/seed-development.ts",
     "//update:about": "Reorders the home About Us team and rewrites their role lines in place. Touches only that block's members; stops without writing if the names in the doc don't match.",
     "update:about": "bun scripts/update-about-team.ts",
+    "//update:paid-faq": "Replaces ONLY the /paid-advertising FAQ rows (copy in src/lib/mock/paid-faq.ts). Other blocks untouched.",
+    "update:paid-faq": "bun scripts/update-paid-faq.ts",
     "//check:slots": "Self-check for the booking availability engine (src/lib/slots.ts). Plain asserts, no test framework — run it after touching business hours, slot length or the race guard.",
     "check:slots": "bun scripts/check-slots.ts",
     "//seed:node": "Fallback runner on Node via Payload's own loader. Needed only if payload.config.ts ever imports @payloadcms/richtext-lexical again — its circular ESM deps break under bun.",
