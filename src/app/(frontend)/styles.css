@@ -397,17 +397,18 @@ html.lenis body {
 .route-curtain.is-reveal {
   animation: preloader-up 1.2s cubic-bezier(0.87, 0, 0.13, 1) 0.1s both;
 }
-/* Touch: the exit leaves `fixed` for page content, the Loader's trick (see Loader.tsx). A fixed box
-   on the bottom edge makes iOS 26 Safari paint its colour behind the floating toolbar, and that
-   tint fades on Safari's own clock — so the wipe started above the glass over a lingering pink
-   strip. reveal() has already scrolled to 0, so absolute at the document top lands exactly where
-   fixed was; dvh + apron runs it under the glass, and padding-bottom keeps the butterfly centred
-   on the same box it sat in. Cover/hold stay fixed: a tint the curtain's own colour is invisible.
-   Page held still while it runs, same as the intro. */
+/* Touch: the curtain is page content, never `fixed` — the Loader's trick (see Loader.tsx). A fixed
+   box on the bottom edge makes iOS 26 Safari tint the glass behind its floating toolbar with that
+   box's colour, and the tint outlives the box on Safari's own fade: the exit wipe started above the
+   glass over a pink strip, which then blinked out after the curtain had gone. Switching only the
+   exit was too late — the tint is taken during cover.
+   --curtain-top (RouteTransition.tsx) puts it where the viewport is on click, then 0 in the same
+   frame as the scroll reset once it covers. dvh + apron runs it under the glass; padding-bottom
+   keeps the butterfly centred on the visible part. Page held still while it runs, like the intro. */
 @media (pointer: coarse) {
-  .route-curtain.is-reveal {
+  .route-curtain {
     position: absolute;
-    top: 0;
+    top: var(--curtain-top, 0px);
     bottom: auto;
     height: calc(100dvh + 10rem);
     padding-bottom: 10rem;

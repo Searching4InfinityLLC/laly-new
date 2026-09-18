@@ -53,6 +53,10 @@ export function RouteTransition() {
   const cover = useCallback(() => {
     const to = target.current
     target.current = null
+    // touch: the curtain is page content at the click's scroll offset (styles.css, .route-curtain).
+    // Fully covered now, so move it and the page to the top together — one frame, nothing seen.
+    document.documentElement.style.setProperty('--curtain-top', '0px')
+    window.scrollTo(0, 0)
     setPhase('hold')
     if (to) startTransition(() => router.push(to))
   }, [router])
@@ -100,6 +104,7 @@ export function RouteTransition() {
       // Warms the route cache across the slide without committing anything. By the time cover()
       // pushes, a prefetched route has nothing left to wait for.
       router.prefetch(to)
+      document.documentElement.style.setProperty('--curtain-top', `${window.scrollY}px`)
       setPhase('cover')
     }
 
