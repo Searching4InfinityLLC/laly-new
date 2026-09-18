@@ -31,9 +31,15 @@ export function Loader() {
 
     // hold the page still behind the intro. Released when the wipe ends, NOT in the cleanup alone:
     // finishing only renders null, the component stays mounted, so the cleanup never runs then.
-    root.style.overflow = 'clip'
+    // Touch: no overflow clip (it stops iOS painting under its toolbar — see styles.css); a
+    // non-passive touchmove block holds the page instead.
+    const touch = window.matchMedia('(pointer: coarse)').matches
+    const block = (e: TouchEvent) => e.preventDefault()
+    if (touch) window.addEventListener('touchmove', block, { passive: false })
+    else root.style.overflow = 'clip'
     getLenis()?.stop()
     const release = () => {
+      window.removeEventListener('touchmove', block)
       root.style.removeProperty('overflow')
       getLenis()?.start()
     }
@@ -65,16 +71,17 @@ export function Loader() {
     // behind its floating toolbar whenever a fixed box touches the bottom edge (this one did, bar
     // track and all). Page content is allowed under the glass, so the loader is laid out as content:
     // the page is scroll-locked at the top while it runs, and lvh reaches down behind the toolbar.
-    // What must be SEEN (butterfly centre, label, bar) is placed against svh — the visible area —
-    // via --loader-toolbar = lvh - svh (0 wherever the two are equal, i.e. desktop).
-    <div ref={ref} aria-hidden className="loader absolute inset-x-0 top-0 z-[10000] h-lvh">
+    // It runs an apron past the bottom (--loader-apron) so the strip iOS paints under the glass is
+    // loader, not page. What must be SEEN (butterfly centre, label, bar) is placed against the
+    // visible area via --loader-below = (lvh - svh) + apron, measured up from the loader's bottom.
+    <div ref={ref} aria-hidden className="loader absolute inset-x-0 top-0 z-[10000] h-[calc(100lvh+var(--loader-apron))]">
       {/* the wipe ground; its own butterfly copy rides inside it so the swap reads as the butterfly
           changing colour under the wipe line (Karo duplicates its text the same way). Colours are
           theme tokens on .loader in styles.css. */}
-      <div className="loader-pink absolute -inset-px z-[3] flex items-center justify-center bg-(--loader-wipe) pb-(--loader-toolbar)">
+      <div className="loader-pink absolute -inset-px z-[3] flex items-center justify-center bg-(--loader-wipe) pb-(--loader-below)">
         <Butterfly className="text-(--loader-wipe-mark)" />
       </div>
-      <div className="loader-cream absolute -inset-px z-[1] flex items-center justify-center bg-(--loader-ground) pb-(--loader-toolbar)">
+      <div className="loader-cream absolute -inset-px z-[1] flex items-center justify-center bg-(--loader-ground) pb-(--loader-below)">
         {/* light theme only: grid holds full strength to ~70% down, then softens to nothing */}
         <div
           className="grid-backdrop absolute inset-0"
@@ -86,7 +93,7 @@ export function Loader() {
         <Butterfly className="relative text-(--loader-mark)" />
       </div>
       {/* Figma: Fira 16/1.4, 1px tracking, 24px over a 14px bar */}
-      <div className="loader-bottom absolute inset-x-0 bottom-(--loader-toolbar) z-[2] flex flex-col items-center">
+      <div className="loader-bottom absolute inset-x-0 bottom-(--loader-below) z-[2] flex flex-col items-center">
         {/* the site's own eyebrow mechanic — brackets swing out, word wipes up */}
         <BracketLabel className="mb-6 w-30 text-(--loader-label) text-[16px]! tracking-[1px]!">Loading</BracketLabel>
         <div className="h-3.5 self-stretch bg-(--loader-track)">

@@ -198,37 +198,29 @@ html.lenis body {
   --loader-wipe: #ff6d6a;
   --loader-wipe-mark: #292624;
   --loader-grid: block;
-  --loader-toolbar: calc(100lvh - 100svh); /* what the browser's toolbars cover (Loader.tsx) */
+  /* Loader.tsx: how far the loader runs past the visible area — whatever the toolbars cover, plus an
+     apron so iOS's under-toolbar strip is loader too, not the page root. */
+  --loader-apron: 10rem;
+  --loader-below: calc(100lvh - 100svh + var(--loader-apron));
   --expo-in-out: cubic-bezier(0.87, 0, 0.13, 1);
   animation: loader-wipe 1.2s var(--expo-in-out) 3.4s both;
 }
 /* The intro is laid out as page content at the document top (Loader.tsx), so the page must not
-   scroll out from under it — from first paint, before Loader's JS lock lands. Lifts itself when the
-   loader unmounts. */
-html:has(> body > .loader) {
-  overflow: clip;
-  /* The strip under iOS's toolbar that even 100lvh can't reach — the bottom safe area, outside the
-     layout viewport (no viewport-fit=cover here, deliberately: that would re-inset the whole site).
-     Safari paints it with the root background, so the root follows the loader's own timeline: its
-     ground until the swap wipe at 2.1s (bottom-up, so the bottom goes first), the wipe colour until
-     the exit at 3.4s, then back to normal as the exit uncovers the page from the bottom. */
-  --loader-root-ground: #fcf7f3;
-  --loader-root-wipe: #ff6d6a;
-  animation: loader-root 3.4s step-end;
-}
-@media (prefers-color-scheme: dark) {
+   scroll out from under it — from first paint, before Loader's JS lands. Lifts itself when the
+   loader unmounts.
+   Desktop: overflow clip. Touch: NOT clip — a clipped root stops iOS 26 Safari painting anything
+   under its floating toolbar, and that strip showed the bare root background instead of the loader.
+   touch-action/overscroll hold the page there instead (Loader adds a touchmove block on top). */
+@media (pointer: fine) {
   html:has(> body > .loader) {
-    --loader-root-ground: #ff6d6a;
-    --loader-root-wipe: #292624;
+    overflow: clip;
   }
 }
-@keyframes loader-root {
-  0% {
-    background-color: var(--loader-root-ground);
-  }
-  61.765% {
-    /* 2.1s of 3.4s */
-    background-color: var(--loader-root-wipe);
+@media (pointer: coarse) {
+  html:has(> body > .loader),
+  html:has(> body > .loader) body {
+    touch-action: none;
+    overscroll-behavior: none;
   }
 }
 .loader-bar {
