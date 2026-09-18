@@ -52,7 +52,7 @@ photo
   overlay padding: 24 / 24 / 32
 
 "Cindy Ripoll"  (name on the photo)
-  size:            32 / 48 / 60
+  size:            20 / 32 / 32
   weight:          400
   leading:         140%
   color:           #262626
@@ -67,10 +67,12 @@ info bar
   padding top+bottom: 20 / 20 / 24
 
 "The trusty team leader and your first point of contact."
-  size:            18 / 24 / 28
+  size:            20 / 20 / 20
   weight:          400
   leading:         125%
   color:           #FCF7F3
+  alignment:       center
+  max width:       280
 
 button "OUR STORY"
   label size:      16 / 16 / 18

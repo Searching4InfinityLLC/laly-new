@@ -106,17 +106,17 @@ export const branding: BrandingContent = {
       {
         period: 'Months 1–6',
         title: 'Foundation',
-        body: 'Site optimization.\nContent creation.\nSocial launch.\nOOH placements go live.\nGoogle begins indexing and recognizing your site.\nBrand awareness seeds planted.',
+        body: 'Site optimization, social launch, and OOH placements go live.\nGoogle begins indexing and recognizing your site.\nBrand awareness seeds planted, aided by strategic content generation.',
       },
       {
         period: 'Months 6–12',
         title: 'Traction',
-        body: 'First organic rankings appear.\nSocial engagement compounds.\nBrand name searches begin increasing.\nDirect leads start flowing from organic search.',
+        body: 'First organic rankings appear and brand name searches begin climbing.\nSocial engagement compounds.\nDirect leads start flowing from organic search.',
       },
       {
         period: 'Months 12–18',
         title: 'Momentum',
-        body: 'Organic traffic rival paid ad volume.\nCost per acquisition drops.\nReferrals increase with community recognition and social proof.\nAd dependency decreases.',
+        body: 'Organic traffic rivals paid ad volume.\nCost per acquisition drops.\nReferrals increase with community recognition and social proof as ad dependency decreases.',
       },
       {
         period: 'Year 2+',

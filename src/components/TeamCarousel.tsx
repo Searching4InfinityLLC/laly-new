@@ -194,8 +194,8 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             phase={phase}
             direction={direction}
             // mobile = body-2/l: New Spirit 400 / 20 / 125% / letter-spacing l / #262626
-            // md+ = heading/h3/s: 28 / 125% / -0.5px. Was 40 — sized for the wider card.
-            className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-[28px] md:tracking-[-0.5px]"
+            // md+ = heading/h3/s: 32 / 125% / -0.5px.
+            className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-[32px] md:tracking-[-0.5px]"
             {...T_NAME}
           />
           {/* on-card arrows — desktop only; mobile uses swipe + the SCROLL affordance above.
@@ -207,21 +207,21 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
         </div>
       </div>
 
-      {/* info bar — dark ground: masked role line left, static Our Story button right.
+      {/* info bar — dark ground: masked role line centred while Our Story is unavailable.
           md+ padding is Figma's 24/6 (node 2017:5134); the 6 is what makes the bar 58 tall rather
           than the 20 it used to carry. Mobile is unchanged — Figma only specs the desktop frame.
           md+ vertical padding is 12, not Figma's 6 (client note): with Our Story hidden the button no
           longer holds the bar at 58px, and 6 around the role line alone reads cramped. */}
-      <div className="flex items-center justify-between gap-4 bg-[#292624] px-6 py-5 md:py-3">
-        <div className="min-w-0 flex-1">
+      <div className="flex items-center justify-center bg-[#292624] px-6 py-5 md:py-3">
+        <div className="mx-auto w-full max-w-[280px] min-w-0 text-center">
           <MaskText
             current={members[current].role}
             incoming={incoming !== null ? members[incoming].role : null}
             phase={phase}
             direction={direction}
-            // mobile = body-2/s: New Spirit 400 / 16 / 125% / letter-spacing l / #FCF7F3
-            // md+ = body-2/m: 18 / 125% / letter-spacing 0. Was 24 stepping to 28.
-            className="whitespace-pre-line font-sans text-base font-normal leading-[1.25] tracking-[-0.01em] text-[#FCF7F3] md:text-lg md:tracking-normal"
+            // With the button hidden, the role is centred at 20px within a 280px text box on all
+            // breakpoints.
+            className="whitespace-pre-line font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#FCF7F3] md:tracking-normal"
             {...T_ROLE}
           />
         </div>

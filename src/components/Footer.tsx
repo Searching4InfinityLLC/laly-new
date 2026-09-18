@@ -10,13 +10,15 @@ export default function Footer() {
       {/* mobile: 48 top / 20 sides / 20 bottom, three blocks 48 apart — logo, the NAV+CONTACT
           column, then the copyright */}
       <div className="section-shell flex flex-col items-center gap-12 px-5 pt-12 pb-5 sm:px-10 md:flex-row md:items-start md:justify-between md:gap-12 md:px-12 md:pt-12 md:pb-5">
-        <img
-          src="/primarylogo.svg"
-          alt="Laly Agency"
-          width={400}
-          height={94}
-          className="h-auto w-[300px] md:w-[400px]"
-        />
+        <a href="/" aria-label="Laly Agency home" className="block">
+          <img
+            src="/primarylogo.svg"
+            alt="Laly Agency"
+            width={400}
+            height={94}
+            className="h-auto w-[300px] md:w-[400px]"
+          />
+        </a>
 
         {/* NAV and CONTACT are one block on mobile — 80 between the two groups, 20 under them.
             The wrapper dissolves at md+ so the desktop four-column row is unchanged. */}

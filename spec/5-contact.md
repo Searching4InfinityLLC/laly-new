@@ -29,9 +29,8 @@ team photo
   desktop:         280 × 330, hangs off the right edge, rotated 2°, 48 from the top
   wide:            340 × 400, 56 from the top
 
-buttons "LET'S BEGIN" + "BOOK A CALL"
+button "BOOK A CALL"
   label size:      16 / 16 / 18
-  gap between:     12 / 12 / 16
   hover:           none (client's call)
 
 social icons
