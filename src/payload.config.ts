@@ -47,7 +47,10 @@ export default buildConfig({
   // 401s. Public urls are <id>.public.blob.vercel-storage.com, which next.config.mjs already allows.
   plugins: [
     vercelBlobStorage({
-      collections: { media: true },
+      // Direct Blob urls instead of proxying through /api/media/file. Payload's proxy answers Range
+      // requests with 200 (not 206), and iOS Safari won't play a video without a real 206. The url
+      // is computed on read, so existing docs switch over with no migration. Media is public anyway.
+      collections: { media: { disablePayloadAccessControl: true } },
       token: process.env.BLOB_READ_WRITE_TOKEN || '',
     }),
   ],
