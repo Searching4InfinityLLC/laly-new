@@ -57,7 +57,8 @@ type Props = {
   showAlt?: boolean
   // Opens the booking dialog. A flag rather than an onClick because every CTA that wants this sits
   // in a server component, which cannot pass a function across the boundary — so the prop IS the
-  // wiring. Ignored when `href` is set; a link goes to the link.
+  // wiring. Wins over `href`: every CTA passes both, and a stray CMS href must not quietly turn a
+  // booking button into a link.
   booking?: boolean
   type?: 'button' | 'submit'
   disabled?: boolean
@@ -107,7 +108,7 @@ export function Button({
   const cls =
     `${SHELL_BASE} ${VARIANTS[variant].shell} ${disabled ? 'cursor-not-allowed opacity-45' : ''} ${className}`.trim()
 
-  return href ? (
+  return href && !booking ? (
     <Link href={href} aria-label={children} className={cls} onMouseEnter={onMouseEnter}>
       {label}
     </Link>
