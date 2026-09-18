@@ -131,58 +131,152 @@ html.lenis body {
   pointer-events: none; /* an iframe would swallow the wheel events mid-scroll */
 }
 
-/* Preloader curtain (see Preloader.tsx) — covers from first paint. `preloading-done` starts its
-   slide-up; `preloader-done` unmounts it. */
+/* Route curtain exit (RouteTransition.tsx) — named for the old preloader it used to share. A clip
+   wipe, not a slide, so the butterfly stays put in the middle and is masked off with the ground,
+   the way the intro's exit works. */
 @keyframes preloader-up {
   from {
-    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
   }
   to {
-    transform: translateY(-100%);
+    clip-path: inset(0 0 100% 0);
   }
 }
-.preloader {
-  animation: none;
+
+/* First-paint intro (Loader.tsx) — karocrafts.com's GSAP timeline, same numbers, as keyframes:
+     0.0s  bar fills left->right, 2s steps(30)
+     2.1s  pink wipes up over the cream, cream collapses upward with it, 1.2s expo.inOut
+     3.3s  LOADING + bar vanish, 0.1s
+     3.4s  whole loader wipes up off the page, 1.2s expo.inOut — hero released here (Loader.tsx)
+     4.6s  unmount
+   Fill `both` so each layer sits in its from-state through its delay, the way gsap.set primes it. */
+@keyframes loader-bar {
+  from {
+    transform: scaleX(0);
+  }
 }
-html.preloading-done .preloader {
-  animation: preloader-up 1.2s cubic-bezier(0.83, 0, 0.17, 1) both; /* easeInOutQuint */
+@keyframes loader-in-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }
-/* State changes before React unmounts the node. Keep it above viewport for that render boundary. */
-html.preloader-done .preloader {
-  transform: translateY(-100%);
+@keyframes loader-out-up {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+@keyframes loader-hide {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+/* the wipe's name is what Loader.tsx looks up to read the clock */
+@keyframes loader-wipe {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+/* Theme follows the OS setting — pure CSS, so the right palette is there on the first painted frame.
+   Light = Figma 3481:2101 (cream grid) wiping to the pink frame 3492:3746.
+   Dark  = Figma 3492:3746 (pink) wiping to 3492:3649 (near-black). */
+.loader {
+  --loader-ground: #fcf7f3;
+  --loader-mark: #ff6d6a;
+  --loader-label: #867a72;
+  --loader-track: #e7dcd4;
+  --loader-bar: #ff6d6a;
+  --loader-wipe: #ff6d6a;
+  --loader-wipe-mark: #292624;
+  --loader-grid: block;
+  --expo-in-out: cubic-bezier(0.87, 0, 0.13, 1);
+  animation: loader-wipe 1.2s var(--expo-in-out) 3.4s both;
+}
+.loader-bar {
+  transform-origin: left;
+  animation: loader-bar 2s steps(30) both;
+}
+.loader-pink {
+  animation: loader-in-up 1.2s var(--expo-in-out) 2.1s both;
+}
+.loader-cream {
+  animation: loader-out-up 1.2s var(--expo-in-out) 2.1s both;
+}
+.loader-bottom {
+  animation: loader-hide 0.1s linear 3.3s both;
+}
+@media (prefers-color-scheme: dark) {
+  .loader {
+    --loader-ground: #ff6d6a;
+    --loader-mark: #292624;
+    --loader-label: #292624;
+    --loader-track: #e6625f;
+    --loader-bar: #292624;
+    --loader-wipe: #292624;
+    --loader-wipe-mark: #ff6d6a;
+    --loader-grid: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    display: none;
+  }
 }
 
 /* Route transitions (see RouteTransition.tsx) — the same curtain on a per-navigation clock. It
    enters from below, holds while the destination loads, then exits upward on the preloader's own
    keyframes, so a navigation and a cold load are the same gesture at the same speed. Driven by a
    class rather than an html state because two curtains must never share one switch. */
+/* ...and its entry: the ground wipes up from the bottom edge, revealing a butterfly that never moves */
 @keyframes curtain-in {
   from {
-    transform: translateY(100%);
+    clip-path: inset(100% 0 0 0);
   }
   to {
-    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
   }
 }
+/* Theme follows the OS, like the intro. Light = Figma 3496:3977 (pink, cream butterfly),
+   dark = 3495:1970 (near-black, pink butterfly). */
+.route-curtain {
+  --curtain-ground: #ff6d6a;
+  --curtain-mark: #f7f1ee;
+}
+@media (prefers-color-scheme: dark) {
+  .route-curtain {
+    --curtain-ground: #292624;
+    --curtain-mark: #ff6d6a;
+  }
+}
+/* Intro timing (Loader): 1.2s expo.inOut per wipe, and the exit waits the intro's 0.1s beat
+   (Karo's ">+=0.1") after the cover. That delay sits inside RouteTransition's FALLBACK_MS slack. */
 .route-curtain.is-cover {
-  animation: curtain-in 1.2s cubic-bezier(0.83, 0, 0.17, 1) both;
+  animation: curtain-in 1.2s cubic-bezier(0.87, 0, 0.13, 1) both;
 }
 .route-curtain.is-hold {
-  transform: translateY(0);
+  clip-path: inset(0 0 0 0);
 }
 .route-curtain.is-reveal {
-  animation: preloader-up 1.2s cubic-bezier(0.83, 0, 0.17, 1) both;
+  animation: preloader-up 1.2s cubic-bezier(0.87, 0, 0.13, 1) 0.1s both;
 }
 @media (prefers-reduced-motion: reduce) {
   /* no curtain at all — animation:none would leave it parked over the page forever. The route
      curtain never mounts under this setting (RouteTransition bails on click), belt and braces. */
-  .preloader,
   .route-curtain {
     display: none;
   }
 }
 
-/* Hero entry — gated on <html class="preloading-done">, at same time curtain starts closing.
+/* Hero entry — gated on <html class="preloader-done">, set by Loader.tsx as its exit wipe starts.
    Heading waits 0.8s; it begins before curtain fully clears at 1.2s.
 
    fade-up = hero copy (heading/desc/button). Base sits at keyframe from-state, so attaching
@@ -227,7 +321,6 @@ html.preloader-done .preloader {
   opacity: 0;
   transform: translateY(12px);
 }
-html.preloading-done .entry-copy,
 html.preloader-done .entry-copy {
   animation-name: fade-up;
   animation-duration: 0.6s;
@@ -252,9 +345,7 @@ html.anim-heading-mix .hero-heading .heading-char {
   transform: translateY(60%) scaleY(0.5);
   transform-origin: bottom;
 }
-html.anim-heading-letters.preloading-done .hero-heading .heading-char,
 html.anim-heading-letters.preloader-done .hero-heading .heading-char,
-html.anim-heading-mix.preloading-done .hero-heading .heading-char,
 html.anim-heading-mix.preloader-done .hero-heading .heading-char {
   animation-name: char-rise;
   animation-duration: 0.9s;
@@ -267,7 +358,6 @@ html.anim-heading-mix.preloader-done .hero-heading .heading-char {
 .entry-fade {
   opacity: 0;
 }
-html.preloading-done .entry-fade,
 html.preloader-done .entry-fade {
   animation-name: fade-in;
   animation-duration: 0.6s;
@@ -275,25 +365,19 @@ html.preloader-done .entry-fade {
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   animation-fill-mode: forwards;
 }
-html.anim-heading-letters.preloading-done .hero-desc,
 html.anim-heading-letters.preloader-done .hero-desc {
   animation-delay: 2s !important;
 }
-html.anim-heading-letters.preloading-done .hero-cta,
 html.anim-heading-letters.preloader-done .hero-cta {
   animation-delay: 2.15s !important;
 }
-html.anim-heading-letters.preloading-done .entry-fade,
 html.anim-heading-letters.preloader-done .entry-fade {
   animation-delay: calc(2.25s + var(--slide-delay, 0s));
 }
-html.anim-heading-mix.preloading-done .hero-desc,
 html.anim-heading-mix.preloader-done .hero-desc,
-html.anim-heading-mix.preloading-done .hero-cta,
 html.anim-heading-mix.preloader-done .hero-cta {
   animation-delay: 1.1s !important;
 }
-html.anim-heading-mix.preloading-done .entry-fade,
 html.anim-heading-mix.preloader-done .entry-fade {
   animation-delay: calc(1.4s + var(--slide-delay, 0s));
 }
@@ -310,15 +394,11 @@ html.anim-heading-mix.preloader-done .entry-fade {
   .entry-fade {
     opacity: 1;
   }
-  html.preloading-done .entry-copy,
   html.preloader-done .entry-copy,
-  html.preloading-done .entry-fade,
   html.preloader-done .entry-fade {
     animation: none;
   }
-  html.anim-heading-letters.preloading-done .hero-heading .heading-char,
   html.anim-heading-letters.preloader-done .hero-heading .heading-char,
-  html.anim-heading-mix.preloading-done .hero-heading .heading-char,
   html.anim-heading-mix.preloader-done .hero-heading .heading-char {
     animation: none;
   }
@@ -356,7 +436,6 @@ html.anim-heading-mix .hero-pills {
   opacity: 0;
   transform: translateX(-24px);
 }
-html.preloading-done .hero-pills > li,
 html.preloader-done .hero-pills > li {
   animation-name: fade-in-left;
   animation-duration: 0.7s;
@@ -369,7 +448,6 @@ html.preloader-done .hero-pills > li {
     opacity: 1;
     transform: none;
   }
-  html.preloading-done .hero-pills > li,
   html.preloader-done .hero-pills > li {
     animation: none;
   }
@@ -1194,7 +1272,7 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   --section-body: #e7dcd4;
   --section-muted: #d1c1b7;
   --section-label: #ff6d6a;
-  --grid-ink: rgba(231, 220, 212, 0.12);
+  --grid-ink: rgba(231, 220, 212, 0.05); /* subtler than the light grid reads — lines glow on black */
 }
 /* Grid sections cover the shared grain with a flat ground, leaving their own CSS grid above it.
    Grid scale and directional masks remain identical in both themes. */
@@ -1280,6 +1358,36 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   transition: background-color 350ms ease-in-out, border-color 300ms ease-out,
     box-shadow 300ms ease-out, scale 300ms ease-out;
 }
+/* Scratch band (ScratchCover.tsx). Original: dark cover over the cream band. The 'focus-scratch' scroll
+   theme inverts it — cream cover over a dark band (Figma 3501:3270 / 3501:3275) — until the band
+   reaches the intersection line, then fades back to the original on the theme's own 350ms. The
+   inverted cover is a second canvas under the original, so hiding the original reveals it. */
+.scratch-original {
+  transition: opacity 350ms ease-in-out;
+}
+.scratch-label {
+  color: #baa99e;
+  transition: opacity 500ms ease-out, color 350ms ease-in-out;
+}
+section:has(> .scratch-cover) {
+  transition: background-color 350ms ease-in-out;
+}
+html[data-scroll-theme='focus-scratch'] .scratch-cover:not([data-reached]) .scratch-original {
+  opacity: 0;
+}
+html[data-scroll-theme='focus-scratch'] .scratch-cover:not([data-reached]) .scratch-label {
+  color: #3c3734;
+}
+html[data-scroll-theme='focus-scratch'] section:has(> .scratch-cover:not([data-reached])) {
+  background-color: #292624;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scratch-original,
+  .scratch-label,
+  section:has(> .scratch-cover) {
+    transition: none;
+  }
+}
 /* Review control is portalled to body: it never participates in page layout or inherits a
    section's stacking context. Contact stays pink; only its preceding About section changes. */
 .theme-preview-selector {
@@ -1356,7 +1464,7 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   --section-body: #e7dcd4;
   --section-muted: #d1c1b7;
   --section-label: #ff6d6a;
-  --grid-ink: rgba(231, 220, 212, 0.12);
+  --grid-ink: rgba(231, 220, 212, 0.05); /* subtler than the light grid reads — lines glow on black */
 }
 .contact-theme[data-contact-theme='pink'] {
   --section-heading: #151414;

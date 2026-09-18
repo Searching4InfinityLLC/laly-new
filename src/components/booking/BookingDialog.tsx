@@ -764,7 +764,7 @@ export function BookingDialog() {
               className="pointer-events-none absolute inset-0 z-0 size-full scale-125 object-cover opacity-25 blur-2xl mix-blend-multiply"
             />
 
-            {/* blacklogo.png — the route curtain's logo (RouteTransition.tsx), not the header's
+            {/* blacklogo.png — the logo the route curtain used to carry (it shows the butterfly now), not the header's
                 SVG. That curtain is the same #ff6d6a ground this rail is, so it is the version of
                 the mark already drawn for this exact colour, and h-7 w-30 is the size both the
                 curtain and the navbar use.

@@ -54,8 +54,9 @@ export default async function DevelopmentPage() {
 
       {/* Development has no scratch band; its theme sequence starts after the hero. */}
       <SectionThemeSequence
+        focusFirst
         sections={[
-          { id: 'help', tone: 'cream', content: <HowWeHelp content={development.howWeHelp} /> },
+          { id: 'help', tone: 'cream', texture: 'grid', content: <HowWeHelp content={development.howWeHelp} /> },
           { id: 'method', tone: 'dark', content: <OurMethod content={development.ourMethod} /> },
         ]}
         contact={<SectionFade><Contact content={contact} /></SectionFade>}

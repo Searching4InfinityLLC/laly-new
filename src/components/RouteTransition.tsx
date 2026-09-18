@@ -2,16 +2,15 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
-import Image from 'next/image'
-import logo from '../../public/blacklogo.png'
+import { Butterfly } from '@/components/Loader'
 import { PRELOADER_CLOSE_DURATION } from '@/lib/motion'
 
-// Route transitions run a pink curtain: it slides up from below to cover, holds while the destination
-// finishes loading, then keeps going up to reveal it. Same pink, same logo, same 1.2s easeInOutQuint
+// Route transitions run a curtain (pink, or near-black on a dark OS theme): it slides up from below to cover, holds while the destination
+// finishes loading, then keeps going up to reveal it. Same ground, same butterfly, same 1.2s expo.inOut wipes as the intro
 // in both directions.
 //
 // The curtain used to be shared with the first-paint preloader (hence the `preloader-up` keyframe
-// name it still animates on). That preloader is now ButterflyReveal, a WebGL layer, so this is the
+// name it still animates on). The first-paint intro is now Loader.tsx, a separate sequence, so this is the
 // only caller left and the markup lives here.
 //
 // This intercepts clicks at the document instead of shipping a <TransitionLink>: every internal
@@ -145,16 +144,11 @@ function Curtain({
     <div
       aria-hidden
       onAnimationEnd={onAnimationEnd}
-      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#ff6d6a] ${className}`}
+      className={`fixed inset-0 z-[100] flex items-center justify-center bg-(--curtain-ground) ${className}`}
     >
-      <Image
-        src={logo}
-        alt="Laly Agency"
-        priority
-        quality={100}
-        sizes="120px"
-        className="h-7 w-30" /* matches the navbar logo exactly (Header.tsx) */
-      />
+      {/* Figma 3496:3977 — the butterfly mark centred, not the wordmark; colours follow the OS
+          theme via --curtain-* in styles.css */}
+      <Butterfly className="text-(--curtain-mark)" />
     </div>
   )
 }

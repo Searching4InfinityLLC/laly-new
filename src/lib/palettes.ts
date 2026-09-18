@@ -52,11 +52,19 @@ export const EMBER_WASH =
 //
 // `stop` is where the card's #FFFCF9 top gives way to the wash: the amber card holds the cream
 // longer because its copy runs three lines deeper.
+// dark* = Figma 3503:3609, the section on the dark theme ground: same wash and stop, the wash rising
+// out of #151414 instead of cream, and the copy lifted to the pale end of each hue.
 export const HELP_ACCENTS = [
-  { wash: '#E2C5DF', stop: '30%', fg: '#443B43', body: '#716370', badge: '#716370', rail: '#CBB1C9' },
-  { wash: '#B5B449', stop: '30%', fg: '#313008', body: '#57570F', badge: '#807F0D', rail: '#B5B449' },
-  { wash: '#F2BA63', stop: '45%', fg: '#302514', body: '#614A28', badge: '#795D32', rail: '#C7964A' },
+  { wash: '#E2C5DF', stop: '30%', fg: '#443B43', body: '#716370', badge: '#716370', rail: '#CBB1C9', darkFg: '#F6EEF5', darkBody: '#F3E8F2' },
+  { wash: '#B5B449', stop: '30%', fg: '#313008', body: '#57570F', badge: '#807F0D', rail: '#B5B449', darkFg: '#E6E6C6', darkBody: '#D3D39C' },
+  { wash: '#F2BA63', stop: '45%', fg: '#302514', body: '#614A28', badge: '#795D32', rail: '#C7964A', darkFg: '#F7D6A1', darkBody: '#F5C882' },
 ] as const
+
+// A colour that follows the shared section theme: `light` on the light ground, `dark` on the dark
+// one, blended on the same animated --section-dark-progress the ground itself fades on, so the two
+// can never drift. Outside a SectionTheme the variable is unset and this is just `light`.
+export const themed = (light: string, dark: string) =>
+  `color-mix(in srgb, ${light}, ${dark} calc(var(--section-dark-progress, 0) * 100%))`
 
 // Dark case-study state, Figma 3501:2293. Key by the CMS-resolved background, not card order.
 export const CARD_DARK_PALETTES: Record<string, { bg: string; fg: string; muted: string }> = {

@@ -16,12 +16,20 @@ import { useEffect, useRef, useState } from 'react'
 // just never mounts the cover.
 
 const COVER = '#292624' // color/neutral-variant/10 — the unscratched ground
+// The 'focus-scratch' scroll theme (SectionTheme's selector) inverts the band until it reaches the
+// intersection line: cream cover over a dark band (Figma 3501:3270 / 3501:3275), then back to this
+// original. Two canvases take every stroke, and CSS cross-fades them (.scratch-cover in styles.css),
+// so the swap never repaints — nothing already scratched grows back.
+const COVER_INVERTED = '#FCF7F3' // color/neutral-variant/95
 const NOISE = 18 // ± per channel; the design's sub-hero-noise, radius 4
 const BRUSH = 30 // scratch radius in CSS px
 const CORE = 0.45 // fraction of BRUSH that erases fully; past it the stamp ramps to nothing
 
 export function ScratchCover({ label }: { label: string }) {
+  const rootRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const invertedRef = useRef<HTMLCanvasElement>(null)
+  const [reached, setReached] = useState(false)
   const [enabled, setEnabled] = useState(true)
   const [started, setStarted] = useState(false)
   // a ref, not state: it changes per pointermove and must not re-render the canvas out from under
@@ -35,8 +43,10 @@ export function ScratchCover({ label }: { label: string }) {
     }
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    const layers = [
+      [canvas, COVER],
+      [invertedRef.current, COVER_INVERTED],
+    ] as const
 
     const paint = () => {
       // a repaint wipes every stroke, so once the user has started the stale bitmap just stretches.
@@ -46,21 +56,25 @@ export function ScratchCover({ label }: { label: string }) {
       if (!rect.width || !rect.height) return
       // capped at 2: this is a noise field, not a photo
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvas.width = Math.round(rect.width * dpr)
-      canvas.height = Math.round(rect.height * dpr)
-      ctx.globalCompositeOperation = 'source-over'
-      ctx.fillStyle = COVER
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      for (const [layer, color] of layers) {
+        const ctx = layer?.getContext('2d')
+        if (!layer || !ctx) continue
+        layer.width = Math.round(rect.width * dpr)
+        layer.height = Math.round(rect.height * dpr)
+        ctx.globalCompositeOperation = 'source-over'
+        ctx.fillStyle = color
+        ctx.fillRect(0, 0, layer.width, layer.height)
 
-      const img = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const d = img.data
-      for (let i = 0; i < d.length; i += 4) {
-        const n = (Math.random() - 0.5) * NOISE
-        d[i] += n
-        d[i + 1] += n
-        d[i + 2] += n
+        const img = ctx.getImageData(0, 0, layer.width, layer.height)
+        const d = img.data
+        for (let i = 0; i < d.length; i += 4) {
+          const n = (Math.random() - 0.5) * NOISE
+          d[i] += n
+          d[i + 1] += n
+          d[i + 2] += n
+        }
+        ctx.putImageData(img, 0, 0)
       }
-      ctx.putImageData(img, 0, 0)
     }
 
     paint()
@@ -72,6 +86,31 @@ export function ScratchCover({ label }: { label: string }) {
     return () => ro.disconnect()
   }, [])
 
+  // Same line SectionTheme uses for its boundaries, read off <html> where the selector publishes it,
+  // so the inverted band turns back at the same point a section would. Reversible, like the theme.
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el) return
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const pct = Number(document.documentElement.dataset.intersection ?? 50)
+      const { top, height } = el.getBoundingClientRect()
+      setReached(top <= window.innerHeight - Math.min(height, window.innerHeight) * (pct / 100))
+    }
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+    }
+  }, [])
+
   const scratch = (e: React.PointerEvent<HTMLCanvasElement>) => {
     // mouse only scratches while held; pen/touch only fire move while down anyway
     if (e.pointerType === 'mouse' && e.buttons !== 1) {
@@ -79,27 +118,31 @@ export function ScratchCover({ label }: { label: string }) {
       return
     }
     const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
-    if (!canvas || !ctx) return
+    if (!canvas) return
+    const contexts = [canvas, invertedRef.current]
+      .map((layer) => layer?.getContext('2d'))
+      .filter((ctx): ctx is CanvasRenderingContext2D => !!ctx)
 
     const rect = canvas.getBoundingClientRect()
     const dpr = canvas.width / rect.width
     const x = (e.clientX - rect.left) * dpr
     const y = (e.clientY - rect.top) * dpr
 
-    ctx.globalCompositeOperation = 'destination-out'
     const r = BRUSH * dpr
     // The brush is a radial gradient rather than a flat disc: destination-out subtracts the stamp's
     // own alpha, so the ramp from CORE out to the rim leaves a feathered edge instead of a cut one.
     // Overlapping passes keep eating the leftover partial alpha, the way a coin does.
     const stamp = (x: number, y: number) => {
-      const g = ctx.createRadialGradient(x, y, r * CORE, x, y, r)
-      g.addColorStop(0, 'rgba(0,0,0,1)')
-      g.addColorStop(1, 'rgba(0,0,0,0)')
-      ctx.fillStyle = g
-      ctx.beginPath()
-      ctx.arc(x, y, r, 0, Math.PI * 2)
-      ctx.fill()
+      for (const ctx of contexts) {
+        ctx.globalCompositeOperation = 'destination-out'
+        const g = ctx.createRadialGradient(x, y, r * CORE, x, y, r)
+        g.addColorStop(0, 'rgba(0,0,0,1)')
+        g.addColorStop(1, 'rgba(0,0,0,0)')
+        ctx.fillStyle = g
+        ctx.beginPath()
+        ctx.arc(x, y, r, 0, Math.PI * 2)
+        ctx.fill()
+      }
     }
 
     // stamps along the segment rather than one stroked line: a line has a single hard width, and at
@@ -121,7 +164,9 @@ export function ScratchCover({ label }: { label: string }) {
   if (!enabled) return null
 
   return (
-    <div aria-hidden className="absolute inset-0">
+    <div ref={rootRef} aria-hidden className="scratch-cover absolute inset-0" data-reached={reached || undefined}>
+      {/* the inverted twin sits under the input canvas and only ever receives strokes from it */}
+      <canvas ref={invertedRef} className="scratch-inverted pointer-events-none absolute inset-0 size-full" />
       <canvas
         ref={canvasRef}
         onPointerDown={(e) => {
@@ -130,15 +175,17 @@ export function ScratchCover({ label }: { label: string }) {
           scratch(e)
         }}
         onPointerMove={scratch}
-        // pan-y, not none: this is a full-bleed band on a scrolling page, so a vertical swipe has to
-        // stay a scroll. Horizontal drag is the scratch.
-        className="absolute inset-0 size-full cursor-crosshair touch-pan-y"
+        // touch-none: a finger on the band scratches in every direction instead of scrolling the
+        // page (client note). touch-action only governs touch/pen, so wheel and trackpad scrolling
+        // over the band on desktop are untouched. The band is short, so the page stays swipeable
+        // above and below it.
+        className="scratch-original absolute inset-0 size-full cursor-crosshair touch-none"
       />
       {/* the prompt rides on top of the cover and leaves on the first stroke — it has done its job by
           then, and it would otherwise sit over whatever gets uncovered */}
       <span
         // heading/h4: 18px mobile (2581:2758), 24 from md up
-        className={`pointer-events-none absolute inset-0 flex items-center justify-center font-sans text-lg leading-[1.4] tracking-[-0.5px] text-[#BAA99E] transition-opacity duration-500 ease-out md:text-2xl ${
+        className={`scratch-label pointer-events-none absolute inset-0 flex items-center justify-center font-sans text-lg leading-[1.4] tracking-[-0.5px] transition-opacity duration-500 ease-out md:text-2xl ${
           started ? 'opacity-0' : 'opacity-100'
         }`}
       >

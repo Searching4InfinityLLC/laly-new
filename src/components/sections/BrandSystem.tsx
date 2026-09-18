@@ -24,18 +24,35 @@ export function BrandSystem({ content }: { content: SystemContent }) {
           the large one half off the right edge beside the stack and the small one at the bottom
           left, and both are two thirds the size they are on desktop. Decorative. Plain <img>: they
           are static shapes in /public, and the small one carries an SVG noise filter that
-          next/image would have nothing to do with. */}
+          next/image would have nothing to do with. Each has a dark twin (Figma 3503:3357, #544D49 at
+          28/43%) cross-faded on the theme's own progress. */}
       <img
         src="/branding/blob-large.svg"
         alt=""
         aria-hidden
         className="pointer-events-none absolute bottom-[256px] right-[-16px] h-[126.397px] w-[68.542px] rotate-[148.51deg] md:bottom-auto md:right-auto md:left-[calc(50%+210px)] md:top-[527px] md:h-[189.261px] md:w-[102.631px]"
+        style={{ opacity: 'calc(1 - var(--section-dark-progress, 0))' }}
+      />
+      <img
+        src="/branding/blob-large-dark.svg"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute bottom-[256px] right-[-16px] h-[126.397px] w-[68.542px] rotate-[148.51deg] md:bottom-auto md:right-auto md:left-[calc(50%+210px)] md:top-[527px] md:h-[189.261px] md:w-[102.631px]"
+        style={{ opacity: 'var(--section-dark-progress, 0)' }}
       />
       <img
         src="/branding/blob-small.svg"
         alt=""
         aria-hidden
         className="pointer-events-none absolute bottom-[33px] left-5 h-[41.301px] w-[15.88px] rotate-[-36.07deg] md:bottom-[73px] md:left-[calc(50%-242px)] md:h-[51.075px] md:w-[19.638px]"
+        style={{ opacity: 'calc(1 - var(--section-dark-progress, 0))' }}
+      />
+      <img
+        src="/branding/blob-small-dark.svg"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute bottom-[33px] left-5 h-[41.301px] w-[15.88px] rotate-[-36.07deg] md:bottom-[73px] md:left-[calc(50%-242px)] md:h-[51.075px] md:w-[19.638px]"
+        style={{ opacity: 'var(--section-dark-progress, 0)' }}
       />
 
       {/* Figma stacks three groups on the centreline: the heading block, the argument, and the

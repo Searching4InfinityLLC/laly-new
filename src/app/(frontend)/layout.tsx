@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
 import { BookingDialog } from '@/components/booking/BookingDialog'
-import { ButterflyReveal } from '@/components/ButterflyReveal'
+import { Loader } from '@/components/Loader'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { HeaderGround } from '@/components/HeaderGround'
@@ -21,11 +21,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${fontVariables} preloading anim-heading-fade anim-sections-media`}
+      className={`${fontVariables} anim-heading-fade anim-sections-media`}
     >
       <body className="relative min-h-screen antialiased font-sans">
         <SmoothScroll />
-        <ButterflyReveal />
+        <Loader />
         <RouteTransition />
         <HeaderGround />
         <Header />

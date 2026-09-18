@@ -32,6 +32,7 @@ export default async function HomePage() {
     <main>
       <Hero content={home.hero} />
       <SectionTheme
+        focusFirst
         before={<WhoWeAre content={home.whoWeAre} />}
         after={<Strategy content={home.strategy} />}
         returnToLight={<About content={home.about} />}

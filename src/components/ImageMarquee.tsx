@@ -18,7 +18,7 @@ const slideSizes = ({ width, height }: MediaDoc) => {
 
 // Continuous auto-scrolling image strip (Embla + auto-scroll). Slides fade in (opacity only — no
 // transform, so it won't fight Embla's loop transforms), staggered left->right. The fade is gated on
-// <html class="preloading-done"> (see .entry-fade in styles.css) so it starts when the curtain closes
+// <html class="preloader-done"> (see .entry-fade in styles.css) so it starts when the curtain closes
 // of the hero; Embla takes over scrolling once it hydrates.
 // Pause = press and hold (pointerDown), resume on release: stopOnMouseEnter off so hover does
 // nothing, stopOnInteraction off so the plugin re-plays once the drag settles instead of staying dead.

@@ -60,6 +60,7 @@ export default async function BrandingPage() {
       </SectionFade>
 
       <SectionThemeSequence
+        focusFirst
         sections={[
           { id: 'system', tone: 'cream', texture: 'grid', content: <BrandSystem content={branding.system} /> },
           { id: 'channels', tone: 'dark', content: <Channels content={branding.channels} /> },

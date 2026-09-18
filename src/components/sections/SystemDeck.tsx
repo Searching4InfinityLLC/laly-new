@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { themed } from '@/lib/palettes'
 import type { SystemContent } from '@/lib/types'
 
 // The three-card deck in "The System" (Figma 2767:9520 / 2739:8892), cycling the way the client's
@@ -28,13 +29,26 @@ const OVERLAP = 17.225 // 72 of a 418px card, as cqw — same value the static s
 // TODO(design): Search shipped a front treatment (the amber), Physical/Social shipped tints, and
 // Physical's front lavender came back from review. Everything still marked below is matched by eye
 // in the same hue, standing in until the designer gives their own.
+//
+// `dark` = the same slots on the dark theme ground (Figma 3503:3357). That frame draws Search in front
+// and Physical/Social behind; the other three states follow its token steps — the hue's /5 as the
+// ground in both states, /10 for text behind, /30-40 for the front keyline, /60 for text in front.
 const PALETTE = [
   // Physical
-  { tintBg: '#F6EEF5', tintFg: '#EBD6E9', bg: '#E5CBE2', border: '#9C6790', fg: '#4E2F49' }, // border/fg placeholder
+  {
+    tintBg: '#F6EEF5', tintFg: '#EBD6E9', bg: '#E5CBE2', border: '#9C6790', fg: '#4E2F49', // border/fg placeholder
+    dark: { tintBg: '#443B43', tintFg: '#716370', bg: '#443B43', border: '#CBB1C9', fg: '#E2C5DF' }, // front derived
+  },
   // Social
-  { tintBg: '#E6E6C6', tintFg: '#CACA86', bg: '#CFCF72', border: '#8C8C43', fg: '#4A4A22' }, // bg/border/fg placeholder
+  {
+    tintBg: '#E6E6C6', tintFg: '#CACA86', bg: '#CFCF72', border: '#8C8C43', fg: '#4A4A22', // bg/border/fg placeholder
+    dark: { tintBg: '#313008', tintFg: '#57570F', bg: '#313008', border: '#B5B449', fg: '#CACA86' }, // front derived
+  },
   // Search
-  { tintBg: '#FAECD6', tintFg: '#EFD4AA', bg: '#F2BA63', border: '#AE8340', fg: '#614A28' }, // tintBg/tintFg placeholder
+  {
+    tintBg: '#FAECD6', tintFg: '#EFD4AA', bg: '#F2BA63', border: '#AE8340', fg: '#614A28', // tintBg/tintFg placeholder
+    dark: { tintBg: '#302514', tintFg: '#614A28', bg: '#302514', border: '#AE8340', fg: '#F2BA63' }, // tint derived
+  },
 ]
 
 // Figma's own card metrics, as a percentage of the front card's width
@@ -117,20 +131,20 @@ export function SystemDeck({ chain }: { chain: SystemContent['chain'] }) {
                   {
                     padding: `${PAD}cqw`,
                     gap: `${GAP}cqw`,
-                    backgroundColor: front ? skin.bg : skin.tintBg,
+                    backgroundColor: front ? themed(skin.bg, skin.dark.bg) : themed(skin.tintBg, skin.dark.tintBg),
                     // the back cards have no keyline in the frame; it stays in the box at zero alpha
                     // so gaining one never changes the card's size
-                    borderColor: front ? skin.border : 'transparent',
+                    borderColor: front ? themed(skin.border, skin.dark.border) : 'transparent',
                     // A retired card goes one flat colour: its blurb drops to the same tint its
                     // title takes (client note), rather than staying on the old neutral body grey.
-                    color: front ? skin.fg : skin.tintFg,
+                    color: front ? themed(skin.fg, skin.dark.fg) : themed(skin.tintFg, skin.dark.tintFg),
                     '--card-delay': `${d * 0.15}s`,
                   } as CSSProperties
                 }
               >
                 <p
                   className="w-full font-sans text-[34px] font-medium leading-[1.25] tracking-[-0.5px] md:text-[56px]"
-                  style={{ color: front ? skin.fg : skin.tintFg }}
+                  style={{ color: front ? themed(skin.fg, skin.dark.fg) : themed(skin.tintFg, skin.dark.tintFg) }}
                 >
                   {card.title}
                 </p>

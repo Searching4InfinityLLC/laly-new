@@ -11,8 +11,8 @@ import type { HeroContent } from '@/lib/types'
 // Heading = Figma display/l: Neue Haas (font-display) 500 / 72px / 100% leading / center / #262626.
 // Mobile = Figma heading/h1/s: 450 (→400, only 400/500/700 shipped) / 44px / 110% leading.
 // Desc = New Spirit (font-sans) 400 / 20px mobile, 28px desktop / 125% leading / center / #4A4A4A.
-// Entry: `preloading-done` starts the curtain close and hero sequence together. Heading waits 0.8s,
-// so it begins shortly before the 1.2s curtain close completes.
+// Entry: Loader.tsx sets `preloader-done` as its 1.2s exit wipe starts. Heading waits 0.8s, so it
+// begins shortly before the wipe clears.
 export default function Hero({ content }: { content: HeroContent }) {
   const { heading, description, button, slides } = content
   const rows = heading.split('\n').map((line) => line.trim()).filter(Boolean)

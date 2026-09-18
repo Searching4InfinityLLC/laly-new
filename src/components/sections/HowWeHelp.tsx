@@ -1,7 +1,7 @@
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { GridBackdrop } from '@/components/ui/GridBackdrop'
 import { HELP_WIDGETS } from '@/components/sections/HelpWidgets'
-import { HELP_ACCENTS } from '@/lib/palettes'
+import { HELP_ACCENTS, themed } from '@/lib/palettes'
 import type { HowWeHelpContent } from '@/lib/types'
 
 // Figma 3304:1848 — the section that fills the gap /development used to leave between the hero and
@@ -79,7 +79,7 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
                 // chips. Mobile: pt 32 / pb 48, and the border belongs to the stack, not the card.
                 className="relative flex flex-1 flex-col gap-10 overflow-hidden px-5 pt-8 pb-12 md:border md:border-[rgba(60,55,52,0.1)] md:pt-6 md:pb-10"
                 style={{
-                  backgroundImage: `linear-gradient(180deg, #FFFCF9 ${accent.stop}, ${accent.wash} 100%)`,
+                  backgroundImage: `linear-gradient(180deg, ${themed('#FFFCF9', '#151414')} ${accent.stop}, ${accent.wash} 100%)`,
                 }}
               >
                 <GridBackdrop />
@@ -88,13 +88,13 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
                   <div className="flex flex-col gap-2 md:gap-3">
                     <p
                       className="font-mono text-xs font-normal uppercase leading-[1.4] tracking-[1px] opacity-80 md:text-sm"
-                      style={{ color: accent.fg }}
+                      style={{ color: themed(accent.fg, accent.darkFg) }}
                     >
                       {card.eyebrow}
                     </p>
                     <h3
                       className="font-sans text-[32px] font-normal leading-[1.1] tracking-[-0.5px] md:text-[40px]"
-                      style={{ color: accent.fg }}
+                      style={{ color: themed(accent.fg, accent.darkFg) }}
                     >
                       {card.title.split('\n').map((line) => (
                         <span key={line} className="block">
@@ -130,7 +130,7 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
                         </div>
                         <p
                           className="min-w-0 flex-1 font-display text-base font-normal leading-[1.25] tracking-[0.25px] md:text-lg"
-                          style={{ color: accent.body }}
+                          style={{ color: themed(accent.body, accent.darkBody) }}
                         >
                           {step}
                         </p>
