@@ -17,7 +17,7 @@ import { header } from '@/lib/mock/globals'
 // mid-page. The light svg is the same file with the wordmark recoloured; the mark stays brand pink.
 export default function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex h-19 items-center justify-between bg-[#fffcf9] px-5 sm:px-10">
+    <header className="fixed inset-x-0 top-0 z-50 flex h-19 items-center justify-between border-b border-[#544D49] bg-[#fffcf9] px-5 sm:px-10">
       {/* home link — a plain next/link, which is all the curtain transition needs: RouteTransition
           intercepts every internal <a> at the document, so nothing else has to be wired up */}
       {/* The two logos are stacked, not swapped in and out of flow: styles.css cross-fades them on

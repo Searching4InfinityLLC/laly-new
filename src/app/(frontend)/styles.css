@@ -80,7 +80,7 @@
    is a seam, and the light logo and light MENU toggle would be invisible against it. Everything
    here transitions, so opening the menu fades the bar, the logo and the toggle together. */
 body:has(.hero-dark) header {
-  transition: background-color 250ms ease;
+  transition: background-color 250ms ease, border-color 250ms ease;
 }
 header .logo-dark,
 header .logo-light {
@@ -92,6 +92,7 @@ header .logo-light {
 }
 body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header {
   background-color: transparent;
+  border-color: transparent; /* the keyline belongs to the solid bar, not the see-through one */
 }
 body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header .logo-dark {
   opacity: 0;
@@ -107,6 +108,112 @@ body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header button {
 }
 body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header button:hover {
   background-color: rgb(255 255 255 / 0.1);
+}
+
+/* Dark header + menu (Figma 3038:1660, the #151414 variants), following the shared section theme:
+   whenever SectionTheme has flipped the page dark, the bar, its logo and toggle, and the drop-down
+   sheet all go dark with it, on the theme's own 350ms. Same mechanism as the dark-hero bar above —
+   read off <body> with :has, so Header stays a server component. Unlike the hero case the sheet is
+   dark too (Figma draws dark CLOSE states), so opening the menu keeps the bar dark.
+   Unlayered, so these beat the Tailwind utilities on the same elements. */
+header,
+.nav-sheet,
+.nav-copyright {
+  transition: background-color 350ms ease-in-out, border-color 350ms ease-in-out,
+    color 350ms ease-in-out;
+}
+/* the sheet's own slide has to be restated: this rule replaces its transition-transform utility.
+   `translate`, not `transform` — Tailwind v4's translate-y-* set the standalone translate property,
+   and listing only transform here is what made the sheet snap instead of slide. */
+.nav-sheet {
+  transition: translate 850ms cubic-bezier(0.5, 0, 0.2, 1), transform 850ms cubic-bezier(0.5, 0, 0.2, 1),
+    background-color 350ms ease-in-out, border-color 350ms ease-in-out;
+}
+.nav-sheet svg rect,
+.nav-sheet svg path {
+  transition: stroke 350ms ease-in-out, fill 350ms ease-in-out;
+}
+/* its own rule so the open-menu rule below can win: this selector outranks it otherwise */
+body:has(.section-theme[data-theme='dark']):not([data-menu-open]) header {
+  border-color: #3c3734; /* Figma 3544:4750 */
+}
+/* Bar keyline (#544D49 light, Figma 3038:1659). With the sheet down, bar and sheet are one block in
+   the open frames, closed by the sheet's own line — so the bar's line steps aside. data-menu-open
+   outlives the close by 675ms (NavMenu), so it only returns once the sheet is mostly gone. */
+body[data-menu-open] header {
+  border-color: transparent;
+}
+body:has(.section-theme[data-theme='dark']) header .logo-dark {
+  opacity: 0;
+}
+body:has(.section-theme[data-theme='dark']) header .logo-light {
+  opacity: 1;
+}
+body:has(.section-theme[data-theme='dark']) header button,
+body:has(.section-theme[data-theme='dark']) .nav-sheet a {
+  border-color: #fffcf9;
+  color: #fffcf9;
+}
+body:has(.section-theme[data-theme='dark']) header button:hover,
+body:has(.section-theme[data-theme='dark']) .nav-sheet a:hover {
+  background-color: rgb(255 255 255 / 0.1);
+}
+body:has(.section-theme[data-theme='dark']) .nav-sheet {
+  border-color: #3c3734;
+}
+/* The dark bar and sheet carry the grain (Figma 3544:4750 / 3544:4852 — #151414 under the noise),
+   the same tile the dark sections use. This layer IS the dark ground: opaque #151414 + grain,
+   faded on the same 350ms ease-in-out as .section-theme::before, over the untouched cream. Fading
+   the background colour as well stacked two fades and ran the bar ahead of the sections. Sits under the content: the header
+   is its own stacking context (fixed + z-50), the sheet gets one here. */
+header::before,
+.nav-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #151414 url('/grain.webp') repeat;
+  background-size: 512px 512px;
+  opacity: 0;
+  transition: opacity 350ms ease-in-out;
+}
+.nav-sheet {
+  position: relative;
+  isolation: isolate;
+}
+body:has(.section-theme[data-theme='dark']) header::before,
+body:has(.section-theme[data-theme='dark']) .nav-sheet::before {
+  opacity: 1;
+}
+/* the transparent dark-hero bar stays see-through — its grain would paint over the hero photo */
+body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header::before {
+  opacity: 0;
+}
+body:has(.section-theme[data-theme='dark']) .nav-sheet svg rect {
+  stroke: #fffcf9;
+}
+body:has(.section-theme[data-theme='dark']) .nav-sheet svg path {
+  fill: #fffcf9;
+}
+body:has(.section-theme[data-theme='dark']) .nav-copyright {
+  color: #d1c1b7; /* mobile frame; desktop draws #baa99e */
+}
+@media (min-width: 72rem) {
+  body:has(.section-theme[data-theme='dark']) .nav-copyright {
+    color: #baa99e;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  header,
+  .nav-sheet,
+  .nav-copyright,
+  .nav-sheet svg rect,
+  .nav-sheet svg path,
+  header::before,
+  .nav-sheet::before {
+    transition: none;
+  }
 }
 
 /* Lenis (see SmoothScroll.tsx) — inlined rather than importing lenis/dist/lenis.css, because

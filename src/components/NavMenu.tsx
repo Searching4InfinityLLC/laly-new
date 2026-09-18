@@ -100,7 +100,7 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
         <nav
           ref={sheetRef}
           aria-label="Primary"
-          className={`pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 md:pt-6 ${
+          className={`nav-sheet pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 md:pt-6 ${
             open ? 'translate-y-0' : '-translate-y-full'
           }`}
         >
@@ -145,7 +145,7 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
           )}
 
           {copyright && (
-            <p className="text-center font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#9F9188]">
+            <p className="nav-copyright text-center font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#9F9188]">
               {copyright}
             </p>
           )}
