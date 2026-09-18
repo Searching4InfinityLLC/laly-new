@@ -15,6 +15,19 @@ type SectionTone = 'cream' | 'dark' | 'white'
 
 const INTERSECTION_PERCENTAGES = [20, 25, 30, 35, 40, 45, 50, 55, 60] as const
 
+// The review selector's choice survives navigation and reloads: it is one browser's preview setting,
+// so localStorage, read once on mount and written only from the selects' own onChange (an effect
+// writing on every change would store the page's defaults before the saved value was read back).
+// try/catch: storage can throw (private mode, blocked site data); the defaults then just stand.
+const STORAGE_KEY = 'laly-scroll-theme'
+type Saved = { variant?: ContactVariant; intersection?: number }
+const save = (patch: Saved) => {
+  try {
+    const prev = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') as Saved
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...prev, ...patch }))
+  } catch {}
+}
+
 export type ThemeSection = {
   id: string
   tone: SectionTone
@@ -59,6 +72,20 @@ export function SectionThemeSequence({ sections: authored, contact, focusFirst =
   const [intersectionPercentage, setIntersectionPercentage] = useState(50)
   const [contactReached, setContactReached] = useState(false)
   const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') as Saved
+      // the focus variants only exist where the page offers them
+      const allowed: ContactVariant[] = focusFirst
+        ? ['focus', 'focus-scratch', 'current', 'black', 'pink']
+        : ['current', 'black', 'pink']
+      if (saved.variant && allowed.includes(saved.variant)) setVariant(saved.variant)
+      if (INTERSECTION_PERCENTAGES.some((p) => p === saved.intersection)) {
+        setIntersectionPercentage(saved.intersection!)
+      }
+    } catch {}
+  }, [focusFirst])
 
   // Published for components outside the sequence that follow the same choice (ScratchCover).
   useEffect(() => {
@@ -122,7 +149,11 @@ export function SectionThemeSequence({ sections: authored, contact, focusFirst =
             <span>Intersection percentage</span>
             <select
               value={intersectionPercentage}
-              onChange={(event) => setIntersectionPercentage(Number(event.target.value))}
+              onChange={(event) => {
+                const value = Number(event.target.value)
+                setIntersectionPercentage(value)
+                save({ intersection: value })
+              }}
             >
               {INTERSECTION_PERCENTAGES.map((percentage) => (
                 <option key={percentage} value={percentage}>{percentage}%</option>
@@ -131,7 +162,14 @@ export function SectionThemeSequence({ sections: authored, contact, focusFirst =
           </label>
           <label>
             <span>Scroll theme</span>
-            <select value={variant} onChange={(event) => setVariant(event.target.value as ContactVariant)}>
+            <select
+              value={variant}
+              onChange={(event) => {
+                const value = event.target.value as ContactVariant
+                setVariant(value)
+                save({ variant: value })
+              }}
+            >
               {focusFirst && <option value="focus">1 · Focus first + black above Contact</option>}
               {focusFirst && <option value="focus-scratch">2 · Focus + black above Contact + inverted scratch</option>}
               <option value="current">{focusFirst ? 3 : 1} · True color</option>

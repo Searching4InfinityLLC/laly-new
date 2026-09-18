@@ -86,8 +86,13 @@ export function ScratchCover({ label }: { label: string }) {
     return () => ro.disconnect()
   }, [])
 
-  // Same line SectionTheme uses for its boundaries, read off <html> where the selector publishes it,
-  // so the inverted band turns back at the same point a section would. Reversible, like the theme.
+  // Turns back at the same screen line a tall section's boundary trips at, with the percentage read
+  // off <html> where the selector publishes it. Reversible, like the theme.
+  //
+  // SectionTheme's own test scales by the element's height (capped at the viewport), which for a tall
+  // section comes to the same thing. This band is ~150px, so that version put the line 90px off the
+  // bottom edge at 60%: the band flipped back the moment it peeked in and the inverted state was
+  // never seen. Measured against the viewport instead — top edge past (100 - pct)% of the screen.
   useEffect(() => {
     const el = rootRef.current
     if (!el) return
@@ -95,8 +100,7 @@ export function ScratchCover({ label }: { label: string }) {
     const update = () => {
       frame = 0
       const pct = Number(document.documentElement.dataset.intersection ?? 50)
-      const { top, height } = el.getBoundingClientRect()
-      setReached(top <= window.innerHeight - Math.min(height, window.innerHeight) * (pct / 100))
+      setReached(el.getBoundingClientRect().top <= window.innerHeight * (1 - pct / 100))
     }
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update)
