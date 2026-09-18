@@ -1149,6 +1149,17 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
 .booking-dialog[open] {
   display: flex;
 }
+/* Touch has no Lenis (SmoothScroll.tsx), so its stop() no longer holds the page, and iOS scrolls the
+   document behind a modal dialog. Hide the root's overflow instead; contain keeps the form column's
+   scroll from chaining out to it. Desktop keeps Lenis' stop — hiding the scrollbar there shifts the page. */
+@media (pointer: coarse) {
+  html:has(.booking-dialog[open]) {
+    overflow: hidden;
+  }
+}
+.booking-dialog [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
 @media (min-width: 72rem) {
   .booking-dialog {
     align-items: center;
