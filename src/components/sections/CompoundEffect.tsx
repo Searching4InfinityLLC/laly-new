@@ -179,12 +179,12 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
           <div className="flex flex-col gap-6">
             {/* Widest label on the site, hence the bigger travel box */}
             <BracketLabel
-              className="mx-auto w-72 text-[#FF6D6A] md:mx-0 md:w-[460px]"
+              className="mx-auto w-72 theme-label text-[var(--section-label,#FF6D6A)] md:mx-0 md:w-[460px]"
               style={{ '--bracket-size': '18px' } as CSSProperties}
             >
               {content.label}
             </BracketLabel>
-            <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">
+            <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#FFFCF9)] md:text-[64px]">
               {content.heading.split('\n').map((line) => (
                 <span key={line} className="block">
                   {line}
@@ -192,7 +192,7 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
               ))}
             </h2>
           </div>
-          <p className="whitespace-pre-line font-sans text-xl leading-[1.25] text-[#F7F1EE] md:text-2xl">
+          <p className="whitespace-pre-line font-sans text-xl leading-[1.25] theme-ink text-[var(--section-subheading,#F7F1EE)] md:text-2xl">
             {content.body}
           </p>
         </div>
@@ -219,7 +219,7 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
                       : i === last
                         ? 'md:justify-end md:py-1.5'
                         : 'md:justify-center'
-                  } ${selected ? 'text-[#E7DCD4]' : 'text-[#9F9188] hover:text-[#E7DCD4]'}`}
+                  } ${selected ? 'theme-ink text-[var(--section-body,#E7DCD4)]' : 'theme-ink text-[var(--section-muted,#9F9188)] hover:text-[var(--section-body,#E7DCD4)]'}`}
                 >
                   {p.period}
                 </button>
@@ -271,7 +271,7 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
                   className="border-x border-t border-[#3C3734] px-2 py-1"
                   style={{ backgroundImage: EMBER_WASH }}
                 >
-                  <p className="font-mono text-sm font-normal whitespace-nowrap uppercase leading-[1.4] tracking-[1px] text-[#FCF7F3] md:text-lg">
+                  <p className="font-mono text-sm font-normal whitespace-nowrap uppercase leading-[1.4] tracking-[1px] theme-ink text-[var(--section-subheading,#FCF7F3)] md:text-lg">
                     {phase.period}
                   </p>
                 </div>
@@ -282,7 +282,7 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
                   {/* A phase with no copy yet renders the tab and an empty card rather than inventing
                       a headline for it. Fill in mock/branding.ts as the copy lands. */}
                   {phase.title && (
-                    <p className="w-full font-sans text-[40px] leading-[1.1] tracking-[-0.5px] text-[#FCF7F3]">
+                    <p className="w-full font-sans text-[40px] leading-[1.1] tracking-[-0.5px] theme-ink text-[var(--section-subheading,#FCF7F3)]">
                       {hardBreaks(phase.title)}
                     </p>
                   )}
@@ -292,7 +292,7 @@ export function CompoundEffect({ content }: { content: CompoundContent }) {
                       render an empty bullet. Disc markers take the text colour, hung 30px in (the
                       frame's ms-30). */}
                   {phase.body && (
-                    <ul className="w-full list-disc pl-[30px] font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-2xl">
+                    <ul className="w-full list-disc pl-[30px] font-display text-xl font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--section-body,#E7DCD4)] md:text-2xl">
                       {phase.body
                         .split('\n')
                         .map((line) => line.trim())

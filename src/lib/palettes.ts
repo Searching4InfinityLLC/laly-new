@@ -57,3 +57,16 @@ export const HELP_ACCENTS = [
   { wash: '#B5B449', stop: '30%', fg: '#313008', body: '#57570F', badge: '#807F0D', rail: '#B5B449' },
   { wash: '#F2BA63', stop: '45%', fg: '#302514', body: '#614A28', badge: '#795D32', rail: '#C7964A' },
 ] as const
+
+// Dark case-study state, Figma 3501:2293. Key by the CMS-resolved background, not card order.
+export const CARD_DARK_PALETTES: Record<string, { bg: string; fg: string; muted: string }> = {
+  [CARD_PALETTES.olive.bg.toLowerCase()]: { bg: 'rgba(202,202,134,0.11)', fg: '#e6e6c6', muted: '#dddcb1' },
+  [CARD_PALETTES.lilac.bg.toLowerCase()]: { bg: 'rgba(243,232,242,0.07)', fg: '#f6eef5', muted: '#f3e8f2' },
+}
+
+// Readable versions of the Strategy accents while its shared ground is still light.
+export const STRATEGY_LIGHT_ACCENTS: Record<string, string> = {
+  [STRATEGY_ACCENTS.lilac]: '#716370',
+  [STRATEGY_ACCENTS.amber]: '#795D32',
+  [STRATEGY_ACCENTS.olive]: '#57570F',
+}

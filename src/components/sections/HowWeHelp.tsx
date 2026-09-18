@@ -39,12 +39,12 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
           {/* <BracketLabel> like every other section eyebrow on the site, so it gets the same
               scroll-in: brackets swing out from the centre while the label wipes up. Width is the
               w-52 / md:w-[360px] the other ~11-character eyebrows use ("the channels"). */}
-          <BracketLabel className="mx-auto w-52 text-[#867A72] md:w-[360px]">{label}</BracketLabel>
+          <BracketLabel className="mx-auto w-52 theme-label text-[var(--section-label,#867A72)] md:w-[360px]">{label}</BracketLabel>
 
           {/* The break is authored for the 64px desktop set only — the mobile frame (3292:4161)
               is one flowing 40px paragraph, so the spans go inline below md and the join is a real
               space rather than a second copy of the string. */}
-          <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
+          <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#262626)] md:text-[64px]">
             {heading.split('\n').map((line, i) => (
               <span key={line} className="md:block">
                 {i > 0 && ' '}
@@ -54,7 +54,7 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
           </h2>
 
           {/* Same again: two authored clauses at 28px, one flowing paragraph at 20px. */}
-          <p className="font-sans text-xl font-normal leading-[1.25] text-[#4A4A4A] md:text-[28px]">
+          <p className="font-sans text-xl font-normal leading-[1.25] theme-ink text-[var(--section-body,#4A4A4A)] md:text-[28px]">
             {description.split('\n').map((line, i) => (
               <span key={line} className="md:block">
                 {i > 0 && ' '}

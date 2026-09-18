@@ -38,9 +38,9 @@ export default function OurMethod({ content }: { content: OurMethodContent }) {
         <div className="section-shell flex w-full flex-col gap-6 px-5 text-center md:px-52">
           {/* <BracketLabel>, same scroll-in as every other eyebrow on the site; brand pink on the
               dark ground, as on Channels and Strategy. */}
-          <BracketLabel className="mx-auto w-52 text-[#FF6D6A] md:w-[360px]">{label}</BracketLabel>
+          <BracketLabel className="mx-auto w-52 theme-label text-[var(--section-label,#FF6D6A)] md:w-[360px]">{label}</BracketLabel>
 
-          <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">
+          <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#FFFCF9)] md:text-[64px]">
             {heading.split('\n').map((line) => (
               <span key={line} className="block">
                 {line}
@@ -63,19 +63,19 @@ export default function OurMethod({ content }: { content: OurMethodContent }) {
               <div className="flex min-w-0 flex-1 flex-col items-start gap-2 md:flex-row md:items-center md:justify-between md:gap-6">
                 <span
                   aria-hidden
-                  className="shrink-0 font-display text-xl leading-[1.25] tracking-[0.25px] text-[#BAA99E]"
+                  className="shrink-0 font-display text-xl leading-[1.25] tracking-[0.25px] theme-ink text-[var(--section-muted,#BAA99E)]"
                 >
                   {i + 1}—
                 </span>
                 {/* 75 Bold against the 55 Roman everything else on the page is set in — the one
                     place the display face goes bold, and what makes the column read as a list of
                     claims rather than headings. */}
-                <h3 className="font-display text-[40px] font-bold leading-[1.1] tracking-[-1px] text-[#F7F1EE] md:text-5xl">
+                <h3 className="font-display text-[40px] font-bold leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-subheading,#F7F1EE)] md:text-5xl">
                   {step.title}
                 </h3>
               </div>
 
-              <p className="min-w-0 flex-1 font-display text-base font-normal leading-[1.25] tracking-[0.25px] text-[#FCF7F3] opacity-85 md:text-lg">
+              <p className="min-w-0 flex-1 font-display text-base font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--section-subheading,#FCF7F3)] opacity-85 md:text-lg">
                 {step.body}
               </p>
             </li>

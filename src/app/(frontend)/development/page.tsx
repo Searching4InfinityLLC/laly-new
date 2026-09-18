@@ -7,6 +7,7 @@ import MethodScrollSpy from '@/components/sections/MethodScrollSpy'
 import OurMethod from '@/components/sections/OurMethod'
 import { ServiceHero } from '@/components/sections/ServiceHero'
 import { SectionFade } from '@/components/ui/SectionFade'
+import { SectionThemeSequence } from '@/components/ui/SectionTheme'
 import { getDevelopment, getHome } from '@/lib/cms'
 
 export const metadata: Metadata = {
@@ -34,9 +35,8 @@ export const revalidate = 3600
 // The closing CTA is read off the HOME doc, exactly as the other two do it, so one edit in the admin
 // moves all three pages.
 //
-// Every section but the hero is wrapped in <SectionFade>: one opacity ramp per section, tripped by
-// its own observer as it comes on screen. The hero is above the fold, so it has nothing to fade in
-// from.
+// Post-scratch sections share scroll-driven light/dark themes. Hero, scratch and Contact keep
+// their existing treatment; inner content reveals remain independent.
 export default async function DevelopmentPage() {
   const [{ contact }, development] = await Promise.all([getHome(), getDevelopment()])
 
@@ -52,28 +52,15 @@ export default async function DevelopmentPage() {
         objectPosition="object-center"
       />
 
-      {/* Figma 3304:1848 — the three case-study cards. Opens on the 1px keyline the hero closes on,
-          so it butts straight against it. */}
-      <SectionFade>
-        <HowWeHelp content={development.howWeHelp} />
-      </SectionFade>
-
-      {/* Figma 3318:2717 — the dark band. It is the only section on this page that is not cream, so
-          it sets the floor the rest of the page sits on. */}
-      <SectionFade>
-        <OurMethod content={development.ourMethod} />
-      </SectionFade>
-
-      {/* Drives Our Method's rows on touch, where there is no pointer to hover them. Renders
-          nothing — it finds the list itself and marks the row crossing the middle of the viewport,
-          so it is mounted here rather than inside the section only to keep it out of SectionFade's
-          opacity ramp, which would delay the first highlight until the band had faded in. */}
+      {/* Development has no scratch band; its theme sequence starts after the hero. */}
+      <SectionThemeSequence
+        sections={[
+          { id: 'help', tone: 'cream', content: <HowWeHelp content={development.howWeHelp} /> },
+          { id: 'method', tone: 'dark', content: <OurMethod content={development.ourMethod} /> },
+        ]}
+        contact={<SectionFade><Contact content={contact} /></SectionFade>}
+      />
       <MethodScrollSpy />
-
-      {/* Figma draws Contact identically to the other two pages', so it reads the same home doc. */}
-      <SectionFade>
-        <Contact content={contact} />
-      </SectionFade>
 
       {/* Same closing band as the other two, down to the 458px column that sets the break. */}
       <SectionFade>

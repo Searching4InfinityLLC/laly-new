@@ -10,6 +10,7 @@ import { Pricing } from '@/components/sections/Pricing'
 import { ScratchBand } from '@/components/sections/ScratchBand'
 import { ServiceHero } from '@/components/sections/ServiceHero'
 import { SectionFade } from '@/components/ui/SectionFade'
+import { SectionThemeSequence } from '@/components/ui/SectionTheme'
 import { getBranding, getHome } from '@/lib/cms'
 
 export const metadata: Metadata = {
@@ -34,10 +35,8 @@ export const revalidate = 3600
 // The closing CTA is read off the HOME doc, exactly as /paid-advertising does it, so one edit in the
 // admin moves all three pages.
 //
-// Every section but the hero is wrapped in <SectionFade>: one opacity ramp per section, tripped by
-// its own observer as it comes on screen (tech lead). The hero is above the fold, so it has nothing
-// to fade in from. This is on top of, not instead of, the reveals the sections run on their own
-// contents.
+// Post-scratch sections share scroll-driven light/dark themes. Hero, scratch and Contact keep
+// their existing treatment; inner content reveals remain independent.
 export default async function BrandingPage() {
   const [{ contact }, branding] = await Promise.all([getHome(), getBranding()])
 
@@ -60,31 +59,16 @@ export default async function BrandingPage() {
         </ScratchBand>
       </SectionFade>
 
-      <SectionFade>
-        <BrandSystem content={branding.system} />
-      </SectionFade>
-
-      <SectionFade>
-        <Channels content={branding.channels} />
-      </SectionFade>
-
-      {/* No <SectionFade> here, unlike its neighbours (client note): The Channels above is the same
-          #151414 grain ground, so ramping this band's opacity only reads as a dark-to-lighter flicker
-          across the seam rather than a reveal. Its own inner animations still run. */}
-      <CompoundEffect content={branding.compound} />
-
-      <SectionFade>
-        <Pricing content={branding.pricing} />
-      </SectionFade>
-
-      <SectionFade>
-        <Faq content={branding.faq} />
-      </SectionFade>
-
-      {/* Figma draws Contact identically to /paid-advertising's, so it reads the same home doc. */}
-      <SectionFade>
-        <Contact content={contact} />
-      </SectionFade>
+      <SectionThemeSequence
+        sections={[
+          { id: 'system', tone: 'cream', texture: 'grid', content: <BrandSystem content={branding.system} /> },
+          { id: 'channels', tone: 'dark', content: <Channels content={branding.channels} /> },
+          { id: 'compound', tone: 'dark', content: <CompoundEffect content={branding.compound} /> },
+          { id: 'pricing', tone: 'cream', content: <Pricing content={branding.pricing} /> },
+          { id: 'faq', tone: 'cream', texture: 'grid', content: <Faq content={branding.faq} /> },
+        ]}
+        contact={<SectionFade><Contact content={contact} /></SectionFade>}
+      />
 
       {/* Same closing band as /paid-advertising, down to the 458px column — which is what puts the
           break after "brand" that the copy also sets by hand. */}

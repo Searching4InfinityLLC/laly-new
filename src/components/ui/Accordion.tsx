@@ -35,14 +35,14 @@ export function Accordion({ question, answer, id, className = '' }: Props) {
         className="flex w-full cursor-pointer items-center justify-between gap-3 text-left"
       >
         {/* body-2/l 20 mobile — body-2/xl 24 desktop; New Spirit / 125% */}
-        <span className="font-sans text-xl leading-[1.25] text-[#292624] md:text-2xl">
+        <span className="font-sans text-xl leading-[1.25] theme-ink text-[var(--panel-heading,#292624)] md:text-2xl">
           {question}
         </span>
         {/* the chevron flips rather than swapping to Figma's separate cheveron-up node — same glyph
             mirrored, and it can then transition on the same clock as the panel */}
         <ChevronDown
           aria-hidden
-          className={`h-[6.5px] w-[11.5px] shrink-0 transition-transform duration-300 ease-out ${
+          className={`theme-chevron h-[6.5px] w-[11.5px] shrink-0 transition-transform duration-300 ease-out ${
             open ? 'rotate-180' : ''
           }`}
         />
@@ -59,7 +59,7 @@ export function Accordion({ question, answer, id, className = '' }: Props) {
         <div className="overflow-hidden">
           {/* body-2/m — New Spirit 18 / 125% / #867A72, both widths. The top margin rides inside the
               clipped box so it collapses with the panel instead of leaving a gap when closed. */}
-          <p className="mt-4 font-sans text-lg leading-[1.25] text-[#867A72] md:mt-5">{answer}</p>
+          <p className="mt-4 font-sans text-lg leading-[1.25] theme-ink text-[var(--panel-muted,#867A72)] md:mt-5">{answer}</p>
         </div>
       </div>
     </div>

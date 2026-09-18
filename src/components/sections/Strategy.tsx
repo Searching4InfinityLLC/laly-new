@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import type { CSSProperties } from 'react'
 import { ArrowCircleButton } from '@/components/ui/ArrowCircleButton'
-import { STRATEGY_ARROW_HOVER } from '@/lib/palettes'
+import { STRATEGY_ARROW_HOVER, STRATEGY_LIGHT_ACCENTS } from '@/lib/palettes'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { InView } from '@/components/ui/InView'
 import type { StrategyContent } from '@/lib/types'
@@ -10,7 +10,7 @@ import type { StrategyContent } from '@/lib/types'
 // cards) — the lit title, arrow and glow carry the card then. group-active for touch, same reason
 // the glow uses :active. Both hook nodes (desktop + hookMobile) share this, so they dim together.
 const hookClass =
-  'font-sans text-2xl font-normal leading-[1.25] text-[#FCF7F3] transition-opacity duration-300 ease-out group-hover:opacity-65 group-active:opacity-65'
+  'font-sans text-2xl font-normal leading-[1.25] theme-ink text-[var(--section-heading,#FCF7F3)] transition-opacity duration-300 ease-out group-hover:opacity-65 group-active:opacity-65'
 
 const hardBreaks = (text: string) =>
   text.split('\n').map((line, i) => (
@@ -32,13 +32,13 @@ export default function Strategy({ content }: { content: StrategyContent }) {
       // not the #292624 this used to be. The cards are 20% glass now, so the band IS their fill;
       // on the old lighter ground they read washed-out.
       // .grain-ground (styles.css): #151414 under the site's dark grain tile — see there.
-      className="grain-ground relative w-full overflow-hidden py-16 md:py-28"
+      className="strategy-section grain-ground relative w-full overflow-hidden py-16 md:py-28"
     >
       <InView className="section-shell relative px-5 text-center sm:px-10 md:px-12">
-        <BracketLabel className="mx-auto mb-5 w-44 text-[#ff6d6a] md:mb-8 md:w-80">
+        <BracketLabel className="mx-auto mb-5 w-44 theme-label text-[var(--section-label,#ff6d6a)] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-6xl xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#FCF7F3)] md:text-6xl xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
@@ -48,7 +48,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
         {/* 430 is Figma's own column (2017:5089) and what breaks the line before "to spend" — the old
             460 fit "spend" too and orphaned "smarter.". whitespace-pre-line so an Enter typed in the
             CMS is a real break as well; without an Enter the width alone sets the wrap. */}
-        <p className="section-text-reveal mx-auto mt-6 max-w-[430px] whitespace-pre-line font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#E7DCD4] 3xl:max-w-[560px]">
+        <p className="section-text-reveal mx-auto mt-6 max-w-[430px] whitespace-pre-line font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] theme-ink text-[var(--section-body,#E7DCD4)] 3xl:max-w-[560px]">
           {description}
         </p>
 
@@ -80,7 +80,9 @@ export default function Strategy({ content }: { content: StrategyContent }) {
               // (see STRATEGY_ARROW_HOVER) so the var() fallback below keeps it at rest.
               style={
                 {
-                  '--card-fg': card.fg,
+                  '--pillar-dark': card.fg,
+                  '--pillar-light': STRATEGY_LIGHT_ACCENTS[card.fg] ?? '#443B43',
+                  '--card-fg': 'var(--pillar-current, var(--pillar-dark))',
                   '--arrow-hover': STRATEGY_ARROW_HOVER[card.fg],
                   animationDelay: `${0.2 + i * 0.2}s`,
                 } as CSSProperties
@@ -92,8 +94,8 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   subgrid, and only the visible one contributes its stretched ::before hit area. */}
               <div className="flex items-start justify-between gap-4">
                 <h3
-                  className="font-display text-4xl font-normal leading-[1.1] tracking-[-1px] md:text-[44px] 3xl:text-[52px]"
-                  style={{ color: card.fg }}
+                  className="theme-ink font-display text-4xl font-normal leading-[1.1] tracking-[-1px] md:text-[44px] 3xl:text-[52px]"
+                  style={{ color: 'var(--card-fg)' }}
                 >
                   {/* designer's call: the subject always lands on line 2 — authored break, not wrap */}
                   {card.title.split('\n').map((line) => (
@@ -105,7 +107,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                 <ArrowCircleButton
                   href={card.link.href}
                   label={card.link.label}
-                  className="md:hidden cursor-pointer text-[#D1C1B7] group-hover:text-[var(--arrow-hover,#D1C1B7)] group-active:text-[var(--arrow-hover,#D1C1B7)] before:absolute before:inset-0 before:content-['']"
+                  className="md:hidden cursor-pointer theme-ink text-[var(--pillar-arrow,#D1C1B7)] group-hover:text-[var(--arrow-hover,#D1C1B7)] group-active:text-[var(--arrow-hover,#D1C1B7)] before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 
@@ -124,7 +126,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                     // ground: client note, #292624 at 50% (was a flat #2D2A28)
                     // hideOnMobile (CMS checkbox): gone below md, where the cards stack. The star
                     // tint is set by position before this, so hiding a pill doesn't recolour the rest.
-                    className={`flex h-[23px] shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[#292624]/50 px-2.5 font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#F7F1EE]/75 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${
+                    className={`flex h-[23px] shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[var(--pillar-badge-bg,#29262480)] px-2.5 font-sans text-xs leading-[1.25] tracking-[0.25px] theme-ink text-[var(--pillar-badge-ink,#F7F1EEbf)] shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${
                       badge.hideOnMobile ? 'max-md:hidden' : ''
                     }`}
                   >
@@ -179,7 +181,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   size={40}
                   /* max-md:hidden, not `hidden md:inline-flex` — the component's own base
                      `inline-flex` outranks a bare `hidden`; only a variant beats it */
-                  className="max-md:hidden cursor-pointer text-[#D1C1B7] group-hover:text-[var(--arrow-hover,#D1C1B7)] group-active:text-[var(--arrow-hover,#D1C1B7)] before:absolute before:inset-0 before:content-['']"
+                  className="max-md:hidden cursor-pointer theme-ink text-[var(--pillar-arrow,#D1C1B7)] group-hover:text-[var(--arrow-hover,#D1C1B7)] group-active:text-[var(--arrow-hover,#D1C1B7)] before:absolute before:inset-0 before:content-['']"
                 />
               </div>
 
@@ -188,7 +190,7 @@ export default function Strategy({ content }: { content: StrategyContent }) {
                   under the body when a neighbour card is taller.
                   body/s — Neue Haas 450→400 / 16px / 125%, #FCF7F3 at 65%. Static: the hover dim is
                   the hook's (above), and the hover frames (2661:2798) keep this at 65%. */}
-              <p className="font-display text-base font-normal leading-[1.25] tracking-[0.25px] text-[#FCF7F3] opacity-65">
+              <p className="font-display text-base font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--section-heading,#FCF7F3)] opacity-65">
                 {card.body}
               </p>
             </article>

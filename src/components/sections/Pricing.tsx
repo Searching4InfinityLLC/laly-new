@@ -19,12 +19,12 @@ export function Pricing({ content }: { content: PricingContent }) {
     >
       <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-16">
         <div className="flex flex-col gap-6 text-center">
-          <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
+          <BracketLabel className="mx-auto w-44 theme-label text-[var(--section-label,#867A72)] md:w-80">
             {content.label}
           </BracketLabel>
           {/* the break after "Transparent." is authored, not a wrap — whitespace-pre-line keeps
               the editor's Enter */}
-          <h2 className="whitespace-pre-line font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
+          <h2 className="whitespace-pre-line font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#262626)] md:text-[64px]">
             {content.heading}
           </h2>
         </div>
@@ -44,10 +44,10 @@ export function Pricing({ content }: { content: PricingContent }) {
               key={tier.label}
               // 0.3s per card, up from 0.15 — client asked the second card to trail further
               style={{ '--card-delay': `${i * 0.3}s` } as CSSProperties}
-              className={`card-fade relative flex flex-col justify-between gap-8 border bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
+              className={`card-fade relative flex flex-col justify-between gap-8 border theme-surface bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
                 tier.badge
                   ? 'border-[#FF6D6A] shadow-[0_0_6px_0_rgba(66,55,48,0.2),1px_1px_6px_0_rgba(66,55,48,0.2)]'
-                  : 'border-[#E7DCD4]'
+                  : 'border-[var(--panel-border,#E7DCD4)]'
               }`}
             >
               {tier.badge && (
@@ -61,14 +61,14 @@ export function Pricing({ content }: { content: PricingContent }) {
               <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-4">
                   {/* body/l — Neue Haas 20 / 125% / 0.25px, both widths */}
-                  <p className="font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#867A72]">
+                  <p className="font-display text-xl font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--panel-muted,#867A72)]">
                     {tier.label}
                   </p>
-                  <p className="font-sans text-[64px] leading-[1.25] tracking-[-0.5px] text-[#262626] md:text-[72px]">
+                  <p className="font-sans text-[64px] leading-[1.25] tracking-[-0.5px] theme-ink text-[var(--panel-heading,#262626)] md:text-[72px]">
                     {tier.price}
                   </p>
                 </div>
-                <ul className="ml-[30px] list-disc font-sans text-xl leading-[1.5] text-[#4A4A4A] md:ml-9 md:text-2xl">
+                <ul className="ml-[30px] list-disc font-sans text-xl leading-[1.5] theme-ink text-[var(--panel-body,#4A4A4A)] md:ml-9 md:text-2xl">
                   {tier.items.map((item) => (
                     <li key={item}>{item}</li>
                   ))}

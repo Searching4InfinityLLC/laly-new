@@ -97,17 +97,17 @@ export function Channels({ content }: { content: ChannelsContent }) {
       // Figma frame (2796:9847): p 112, blocks 48 apart, no keyline of its own. Mobile (2807:10160):
       // px 16 / py 48, blocks 40 apart.
       //
-      // The section's own reveal is the <SectionFade> the page wraps it in — nothing here.
+      // The page coordinates this ground with its neighboring sections; the carousel stays independent.
       className="grain-ground relative w-full overflow-hidden px-4 py-12 md:p-28"
     >
 
       <div className="relative mx-auto flex w-full max-w-[1216px] flex-col items-center gap-10 md:gap-12">
         <div className="flex w-full flex-col items-center gap-6 text-center md:gap-8">
-          <BracketLabel className="mx-auto w-52 text-[#FF6D6A] md:w-[360px]">
+          <BracketLabel className="mx-auto w-52 theme-label text-[var(--section-label,#FF6D6A)] md:w-[360px]">
             {content.label}
           </BracketLabel>
           {/* 876px is Figma's own width, and it is what puts the break after "actually" */}
-          <h2 className="max-w-[876px] font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FFFCF9] md:text-[64px]">
+          <h2 className="max-w-[876px] font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#FFFCF9)] md:text-[64px]">
             {content.heading}
           </h2>
         </div>
@@ -149,14 +149,14 @@ export function Channels({ content }: { content: ChannelsContent }) {
                       {/* Figma draws an arrow-up-right button beside the title at opacity 0 — a link
                           that does not exist yet, so it is not rendered. Same call as the
                           paid-advertising panels. */}
-                      <p className="w-full font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3] md:text-[40px]">
+                      <p className="w-full font-sans text-[32px] leading-[1.25] tracking-[-0.5px] theme-ink text-[var(--section-subheading,#FCF7F3)] md:text-[40px]">
                         {slide.title}
                       </p>
                       {/* New Spirit Medium Condensed — heavier than the paragraph under it, not bold */}
-                      <p className="w-full font-sans text-xl font-medium leading-[1.25] tracking-[-0.5px] text-[#FCF7F3] md:text-2xl md:leading-[1.4]">
+                      <p className="w-full font-sans text-xl font-medium leading-[1.25] tracking-[-0.5px] theme-ink text-[var(--section-subheading,#FCF7F3)] md:text-2xl md:leading-[1.4]">
                         {slide.lede}
                       </p>
-                      <p className="w-full font-display text-base font-normal leading-[1.25] tracking-[0.25px] text-[#E7DCD4] md:text-xl">
+                      <p className="w-full font-display text-base font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--section-body,#E7DCD4)] md:text-xl">
                         {slide.body}
                       </p>
                     </div>
@@ -173,19 +173,19 @@ export function Channels({ content }: { content: ChannelsContent }) {
                           // the phone sets the figure beside its label; desktop stacks and centres
                           className="flex w-full items-center gap-4 md:flex-col md:gap-2 md:text-center"
                         >
-                          <p className="shrink-0 font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#FCF7F3] md:text-[36px]">
+                          <p className="shrink-0 font-sans text-[32px] leading-[1.25] tracking-[-0.5px] theme-ink text-[var(--section-subheading,#FCF7F3)] md:text-[36px]">
                             {stat.value}
                           </p>
                           {/* Figma sets this nowrap at exactly the panel's inner width. Left to wrap
                               instead: one fallback-font glyph wider and nowrap would overflow the
                               card. */}
-                          <p className="font-display text-xs font-normal leading-[1.25] tracking-[0.25px] text-[#D1C1B7] md:text-base">
+                          <p className="font-display text-xs font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--section-muted,#D1C1B7)] md:text-base">
                             {stat.label}
                           </p>
                         </div>
                       ))}
 
-                      <p className="w-full border-t border-[#3C3734] pt-4 font-display text-xs font-normal leading-[1.25] tracking-[0.25px] text-[#9F9188] md:text-center md:text-sm">
+                      <p className="w-full border-t border-[#3C3734] pt-4 font-display text-xs font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--section-muted,#9F9188)] md:text-center md:text-sm">
                         {slide.quote}
                       </p>
                     </div>

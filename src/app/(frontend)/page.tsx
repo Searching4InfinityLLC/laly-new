@@ -5,6 +5,7 @@ import Note from '@/components/sections/Note'
 import Strategy from '@/components/sections/Strategy'
 import WhoWeAre from '@/components/sections/WhoWeAre'
 import { SectionFade } from '@/components/ui/SectionFade'
+import { SectionTheme } from '@/components/ui/SectionTheme'
 import { getHome } from '@/lib/cms'
 
 // Statically prerendered + ISR. The Local API is a direct DB call, so it sits outside Next's fetch
@@ -18,10 +19,8 @@ export const revalidate = 3600
 // at build time, and free-tier clusters auto-pause when idle) — watch the terminal for [cms] warns,
 // a silent fallback is this design's main failure mode.
 //
-// Every section but the hero is wrapped in <SectionFade>: one opacity ramp per section, tripped by
-// its own observer as it comes on screen (tech lead). The hero is above the fold, so it has nothing
-// to fade in from. This sits on top of the <InView> reveals inside the sections — the two are
-// independent, and a section can hold both.
+// Who We Are, Strategy and About share a reversible light/dark ground. The remaining sections retain
+// their whole-section fades, independently of the content reveals inside each section.
 //
 // Section order lives here, not in the CMS: blocks are matched by type, so reordering them in the
 // admin does nothing. Next: this becomes [[...slug]]/page.tsx with a real block dispatcher once a
@@ -32,18 +31,12 @@ export default async function HomePage() {
   return (
     <main>
       <Hero content={home.hero} />
-      <SectionFade>
-        <WhoWeAre content={home.whoWeAre} />
-      </SectionFade>
-      <SectionFade>
-        <Strategy content={home.strategy} />
-      </SectionFade>
-      <SectionFade>
-        <About content={home.about} />
-      </SectionFade>
-      <SectionFade>
-        <Contact content={home.contact} />
-      </SectionFade>
+      <SectionTheme
+        before={<WhoWeAre content={home.whoWeAre} />}
+        after={<Strategy content={home.strategy} />}
+        returnToLight={<About content={home.about} />}
+        contact={<SectionFade><Contact content={home.contact} /></SectionFade>}
+      />
       <SectionFade>
         <Note content={home.note} />
       </SectionFade>

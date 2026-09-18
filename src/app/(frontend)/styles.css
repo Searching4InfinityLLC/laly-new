@@ -739,11 +739,13 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
    lines hold full strength through the top fifth, then ramp to nothing at the bottom edge. */
 .grid-backdrop {
   --grid-cell: 56px;
+  color: var(--grid-ink, rgba(84, 77, 73, 0.04));
   background-image:
-    linear-gradient(to right, rgba(84, 77, 73, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(84, 77, 73, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, currentColor 1px, transparent 1px),
+    linear-gradient(to bottom, currentColor 1px, transparent 1px);
   background-size: var(--grid-cell) var(--grid-cell);
   mask-image: linear-gradient(to bottom, #000 0%, #000 20%, transparent 100%);
+  transition: color 350ms ease-in-out;
 }
 /* Same ramp run the other way, for sections the designer wants the grid to build INTO rather than
    fade out of. Must stay after .grid-backdrop — equal specificity, so source order decides. */
@@ -1142,3 +1144,243 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   background-size: 512px 512px;
 }
 
+/* Homepage Who We Are → Strategy → About: one reversible theme, timed like Instrument's switch.
+   The grain tile already contains its black ground and subtle noise; fade the layer 0→1,
+   not 0→.04, which would attenuate the baked-in grain a second time. */
+@property --section-dark-progress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+.section-theme {
+  --section-dark-progress: 0;
+  --section-light-ground: #fcf7f3;
+  --section-heading: #262626;
+  --section-subheading: #292624;
+  --section-body: #4a4a4a;
+  --section-muted: #867a72;
+  --section-label: #867a72;
+  --grid-ink: rgba(84, 77, 73, 0.04);
+  position: relative;
+  isolation: isolate;
+  background-color: var(--section-light-ground);
+  transition: --section-dark-progress 350ms ease-in-out;
+}
+.section-theme::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #151414 url('/grain.webp') repeat;
+  background-size: 512px 512px;
+  opacity: var(--section-dark-progress);
+}
+.section-theme-content {
+  position: relative;
+}
+.section-theme .who-we-are,
+.section-theme .strategy-section,
+.section-theme .about-section,
+.section-theme-content > section {
+  background: transparent;
+}
+.section-theme[data-ground='white'] {
+  --section-light-ground: #fffcf9;
+}
+.section-theme[data-theme='dark'] {
+  --section-dark-progress: 1;
+  --section-heading: #fcf7f3;
+  --section-subheading: #fcf7f3;
+  --section-body: #e7dcd4;
+  --section-muted: #d1c1b7;
+  --section-label: #ff6d6a;
+  --grid-ink: rgba(231, 220, 212, 0.12);
+}
+/* Grid sections cover the shared grain with a flat ground, leaving their own CSS grid above it.
+   Grid scale and directional masks remain identical in both themes. */
+.section-theme-content.theme-grid {
+  background-color: color-mix(in srgb, var(--section-light-ground), #151414 calc(var(--section-dark-progress) * 100%));
+}
+.section-theme[data-theme='dark'] .theme-grid,
+.section-theme .theme-grid[data-contact-theme='black'] {
+  --section-heading: #f6f4f4;
+}
+.section-theme .theme-grid[data-contact-theme='pink'] {
+  --section-heading: #151414;
+}
+/* Existing artwork/widgets keep their own palettes. The surrounding panels and their copy use
+   the What You Get dark reference (3501:2866), driven by the same ground progress. */
+.section-theme .theme-surface {
+  --surface-progress: max(var(--section-dark-progress), var(--contact-dark-progress, 0));
+  --panel-heading: var(--section-subheading);
+  --panel-body: var(--section-body);
+  --panel-muted: var(--section-muted);
+  --panel-border: color-mix(in srgb, #e7dcd4, #544d49 calc(var(--surface-progress) * 100%));
+  background-color: color-mix(in srgb, #fffcf9, #1a1818 calc(var(--surface-progress) * 100%));
+}
+.theme-surface .theme-chevron path {
+  stroke: var(--panel-muted, #867a72);
+  transition: stroke 350ms ease-in-out;
+}
+.section-theme .theme-ink,
+.case-study,
+.case-study-body,
+.case-study span[style] {
+  transition: color 350ms ease-in-out, background-color 350ms ease-in-out,
+    opacity 300ms ease-out;
+}
+.section-theme .theme-label {
+  transition: color 350ms ease-in-out, --x-translate 1s cubic-bezier(0.87, 0, 0.13, 1);
+}
+.case-study {
+  --case-fg: var(--case-light-fg);
+  --case-muted: var(--case-light-muted);
+  color: var(--case-fg);
+  background-color: var(--case-light-bg);
+}
+/* Crossfade finished light/dark surfaces, rather than fading a card's alpha over a ground
+   that is also fading. Both dark layers read the same animated value from their ancestor. */
+.section-theme .case-study {
+  isolation: isolate;
+}
+.section-theme .case-study::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: #151414;
+  background-image: linear-gradient(var(--case-dark-bg), var(--case-dark-bg)), url('/grain.webp');
+  background-size: auto, 512px 512px;
+  opacity: var(--section-dark-progress);
+}
+.case-study-body {
+  color: var(--case-fg);
+  opacity: 0.8;
+}
+.section-theme[data-theme='dark'] .case-study {
+  --case-fg: var(--case-dark-fg);
+  --case-muted: var(--case-dark-muted);
+}
+.section-theme[data-theme='dark'] .case-study-body {
+  color: var(--case-dark-muted);
+  opacity: 1;
+}
+.section-theme .case-study-body {
+  transition: color 350ms ease-in-out, opacity 350ms ease-in-out;
+}
+.section-theme[data-theme='light'] .strategy-card {
+  --pillar-current: var(--pillar-light);
+  --pillar-badge-bg: #e7dcd4;
+  --pillar-badge-ink: #443b43;
+  --pillar-arrow: #716370;
+  background-color: rgb(252 247 243 / 0.2);
+}
+.section-theme .strategy-card {
+  transition: background-color 350ms ease-in-out, border-color 300ms ease-out,
+    box-shadow 300ms ease-out, scale 300ms ease-out;
+}
+/* Review control is portalled to body: it never participates in page layout or inherits a
+   section's stacking context. Contact stays pink; only its preceding About section changes. */
+.theme-preview-selector {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  z-index: 60;
+  display: grid;
+  gap: 4px;
+  width: min(220px, calc(100vw - 24px));
+  padding: 8px 10px;
+  border: 1px solid #867a72;
+  border-radius: 8px;
+  background: #fffcf9;
+  color: #262626;
+  font: 12px/1.4 system-ui, sans-serif;
+  box-shadow: 0 2px 12px #0002;
+}
+.theme-preview-selector select {
+  width: 100%;
+  padding: 4px;
+  background: #fffcf9;
+  color: #262626;
+  font: inherit;
+  border: 1px solid #867a72;
+  border-radius: 4px;
+}
+.theme-preview-selector select:focus-visible {
+  outline: 2px solid #262626;
+  outline-offset: 2px;
+}
+.contact-theme {
+  isolation: isolate;
+  --contact-dark-progress: 0;
+  transition: --contact-dark-progress 350ms ease-in-out;
+}
+@property --contact-dark-progress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+.contact-theme::before,
+.contact-theme::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 350ms ease-in-out;
+}
+.contact-theme::before {
+  background: #121212 url('/grain.webp') repeat;
+  background-size: 512px 512px;
+  filter: brightness(0.88);
+  opacity: var(--contact-dark-progress);
+  transition: none;
+}
+.contact-theme.theme-grid::before {
+  background: #151414;
+  filter: none;
+}
+.contact-theme::after {
+  background: #ff6d6a;
+}
+.contact-theme[data-contact-theme='black'] {
+  --contact-dark-progress: 1;
+  --section-heading: #fcf7f3;
+  --section-subheading: #fcf7f3;
+  --section-body: #e7dcd4;
+  --section-muted: #d1c1b7;
+  --section-label: #ff6d6a;
+  --grid-ink: rgba(231, 220, 212, 0.12);
+}
+.contact-theme[data-contact-theme='pink'] {
+  --section-heading: #151414;
+  --section-subheading: #151414;
+  --section-body: #262626;
+  --section-muted: #544d49;
+  --section-label: #262626;
+  --grid-ink: rgba(21, 20, 20, 0.12);
+}
+.contact-theme[data-contact-theme='pink']::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-theme,
+  .section-theme::before,
+  .section-theme .theme-ink,
+  .section-theme .theme-label,
+  .section-theme .case-study,
+  .section-theme .case-study-body,
+  .section-theme .case-study span[style],
+  .section-theme .strategy-card {
+    transition: none;
+  }
+  .contact-theme::before,
+  .contact-theme::after,
+  .contact-theme,
+  .grid-backdrop,
+  .theme-surface .theme-chevron path {
+    transition: none;
+  }
+}

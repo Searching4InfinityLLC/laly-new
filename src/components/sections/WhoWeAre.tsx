@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+import { CARD_DARK_PALETTES } from '@/lib/palettes'
 import { MediaImage } from '@/components/Media/Image'
 import { ArrowCircleButton } from '@/components/ui/ArrowCircleButton'
 import { BracketLabel } from '@/components/ui/BracketLabel'
@@ -17,14 +19,14 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
     <section
       aria-label="Who we are"
       // Figma: 48 top+bottom / 20 sides mobile, 112 / 160 desktop. Ground #FCF7F3.
-      className="w-full bg-[#fcf7f3] py-12 md:py-28"
+      className="who-we-are w-full bg-[#fcf7f3] py-12 md:py-28"
     >
       {/* Figma's padding is the rule inside the shell: 20 sides mobile, 160 desktop */}
       <InView className="section-shell px-5 text-center sm:px-10 md:px-40">
-        <BracketLabel className="mx-auto mb-6 w-44 text-[#867A72] md:mb-8 md:w-80">
+        <BracketLabel className="mx-auto mb-6 w-44 theme-label text-[var(--section-label,#867A72)] md:mb-8 md:w-80">
           {label}
         </BracketLabel>
-        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight text-[#262626] md:text-6xl xl:text-7xl">
+        <h2 className="section-text-reveal font-display text-[40px] font-normal leading-none tracking-tight theme-ink text-[var(--section-heading,#262626)] md:text-6xl xl:text-7xl">
           {heading.split('\n').map((line) => (
             <span key={line} className="block">
               {line}
@@ -41,7 +43,7 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               key={para}
               // desktop-only tracking — it pushes "That" onto line 2 there, but on mobile it was
               // spilling "Us:" onto a second line
-              className={`section-text-reveal font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] text-[#4A4A4A] md:inline md:tracking-[0.02em] ${
+              className={`section-text-reveal font-sans text-xl md:text-2xl xl:text-[28px] font-normal leading-[1.25] theme-ink text-[var(--section-body,#4A4A4A)] md:inline md:tracking-[0.02em] ${
                 i > 0 ? "mt-6 md:mt-0 md:before:content-['_']" : ''
               }`}
             >
@@ -58,8 +60,16 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               // Mobile: single column, stacked (title+arrow, image, body, stat). Desktop: image fills
               // the left column across all three rows; title/body/stat stack in the right column with
               // the body row growing so the stat pins to the bottom.
-              className="relative grid grid-cols-1 gap-4 overflow-hidden border px-3 py-6 text-left md:grid-cols-2 md:gap-6 md:grid-rows-[auto_1fr_auto] md:p-6 3xl:p-8"
-              style={{ color: card.fg, backgroundColor: card.bg, borderColor: card.border }}
+              className="case-study relative grid grid-cols-1 gap-4 overflow-hidden border px-3 py-6 text-left md:grid-cols-2 md:gap-6 md:grid-rows-[auto_1fr_auto] md:p-6 3xl:p-8"
+              style={{
+                '--case-light-bg': card.bg,
+                '--case-light-fg': card.fg,
+                '--case-light-muted': card.muted,
+                '--case-dark-bg': CARD_DARK_PALETTES[card.bg.toLowerCase()]?.bg ?? card.bg,
+                '--case-dark-fg': CARD_DARK_PALETTES[card.bg.toLowerCase()]?.fg ?? card.fg,
+                '--case-dark-muted': CARD_DARK_PALETTES[card.bg.toLowerCase()]?.muted ?? card.muted,
+                borderColor: card.border,
+              } as CSSProperties}
             >
               {/* title row — arrow button only shows on mobile (EXPLORE takes over on desktop) */}
               {/* mb-2 on top of the card's 16 gap = the 24 Figma leaves under the title row */}
@@ -114,9 +124,8 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
               {/* body-2/xl — New Spirit 400 / 24px / 125% */}
               <p
                 // letter-spacing/l — same -0.01em we use on the hero desc
-                className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] opacity-80 md:col-start-2 md:row-start-2 md:text-2xl 3xl:text-[28px]"
+                className="case-study-body font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] md:col-start-2 md:row-start-2 md:text-2xl 3xl:text-[28px]"
                 // body-2/l is the card's own ink (#313008 Senft, #443B43 Vajra) at 80%
-                style={{ color: card.fg }}
               >
                 {card.body}
               </p>
@@ -129,12 +138,11 @@ export default function WhoWeAre({ content }: { content: WhoWeAreContent }) {
                   <CountUp
                     value={card.stat.value}
                     className="font-fira text-[32px] font-normal leading-none md:text-[44px]"
-                    style={{ color: card.fg }}
                   />
                   {/* body-2/xs — New Spirit 400 / 14px / 125%, flat at every width */}
                   <span
                     className="font-sans text-xs leading-[1.25] whitespace-normal md:text-sm md:whitespace-pre-line"
-                    style={{ color: card.muted }}
+                    style={{ color: 'var(--case-muted)' }}
                   >
                     {card.stat.label}
                   </span>

@@ -19,6 +19,7 @@ import { ScratchCover } from '@/components/ui/ScratchCover'
 import { GridBackdrop } from '@/components/ui/GridBackdrop'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { SectionFade } from '@/components/ui/SectionFade'
+import { SectionThemeSequence } from '@/components/ui/SectionTheme'
 
 export const metadata: Metadata = {
   title: 'Paid Advertising | Laly Agency',
@@ -35,10 +36,8 @@ export const metadata: Metadata = {
 // texture are part of the layout rather than editable artwork, and the pill tints follow the row
 // position like BADGE_COLORS does in Strategy.
 //
-// Every section but the hero is wrapped in <SectionFade>: one opacity ramp per section, tripped by
-// its own observer as it comes on screen (tech lead). The hero is above the fold, so it has nothing
-// to fade in from. This sits on top of the <InView> reveals the sections run on their own contents —
-// the two are independent and a section can hold both.
+// Post-scratch sections share scroll-driven light/dark themes. Hero, scratch and Contact keep
+// their existing treatment; inner content reveals remain independent.
 
 // Same 90deg wash on every pill — a warm ember that only reaches full brand pink in the last 15%,
 // so the row reads as one gradient sampled four times rather than four separate chips.
@@ -105,11 +104,11 @@ function Panel({
         {/* heading/h3/m 32 mobile — heading/h3/l 40 desktop; New Spirit / 125% / -0.5px.
             whitespace-pre-line, so an Enter in the CMS is a real break here too, the way it already
             is on the guarantee and the pricing heading. No break authored = it just wraps. */}
-        <h3 className="whitespace-pre-line font-sans text-[32px] leading-[1.25] tracking-[-0.5px] text-[#292624] md:text-[40px]">
+        <h3 className="whitespace-pre-line font-sans text-[32px] leading-[1.25] tracking-[-0.5px] theme-ink text-[var(--panel-heading,#292624)] md:text-[40px]">
           {panel.title}
         </h3>
         {/* body/m 18 mobile — body/l 20 desktop; Neue Haas / 125% / 0.25px */}
-        <p className="font-display text-lg font-normal leading-[1.25] tracking-[0.25px] text-[#544D49] md:text-xl">
+        <p className="font-display text-lg font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--panel-body,#544D49)] md:text-xl">
           {panel.body}
         </p>
       </div>
@@ -279,257 +278,246 @@ export default async function PaidAdvertisingPage() {
           bordered panels in a 1 / 2 / 1 stack. Borders live on the container and on the row/column
           edges rather than on every panel: Figma gives each panel its own b/l/r, which doubles up to
           2px wherever two panels meet. */}
-      <SectionFade>
-        <section
-          aria-label="What you get"
-          // mobile (2234:3818): px 16 / py 48, groups 40 apart
-          className="relative w-full overflow-hidden border-t border-[#544D49] bg-[#FCF7F3] px-4 py-12 md:p-28"
-        >
-          <GridBackdrop />
-
-          <div className="relative mx-auto flex w-full max-w-[1232px] flex-col gap-10 md:gap-12">
-            <div className="flex flex-col items-center gap-6 text-center md:gap-8">
-              <BracketLabel className="mx-auto w-52 text-[#867A72] md:w-[360px]">
-                {paid.whatYouGet.label}
-              </BracketLabel>
-              {/* heading/h1/xs 40 mobile — heading/h1/xl 64 desktop; Neue Haas 450 (→400, only
-                  400/500/700 ship) / 110% / -1px. 876px is Figma's own width, and it is what puts the
-                  break after "and". */}
-              <h2 className="max-w-[876px] font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
-                {paid.whatYouGet.heading}
-              </h2>
-            </div>
-
-            {/* The four panels are indexed, not mapped: the 1 / 2 / 1 arrangement and the borders
-                between the slots are the design, so the shape stays in the markup and only the copy
-                and the mock come from the CMS. */}
-            {/* one gate for the lot: the whole bordered frame slides up as a single element, the way
-                the FAQ box does — not four panels each on their own trip line.
-                InView observes this wrapper, so the trip is on the frame's TOP edge, and the frame is
-                three or four screens tall on a phone. -25% is the balance: deep enough that the move
-                is not over before you reach it, shallow enough that it does not sit there waiting. */}
-            <InView rootMargin="0px 0px -25% 0px">
-              <div className="mobile-reveal w-full border border-[#E7DCD4] bg-[#FFFCF9]">
-                {/* the export plus one live button, which presses itself once when the mock arrives */}
-                <Panel
-                  side
-                  panel={paid.whatYouGet.panels[0]}
-                  width={PANEL_WIDTHS[0]}
-                  graphic={
-                    <WebsiteMock media={paid.whatYouGet.panels[0].image} width={PANEL_WIDTHS[0]} />
-                  }
-                />
-
-                <div className="grid border-t border-[#E7DCD4] md:grid-cols-2">
-                  {/* the one mock that is live DOM — the pie wipes in and the total counts up. Its
-                      panel.image is still in the CMS as the fallback nobody renders; delete it there
-                      once this has been signed off. */}
-                  <Panel
-                    panel={paid.whatYouGet.panels[1]}
-                    width={PANEL_WIDTHS[1]}
-                    graphic={<CallsWidget />}
-                  />
-                  {/* the export plus the wipe that draws its call-volume line in */}
-                  <Panel
-                    className="border-t border-[#E7DCD4] md:border-t-0 md:border-l"
-                    panel={paid.whatYouGet.panels[2]}
-                    width={PANEL_WIDTHS[2]}
-                    graphic={
-                      <DashboardMock media={paid.whatYouGet.panels[2].image} width={PANEL_WIDTHS[2]} />
-                    }
-                  />
-                </div>
-
-                {/* the export plus the cone that reveals its ring around the dollar sign */}
-                <Panel
-                  side
-                  className="border-t border-[#E7DCD4]"
-                  panel={paid.whatYouGet.panels[3]}
-                  width={PANEL_WIDTHS[3]}
-                  graphic={
-                    <RefundMock media={paid.whatYouGet.panels[3].image} width={PANEL_WIDTHS[3]} />
-                  }
-                />
-              </div>
-            </InView>
-          </div>
-        </section>
-      </SectionFade>
-
-      {/* Figma 2488:822 — "The numbers speak." Three stat cards on the dark ground.
-          Cards enter left-to-right on the same clock as the Strategy pillars: InView's media gate
-          plus a 0.2s-per-card inline delay. */}
-      {/* mobile (2234:3922): px 20, pt 48 / pb 96, 64 to the cards, cards 24 apart */}
-      <SectionFade>
-        <section
-          aria-label="Results"
-          // .grain-ground (styles.css): #151414 + the site's dark grain tile (Figma 2488:822)
-          className="grain-ground w-full px-5 pt-12 pb-24 md:px-20 md:py-28"
-        >
-          <InView className="mx-auto flex w-full max-w-[1280px] flex-col gap-16">
-            <div className="flex flex-col gap-6 text-center">
-              <BracketLabel className="mx-auto w-44 text-[#FF6D6A] md:w-80">
-                {paid.results.label}
-              </BracketLabel>
-              <h2 className="section-text-reveal font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-[64px]">
-                {paid.results.heading}
-              </h2>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-3 md:gap-8">
-              {paid.results.stats.map((stat, i) => (
-                <div
-                  key={stat.value}
-                  // the inline animation-delay longhand beats the stylesheet's `animation` shorthand,
-                  // which is what staggers these left→right — same numbers as Strategy's pillars
-                  className="section-media-reveal flex flex-col gap-4 rounded bg-[#151414] px-4 py-6 text-center"
-                  style={{ backgroundImage: STAT_BG, animationDelay: `${0.2 + i * 0.2}s` }}
-                >
-                  <p className="font-sans text-[72px] leading-[1.25] tracking-[-0.5px] text-[#FF6D6A] md:text-[96px]">
-                    {stat.value}
-                  </p>
-                  {/* the authored \n is a desktop break only — mobile (2234:3929) lets the same copy
-                      wrap to the card, and a newline collapses to a space under whitespace-normal */}
-                  <p className="whitespace-normal font-sans text-xl leading-[1.25] text-[#FCF7F3] opacity-85 md:whitespace-pre-line md:text-[28px]">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </InView>
-        </section>
-      </SectionFade>
-
-      {/* Figma 2329:4221 — Pricing. Two cards; the second carries the brand keyline, a glow, and the
-          "pay as they come in" tab straddling its top edge. */}
-      <SectionFade>
-        <section
-          aria-label="Pricing"
-          // mobile (2571:2660): px 20, pt 48 / pb 96, cards 24 apart
-          className="w-full border-t-[0.5px] border-[#867A72] bg-[#FCF7F3] px-5 pt-12 pb-24 md:px-40 md:py-28"
-        >
-          <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-16">
-            <div className="flex flex-col gap-6 text-center">
-              <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
-                {paid.pricing.label}
-              </BracketLabel>
-              {/* the break after "Transparent." is authored, not a wrap — whitespace-pre-line keeps
-                  the editor's Enter */}
-              <h2 className="whitespace-pre-line font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#262626] md:text-[64px]">
-                {paid.pricing.heading}
-              </h2>
-            </div>
-
-            {/* items-stretch (grid's default) is what lets the shorter card match the taller one, and
-                justify-between then parks both CTAs on the same line.
-                The <InView> gate is what fades the pair in on scroll — client feedback, opacity only,
-                second card trailing the first by --card-delay. */}
-            <InView
-              className="grid gap-6 md:grid-cols-2 md:gap-8"
-              // the grid is most of a screen tall, so without this it trips at the viewport
-              // bottom and the fade is finished before the cards are in frame
-              rootMargin="0px 0px -25% 0px"
+      <SectionThemeSequence
+        sections={[
+          { id: 'what-you-get', tone: 'cream', texture: 'grid', content: (
+            <section
+              aria-label="What you get"
+              // mobile (2234:3818): px 16 / py 48, groups 40 apart
+              className="relative w-full overflow-hidden border-t border-[#544D49] bg-[#FCF7F3] px-4 py-12 md:p-28"
             >
-              {paid.pricing.tiers.map((tier, i) => (
-                <div
-                  key={tier.label}
-                  // 0.3s per card, up from 0.15 — client asked the second card to trail further
-                  style={{ '--card-delay': `${i * 0.3}s` } as CSSProperties}
-                  className={`card-fade relative flex flex-col justify-between gap-8 border bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
-                    tier.badge
-                      ? 'border-[#FF6D6A] shadow-[0_0_6px_0_rgba(66,55,48,0.2),1px_1px_6px_0_rgba(66,55,48,0.2)]'
-                      : 'border-[#E7DCD4]'
-                  }`}
-                >
-                  {tier.badge && (
-                    // straddles the keyline near the right edge — Figma pins it at left:372 on a
-                    // fixed-width card, which is that inset measured from the wrong side
-                    <span className="absolute -top-3 right-4 rounded-full bg-[#FF6D6A] px-1.5 py-1 font-fira text-xs leading-[1.25] tracking-[-1px] text-[#292624] shadow-[0_1px_2px_0_rgba(16,24,40,0.04)] md:right-10 md:text-base">
-                      {tier.badge}
-                    </span>
-                  )}
+              <GridBackdrop />
 
-                  <div className="flex flex-col gap-8">
-                    <div className="flex flex-col gap-4">
-                      {/* body/l — Neue Haas 20 / 125% / 0.25px, both widths */}
-                      <p className="font-display text-xl font-normal leading-[1.25] tracking-[0.25px] text-[#867A72]">
-                        {tier.label}
+              <div className="relative mx-auto flex w-full max-w-[1232px] flex-col gap-10 md:gap-12">
+                <div className="flex flex-col items-center gap-6 text-center md:gap-8">
+                  <BracketLabel className="mx-auto w-52 theme-label text-[var(--section-label,#867A72)] md:w-[360px]">
+                    {paid.whatYouGet.label}
+                  </BracketLabel>
+                  {/* heading/h1/xs 40 mobile — heading/h1/xl 64 desktop; Neue Haas 450 (→400, only
+                      400/500/700 ship) / 110% / -1px. 876px is Figma's own width, and it is what puts the
+                      break after "and". */}
+                  <h2 className="max-w-[876px] font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#262626)] md:text-[64px]">
+                    {paid.whatYouGet.heading}
+                  </h2>
+                </div>
+
+                {/* The four panels are indexed, not mapped: the 1 / 2 / 1 arrangement and the borders
+                    between the slots are the design, so the shape stays in the markup and only the copy
+                    and the mock come from the CMS. */}
+                {/* one gate for the lot: the whole bordered frame slides up as a single element, the way
+                    the FAQ box does — not four panels each on their own trip line.
+                    InView observes this wrapper, so the trip is on the frame's TOP edge, and the frame is
+                    three or four screens tall on a phone. -25% is the balance: deep enough that the move
+                    is not over before you reach it, shallow enough that it does not sit there waiting. */}
+                <InView rootMargin="0px 0px -25% 0px">
+                  <div className="mobile-reveal w-full border border-[var(--panel-border,#E7DCD4)] theme-surface bg-[#FFFCF9]">
+                    {/* the export plus one live button, which presses itself once when the mock arrives */}
+                    <Panel
+                      side
+                      panel={paid.whatYouGet.panels[0]}
+                      width={PANEL_WIDTHS[0]}
+                      graphic={
+                        <WebsiteMock media={paid.whatYouGet.panels[0].image} width={PANEL_WIDTHS[0]} />
+                      }
+                    />
+
+                    <div className="grid border-t border-[var(--panel-border,#E7DCD4)] md:grid-cols-2">
+                      {/* the one mock that is live DOM — the pie wipes in and the total counts up. Its
+                          panel.image is still in the CMS as the fallback nobody renders; delete it there
+                          once this has been signed off. */}
+                      <Panel
+                        panel={paid.whatYouGet.panels[1]}
+                        width={PANEL_WIDTHS[1]}
+                        graphic={<CallsWidget />}
+                      />
+                      {/* the export plus the wipe that draws its call-volume line in */}
+                      <Panel
+                        className="border-t border-[var(--panel-border,#E7DCD4)] md:border-t-0 md:border-l"
+                        panel={paid.whatYouGet.panels[2]}
+                        width={PANEL_WIDTHS[2]}
+                        graphic={
+                          <DashboardMock media={paid.whatYouGet.panels[2].image} width={PANEL_WIDTHS[2]} />
+                        }
+                      />
+                    </div>
+
+                    {/* the export plus the cone that reveals its ring around the dollar sign */}
+                    <Panel
+                      side
+                      className="border-t border-[var(--panel-border,#E7DCD4)]"
+                      panel={paid.whatYouGet.panels[3]}
+                      width={PANEL_WIDTHS[3]}
+                      graphic={
+                        <RefundMock media={paid.whatYouGet.panels[3].image} width={PANEL_WIDTHS[3]} />
+                      }
+                    />
+                  </div>
+                </InView>
+              </div>
+            </section>
+          ) },
+          { id: 'results', tone: 'dark', content: (
+            <section
+              aria-label="Results"
+              // .grain-ground (styles.css): #151414 + the site's dark grain tile (Figma 2488:822)
+              className="grain-ground w-full px-5 pt-12 pb-24 md:px-20 md:py-28"
+            >
+              <InView className="mx-auto flex w-full max-w-[1280px] flex-col gap-16">
+                <div className="flex flex-col gap-6 text-center">
+                  <BracketLabel className="mx-auto w-44 theme-label text-[var(--section-label,#FF6D6A)] md:w-80">
+                    {paid.results.label}
+                  </BracketLabel>
+                  <h2 className="section-text-reveal font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-subheading,#FCF7F3)] md:text-[64px]">
+                    {paid.results.heading}
+                  </h2>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-3 md:gap-8">
+                  {paid.results.stats.map((stat, i) => (
+                    <div
+                      key={stat.value}
+                      // the inline animation-delay longhand beats the stylesheet's `animation` shorthand,
+                      // which is what staggers these left→right — same numbers as Strategy's pillars
+                      className="section-media-reveal flex flex-col gap-4 rounded bg-[#151414] px-4 py-6 text-center"
+                      style={{ backgroundImage: STAT_BG, animationDelay: `${0.2 + i * 0.2}s` }}
+                    >
+                      <p className="font-sans text-[72px] leading-[1.25] tracking-[-0.5px] text-[#FF6D6A] md:text-[96px]">
+                        {stat.value}
                       </p>
-                      <p className="font-sans text-[64px] leading-[1.25] tracking-[-0.5px] text-[#262626] md:text-[72px]">
-                        {tier.price}
+                      {/* the authored \n is a desktop break only — mobile (2234:3929) lets the same copy
+                          wrap to the card, and a newline collapses to a space under whitespace-normal */}
+                      <p className="whitespace-normal font-sans text-xl leading-[1.25] text-[#FCF7F3] opacity-85 md:whitespace-pre-line md:text-[28px]">
+                        {stat.label}
                       </p>
                     </div>
-                    <ul className="ml-[30px] list-disc font-sans text-xl leading-[1.5] text-[#4A4A4A] md:ml-9 md:text-2xl">
-                      {tier.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="flex">
-                    {/* Figma sets this label at 18px mobile / 20px desktop; the Button ships 16/18 */}
-                    <Button
-                      booking
-                      href={paid.pricing.cta.href}
-                      className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
-                    >
-                      {paid.pricing.cta.label}
-                    </Button>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </InView>
-          </div>
-        </section>
-      </SectionFade>
+              </InView>
+            </section>
+          ) },
+          { id: 'pricing', tone: 'cream', content: (
+            <section
+              aria-label="Pricing"
+              // mobile (2571:2660): px 20, pt 48 / pb 96, cards 24 apart
+              className="w-full border-t-[0.5px] border-[#867A72] bg-[#FCF7F3] px-5 pt-12 pb-24 md:px-40 md:py-28"
+            >
+              <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-16">
+                <div className="flex flex-col gap-6 text-center">
+                  <BracketLabel className="mx-auto w-44 theme-label text-[var(--section-label,#867A72)] md:w-80">
+                    {paid.pricing.label}
+                  </BracketLabel>
+                  {/* the break after "Transparent." is authored, not a wrap — whitespace-pre-line keeps
+                      the editor's Enter */}
+                  <h2 className="whitespace-pre-line font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#262626)] md:text-[64px]">
+                    {paid.pricing.heading}
+                  </h2>
+                </div>
 
-      {/* Figma 2458:5950 — FAQ. Same cream + grid texture ground as "What you get".
-          Rows are the client <Accordion>: native <details> cannot animate its own open/close outside
-          Chromium, and the panel has to slide at both widths. Everything else here stays server. */}
-      <SectionFade>
-        <section
-          aria-label="FAQ"
-          // mobile (2739:9048): px 20, pt 48 / pb 96, 32 between the header and the container
-          className="relative w-full overflow-hidden border-y border-[#544D49] bg-[#FCF7F3] px-5 pt-12 pb-24 md:px-40 md:py-28"
-        >
-          <GridBackdrop />
+                {/* items-stretch (grid's default) is what lets the shorter card match the taller one, and
+                    justify-between then parks both CTAs on the same line.
+                    The <InView> gate is what fades the pair in on scroll — client feedback, opacity only,
+                    second card trailing the first by --card-delay. */}
+                <InView
+                  className="grid gap-6 md:grid-cols-2 md:gap-8"
+                  // the grid is most of a screen tall, so without this it trips at the viewport
+                  // bottom and the fade is finished before the cards are in frame
+                  rootMargin="0px 0px -25% 0px"
+                >
+                  {paid.pricing.tiers.map((tier, i) => (
+                    <div
+                      key={tier.label}
+                      // 0.3s per card, up from 0.15 — client asked the second card to trail further
+                      style={{ '--card-delay': `${i * 0.3}s` } as CSSProperties}
+                      className={`card-fade relative flex flex-col justify-between gap-8 border theme-surface bg-[#FFFCF9] px-4 py-6 md:gap-10 md:p-10 ${
+                        tier.badge
+                          ? 'border-[#FF6D6A] shadow-[0_0_6px_0_rgba(66,55,48,0.2),1px_1px_6px_0_rgba(66,55,48,0.2)]'
+                          : 'border-[var(--panel-border,#E7DCD4)]'
+                      }`}
+                    >
+                      {tier.badge && (
+                        // straddles the keyline near the right edge — Figma pins it at left:372 on a
+                        // fixed-width card, which is that inset measured from the wrong side
+                        <span className="absolute -top-3 right-4 rounded-full bg-[#FF6D6A] px-1.5 py-1 font-fira text-xs leading-[1.25] tracking-[-1px] text-[#292624] shadow-[0_1px_2px_0_rgba(16,24,40,0.04)] md:right-10 md:text-base">
+                          {tier.badge}
+                        </span>
+                      )}
 
-          <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 md:gap-12">
-            <div className="flex flex-col gap-6 text-center">
-              <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
-                {paid.faq.label}
-              </BracketLabel>
-              <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#292624] md:text-[56px]">
-                {paid.faq.heading}
-              </h2>
-            </div>
+                      <div className="flex flex-col gap-8">
+                        <div className="flex flex-col gap-4">
+                          {/* body/l — Neue Haas 20 / 125% / 0.25px, both widths */}
+                          <p className="font-display text-xl font-normal leading-[1.25] tracking-[0.25px] theme-ink text-[var(--panel-muted,#867A72)]">
+                            {tier.label}
+                          </p>
+                          <p className="font-sans text-[64px] leading-[1.25] tracking-[-0.5px] theme-ink text-[var(--panel-heading,#262626)] md:text-[72px]">
+                            {tier.price}
+                          </p>
+                        </div>
+                        <ul className="ml-[30px] list-disc font-sans text-xl leading-[1.5] theme-ink text-[var(--panel-body,#4A4A4A)] md:ml-9 md:text-2xl">
+                          {tier.items.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
 
-            {/* below md the whole box travels as one — border, rows and all — rather than the rows
-                sliding inside a border that stays put */}
-            <InView rootMargin="0px 0px -15% 0px">
-              <div className="mobile-reveal flex w-full flex-col gap-4 border border-[#E7DCD4] bg-[#FFFCF9] px-3 py-6 md:p-6">
-                {paid.faq.items.map((faq, i) => (
-                  <Accordion
-                    // the placeholder rows are identical copy, so the index is the only stable key
-                    key={i}
-                    id={`faq-${i}`}
-                    question={faq.question}
-                    answer={faq.answer}
-                    // last row drops the rule — Figma ends the stack on the container's own border
-                    className={`px-4 py-6 ${
-                      i < paid.faq.items.length - 1 ? 'border-b border-[#E7DCD4]' : ''
-                    }`}
-                  />
-                ))}
+                      <div className="flex">
+                        {/* Figma sets this label at 18px mobile / 20px desktop; the Button ships 16/18 */}
+                        <Button
+                          booking
+                          href={paid.pricing.cta.href}
+                          className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
+                        >
+                          {paid.pricing.cta.label}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </InView>
               </div>
-            </InView>
-          </div>
-        </section>
-      </SectionFade>
+            </section>
+          ) },
+          { id: 'faq', tone: 'cream', texture: 'grid', content: (
+            <section
+              aria-label="FAQ"
+              // mobile (2739:9048): px 20, pt 48 / pb 96, 32 between the header and the container
+              className="relative w-full overflow-hidden border-y border-[#544D49] bg-[#FCF7F3] px-5 pt-12 pb-24 md:px-40 md:py-28"
+            >
+              <GridBackdrop />
 
-      <SectionFade>
-        <Contact content={contact} />
-      </SectionFade>
+              <div className="relative mx-auto flex w-full max-w-[1120px] flex-col gap-8 md:gap-12">
+                <div className="flex flex-col gap-6 text-center">
+                  <BracketLabel className="mx-auto w-44 theme-label text-[var(--section-label,#867A72)] md:w-80">
+                    {paid.faq.label}
+                  </BracketLabel>
+                  <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#292624)] md:text-[56px]">
+                    {paid.faq.heading}
+                  </h2>
+                </div>
+
+                {/* below md the whole box travels as one — border, rows and all — rather than the rows
+                    sliding inside a border that stays put */}
+                <InView rootMargin="0px 0px -15% 0px">
+                  <div className="mobile-reveal flex w-full flex-col gap-4 border border-[var(--panel-border,#E7DCD4)] theme-surface bg-[#FFFCF9] px-3 py-6 md:p-6">
+                    {paid.faq.items.map((faq, i) => (
+                      <Accordion
+                        // the placeholder rows are identical copy, so the index is the only stable key
+                        key={i}
+                        id={`faq-${i}`}
+                        question={faq.question}
+                        answer={faq.answer}
+                        // last row drops the rule — Figma ends the stack on the container's own border
+                        className={`px-4 py-6 ${
+                          i < paid.faq.items.length - 1 ? 'border-b border-[var(--panel-border,#E7DCD4)]' : ''
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </InView>
+              </div>
+            </section>
+          ) },
+        ]}
+        contact={<SectionFade><Contact content={contact} /></SectionFade>}
+      />
 
       {/* Figma 2148:620 — the same dark qualifier band the home page closes on, reusing the same
           `note` block from this page's own doc: the copy is page-specific, the shape is not.

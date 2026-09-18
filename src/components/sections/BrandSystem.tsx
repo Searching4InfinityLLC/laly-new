@@ -43,12 +43,12 @@ export function BrandSystem({ content }: { content: SystemContent }) {
           deck; the phone runs 24 / 24 / 32. */}
       <div className="relative mx-auto flex w-full max-w-[1216px] flex-col gap-6 md:gap-12">
         <div className="flex flex-col gap-6 text-center md:gap-8">
-          <BracketLabel className="mx-auto w-44 text-[#867A72] md:w-80">
+          <BracketLabel className="mx-auto w-44 theme-label text-[var(--section-label,#867A72)] md:w-80">
             {content.label}
           </BracketLabel>
           {/* heading/h1/xl: Neue Haas 450 (→400) / 64 / 110% / -1px, 40 on the phone. Per-line
               spans, same as Strategy — the \n is a break the designer set, not a wrap. */}
-          <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#292624] md:text-[64px]">
+          <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] theme-ink text-[var(--section-heading,#292624)] md:text-[64px]">
             {content.heading.split('\n').map((line) => (
               <span key={line} className="block">
                 {line}
@@ -60,7 +60,7 @@ export function BrandSystem({ content }: { content: SystemContent }) {
         <div className="flex flex-col items-center gap-8 md:gap-20">
           {/* The argument runs the full 1216 column, centred — no narrower cap: at 28px that is what
               sets the breaks the frame draws. */}
-          <p className="w-full whitespace-pre-line text-center font-sans text-xl leading-[1.25] text-[#4A4A4A] md:text-[28px]">
+          <p className="w-full whitespace-pre-line text-center font-sans text-xl leading-[1.25] theme-ink text-[var(--section-body,#4A4A4A)] md:text-[28px]">
             {content.body.before}
             {/* New Spirit Bold Condensed — the thesis, set apart from the copy either side of it */}
             <strong className="font-bold">{content.body.emphasis}</strong>
