@@ -6,6 +6,8 @@ import { createPortal } from 'react-dom'
 type ContactVariant = 'current' | 'black' | 'pink'
 type SectionTone = 'cream' | 'dark' | 'white'
 
+const INTERSECTION_PERCENTAGES = [20, 25, 30, 35, 40, 45, 50, 55, 60] as const
+
 export type ThemeSection = {
   id: string
   tone: SectionTone
@@ -37,6 +39,7 @@ export function SectionThemeSequence({ sections, contact }: {
   const contactRef = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState<SectionTone>(sections[0]?.tone ?? 'cream')
   const [variant, setVariant] = useState<ContactVariant>('current')
+  const [intersectionPercentage, setIntersectionPercentage] = useState(50)
   const [contactReached, setContactReached] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -49,7 +52,7 @@ export function SectionThemeSequence({ sections, contact }: {
     let frame = 0
     const reached = (section: HTMLElement) => {
       const { top, height } = section.getBoundingClientRect()
-      return top <= window.innerHeight - Math.min(height, window.innerHeight) * 0.5
+      return top <= window.innerHeight - Math.min(height, window.innerHeight) * (intersectionPercentage / 100)
     }
     const update = () => {
       frame = 0
@@ -81,19 +84,32 @@ export function SectionThemeSequence({ sections, contact }: {
       window.removeEventListener('resize', schedule)
       window.removeEventListener('pageshow', schedule)
     }
-  }, [sections])
+  }, [intersectionPercentage, sections])
 
   return (
     <>
       {mounted && createPortal(
-        <label className="theme-preview-selector">
-          <span>Scroll theme</span>
-          <select value={variant} onChange={(event) => setVariant(event.target.value as ContactVariant)}>
-            <option value="current">1 · Current</option>
-            <option value="black">2 · Black above Contact</option>
-            <option value="pink">3 · Pink above Contact</option>
-          </select>
-        </label>,
+        <div className="theme-preview-selector">
+          <label>
+            <span>Intersection percentage</span>
+            <select
+              value={intersectionPercentage}
+              onChange={(event) => setIntersectionPercentage(Number(event.target.value))}
+            >
+              {INTERSECTION_PERCENTAGES.map((percentage) => (
+                <option key={percentage} value={percentage}>{percentage}%</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Scroll theme</span>
+            <select value={variant} onChange={(event) => setVariant(event.target.value as ContactVariant)}>
+              <option value="current">1 · Current</option>
+              <option value="black">2 · Black above Contact</option>
+              <option value="pink">3 · Pink above Contact</option>
+            </select>
+          </label>
+        </div>,
         document.body,
       )}
       <div ref={container} className="section-theme" data-theme={phase === 'dark' ? 'dark' : 'light'} data-ground={phase}>

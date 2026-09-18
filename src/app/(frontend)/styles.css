@@ -1298,6 +1298,10 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   font: 12px/1.4 system-ui, sans-serif;
   box-shadow: 0 2px 12px #0002;
 }
+.theme-preview-selector label {
+  display: grid;
+  gap: 4px;
+}
 .theme-preview-selector select {
   width: 100%;
   padding: 4px;
