@@ -123,7 +123,12 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
     // 600 fixed and centred, not an inset off the 1120 shell — Figma pins the card at 600 (node
     // 2017:5127 sits at x=420 in a 1440 frame). An inset kept growing it with the viewport, which is
     // the "oversized on a laptop" the designer was looking at. Mobile still runs full width.
-    <div className="section-media-reveal mt-8 text-left md:mx-auto md:mt-0 md:w-[600px]">
+    // swipe lives on the whole card, not just the photo — the dark role bar swipes too (client note)
+    <div
+      className="section-media-reveal mt-8 text-left md:mx-auto md:mt-0 md:w-[600px]"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
       <div className="mb-2 flex items-center justify-end gap-1.5 text-[#FF8A88] md:hidden">
         {/* Fira Code 400 / 10 / 100% / no tracking / #FF8A88 */}
@@ -134,11 +139,7 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
 
       {/* photo block — fixed height at both sizes: 430 mobile, 475 md+ (Figma 600x475).
           current photo slides out, incoming slides in from the opposite edge */}
-      <div
-        className="relative h-[430px] w-full overflow-hidden md:h-[475px]"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
+      <div className="relative h-[430px] w-full overflow-hidden md:h-[475px]">
         {/* Keyed by member index, and rendered from an array so React reconciles by key rather than
             by position. Load-bearing, not tidiness.
             When the slide ends, `setCurrent(next)` + `setIncoming(null)` fire together. Unkeyed, the
