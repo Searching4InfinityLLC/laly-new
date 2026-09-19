@@ -29,6 +29,8 @@
     "update:paid-faq": "bun scripts/update-paid-faq.ts",
     "//check:slots": "Self-check for the booking availability engine (src/lib/slots.ts). Plain asserts, no test framework — run it after touching business hours, slot length or the race guard.",
     "check:slots": "bun scripts/check-slots.ts",
+    "//google:auth": "One-time: mints GOOGLE_REFRESH_TOKEN for the booking dialog. Sign in as the calendar owner. See the header of scripts/google-auth.ts.",
+    "google:auth": "bun scripts/google-auth.ts",
     "//seed:node": "Fallback runner on Node via Payload's own loader. Needed only if payload.config.ts ever imports @payloadcms/richtext-lexical again — its circular ESM deps break under bun.",
     "seed:node": "payload run scripts/seed-paid.ts"
   },

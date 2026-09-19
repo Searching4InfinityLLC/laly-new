@@ -102,7 +102,7 @@ export const home: HomeContent = {
           { label: 'Google Ads', color: '#A2A11C' },
           { label: 'Bing Ads', color: '#CBB1C9', hideOnMobile: true }, // client note: off on mobile
           { label: 'Meta Ads', color: '#FF8A88' },
-          { label: 'Tik Tok', color: '#F5C882' },
+          { label: 'TikTok', color: '#F5C882' },
         ],
         // \n = designer's desktop line breaks, hard at md+ and ignored below (see Strategy.tsx)
         hook: "If you're looking for a new stream of\nhigh-quality leads, this is for you.",

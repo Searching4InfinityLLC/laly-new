@@ -88,6 +88,10 @@ function validate(d: Details): Partial<Record<keyof Details, string>> {
 // grid, the chips and the confirmation all read in this zone, labelled, and the only thing the
 // visitor's own zone is used for is metadata on the booking.
 const AGENCY_TZ = 'America/New_York'
+// Chips in a fully open day, morning then afternoon — 9–12 and 13–17 at 30 minutes (src/lib/slots.ts).
+// Drives the skeleton and the height the chip area reserves. If business hours change, change this;
+// get it wrong and the only symptom is the picker's height, never a wrong slot.
+const DAY_SHAPE = [6, 8] as const
 
 // A calendar date, anchored at noon UTC. Noon is the trick: it is the same calendar day in every
 // zone on earth, so the date can be formatted for display without a zone quietly rolling it over.
@@ -138,6 +142,7 @@ const T_EYEBROW: MaskTiming = {
 
 export function BookingDialog() {
   const ref = useRef<HTMLDialogElement>(null)
+  const downOnBackdrop = useRef(false)
   // Nothing renders until the dialog is first opened. Two reasons: the date strip is derived from
   // `new Date()` and would not survive hydration if it shipped in the server HTML, and the homepage
   // is scored on Lighthouse — an unopened modal has no business in the first paint.
@@ -149,8 +154,8 @@ export function BookingDialog() {
   const [slots, setSlots] = useState<Slot[] | null>(null)
   // A NEW day is loading while the PREVIOUS day's chips stay on screen. Blanking them mid-flight was
   // the blink: chips out, skeletons in, chips back — three layouts inside ~100ms on a warm
-  // connection. Hours are identical every day now (see src/lib/slots.ts), so the count never changes
-  // and holding the old grid in place costs nothing.
+  // connection. Counts differ per day once Google's busy list is subtracted, but the chip area
+  // reserves a full day's height (DAY_SHAPE), so holding the old grid in place never moves anything.
   const [pending, setPending] = useState(false)
   const [slot, setSlot] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -168,6 +173,9 @@ export function BookingDialog() {
   // position and the panel stutters.
   const moving = useRef(false)
   const [failed, setFailed] = useState<string | null>(null)
+  // The day's availability could not be loaded (server down, offline). Its own state, because an
+  // empty list reads "nothing free that day" — an outage passed off as a full calendar.
+  const [slotsError, setSlotsError] = useState(false)
   const [meetUrl, setMeetUrl] = useState<string | null>(null)
   // whether the server actually sent a calendar invite. False while the Google wiring is stubbed,
   // and the confirmation copy reads off it rather than assuming.
@@ -231,6 +239,10 @@ export function BookingDialog() {
       setDetails(EMPTY)
       setDate(null)
       setSlot(null)
+      setSlots(null)
+      setSlotsError(false)
+      setErrors({})
+      setFailed(null)
       setMeetUrl(null)
       setInvited(false)
     }
@@ -257,6 +269,7 @@ export function BookingDialog() {
     if (!date) return
     const ac = new AbortController()
     setPending(true)
+    setSlotsError(false)
     fetch(`/api/booking/slots?date=${date}`, { signal: ac.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((data: { slots: Slot[] }) => {
@@ -268,6 +281,7 @@ export function BookingDialog() {
       })
       .catch((e) => {
         if (e.name === 'AbortError') return // a newer day is already in flight and owns `pending`
+        setSlotsError(true)
         setSlots([])
         setSlot(null)
         setPending(false)
@@ -282,7 +296,10 @@ export function BookingDialog() {
   // Which steps the meter will actually take you to. Details is always reachable; picking a time
   // needs the details; the confirmation is somewhere you arrive by booking, never somewhere you can
   // jump to — otherwise the meter would happily show "confirmed" for a booking that never happened.
-  const canGo = (i: number) => i === 0 || (i === 1 && detailsDone) || (i === 2 && step === 2)
+  // And once there, nowhere else: stepping back to the time picker left CONFIRM live on a slot that
+  // was already booked, so a second press booked it twice. A new booking starts from DONE.
+  const canGo = (i: number) =>
+    step === 2 ? i === 2 : i === 0 || (i === 1 && detailsDone)
 
   // Moves to a step, animating. Skips canGo on purpose — book() lands on the confirmation, which is
   // by definition not reachable by the meter. goTo() is the guarded public door.
@@ -432,8 +449,13 @@ export function BookingDialog() {
       className="booking-dialog"
       // Click the backdrop to dismiss. The <dialog> itself is the full-viewport box and the card is
       // its child, so a click whose target IS the dialog landed outside the card.
+      // …but only when the press STARTED there too. A drag that begins in a field (selecting the
+      // email to fix a typo) and ends past the card's edge also clicks on the dialog.
+      onPointerDown={(e) => {
+        downOnBackdrop.current = e.target === ref.current
+      }}
       onClick={(e) => {
-        if (e.target === ref.current) close()
+        if (e.target === ref.current && downOnBackdrop.current) close()
       }}
     >
       {/* Height is FIXED, not content-driven: the three steps are different lengths, and letting
@@ -607,78 +629,118 @@ export function BookingDialog() {
                     })}
                   </div>
 
-                  <div className="mt-8" aria-live="polite">
-                    {/* Skeletons rather than a "loading…" line: they stand in the real chips' footprint,
-                        so the grid does not pop into place under the cursor when the fetch lands. The
-                        counts are the shape of a typical day, not the real answer — they are aria-hidden
-                        and the live region below carries the actual status. */}
-                    {slots === null && pending && (
-                      <>
-                        <p className="sr-only">Checking the calendar…</p>
-                        <div aria-hidden>
-                          {([6, 8] as const).map((count, gi) => (
-                            <div key={gi} className="mb-4 last:mb-0">
-                              <p className="font-fira text-[10px] uppercase tracking-[1px] text-[#867a72]/50">
-                                {gi === 0 ? 'MORNING' : 'AFTERNOON'}
+                  {/* One grid cell, two layers: an invisible full day (DAY_SHAPE) and the real
+                      content on top. The cell is as tall as the taller of the two, so a day with
+                      three free slots holds the same height as an empty calendar and the buttons
+                      below never jump when the date changes. */}
+                  <div className="mt-8 grid" aria-live="polite">
+                    <div aria-hidden className="invisible [grid-area:1/1]">
+                      {DAY_SHAPE.map((count, gi) => (
+                        <div key={gi} className="mb-4 last:mb-0">
+                          <p className="font-fira text-[10px] uppercase tracking-[1px]">MORNING</p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {Array.from({ length: count }).map((_, i) => (
+                              <span
+                                key={i}
+                                className="rounded-full border px-3 py-1.5 font-fira text-sm md:py-1"
+                              >
+                                10:30 AM
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="[grid-area:1/1]">
+                      {/* Skeletons rather than a "loading…" line: they stand in the real chips' footprint,
+                          so the grid does not pop into place under the cursor when the fetch lands. The
+                          counts are the shape of a typical day, not the real answer — they are aria-hidden
+                          and the live region below carries the actual status. */}
+                      {slots === null && pending && (
+                        <>
+                          <p className="sr-only">Checking the calendar…</p>
+                          <div aria-hidden>
+                            {DAY_SHAPE.map((count, gi) => (
+                              <div key={gi} className="mb-4 last:mb-0">
+                                <p className="font-fira text-[10px] uppercase tracking-[1px] text-[#867a72]/50">
+                                  {gi === 0 ? 'MORNING' : 'AFTERNOON'}
+                                </p>
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                  {Array.from({ length: count }).map((_, i) => (
+                                    <span
+                                      key={i}
+                                      className="block h-[34px] w-[92px] animate-pulse rounded-full bg-[#544D49]/12 motion-reduce:animate-none md:h-[30px]"
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                      {slots?.length === 0 &&
+                        (slotsError ? (
+                          <p className="font-sans text-lg text-[#4a4a4a]">
+                            Couldn&apos;t load the times.{' '}
+                            <button
+                              type="button"
+                              onClick={() => setReload((n) => n + 1)}
+                              className="cursor-pointer border-b border-[#151414] text-[#151414]"
+                            >
+                              Try again
+                            </button>
+                          </p>
+                        ) : (
+                          <p className="font-sans text-lg text-[#4a4a4a]">
+                            Nothing free that day. Try another.
+                          </p>
+                        ))}
+                      {/* Stale-while-revalidate: the previous day's chips stay put, dimmed and inert,
+                          until the next day lands. The reserved height means a different count
+                          does not move anything either. */}
+                      <div
+                        className={`transition-opacity duration-200 ${
+                          pending && slots ? 'pointer-events-none opacity-40' : 'opacity-100'
+                        }`}
+                      >
+                        {/* Headings are 10px on a 2px lead rather than the 11px/12px the rest of the
+                            card uses — they are a divider, not a field label, and at full size they
+                            competed with the chips they are meant to sort. */}
+                        {groups.map(([title, group]) => {
+                          if (group.length === 0) return null
+                          return (
+                            <div key={title} className="mb-4 last:mb-0">
+                              <p className="font-fira text-[10px] uppercase tracking-[1px] text-[#867a72]">
+                                {title}
                               </p>
                               <div className="mt-2 flex flex-wrap gap-1.5">
-                                {Array.from({ length: count }).map((_, i) => (
-                                  <span
-                                    key={i}
-                                    className="block h-[34px] w-[92px] animate-pulse rounded-full bg-[#544D49]/12 motion-reduce:animate-none md:h-[30px]"
-                                  />
-                                ))}
+                                {group.map((s) => {
+                                  const on = s.start === slot
+                                  return (
+                                    <button
+                                      key={s.start}
+                                      type="button"
+                                      aria-pressed={on}
+                                      onClick={() => {
+                                      setSlot(s.start)
+                                      // the last error was about a different choice
+                                      setFailed(null)
+                                    }}
+                                      className={`cursor-pointer rounded-full border px-3 py-1.5 font-fira text-sm transition-colors md:py-1 ${
+                                        on
+                                          ? 'border-[#ff6d6a] bg-[#ff6d6a] text-[#292624]'
+                                          : 'border-[#544D49]/40 text-[#262626] hover:border-[#151414]'
+                                      }`}
+                                    >
+                                      {time(s.start)}
+                                    </button>
+                                  )
+                                })}
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                    {slots?.length === 0 && (
-                      <p className="font-sans text-lg text-[#4a4a4a]">
-                        Nothing free that day. Try another.
-                      </p>
-                    )}
-                    {/* Stale-while-revalidate: the previous day's chips stay put, dimmed and inert,
-                        until the next day lands. Same count every day, so nothing moves. */}
-                    <div
-                      className={`transition-opacity duration-200 ${
-                        pending && slots ? 'pointer-events-none opacity-40' : 'opacity-100'
-                      }`}
-                    >
-                      {/* Headings are 10px on a 2px lead rather than the 11px/12px the rest of the
-                          card uses — they are a divider, not a field label, and at full size they
-                          competed with the chips they are meant to sort. */}
-                      {groups.map(([title, group]) => {
-                        if (group.length === 0) return null
-                        return (
-                          <div key={title} className="mb-4 last:mb-0">
-                            <p className="font-fira text-[10px] uppercase tracking-[1px] text-[#867a72]">
-                              {title}
-                            </p>
-                            <div className="mt-2 flex flex-wrap gap-1.5">
-                              {group.map((s) => {
-                                const on = s.start === slot
-                                return (
-                                  <button
-                                    key={s.start}
-                                    type="button"
-                                    aria-pressed={on}
-                                    onClick={() => setSlot(s.start)}
-                                    className={`cursor-pointer rounded-full border px-3 py-1.5 font-fira text-sm transition-colors md:py-1 ${
-                                      on
-                                        ? 'border-[#ff6d6a] bg-[#ff6d6a] text-[#292624]'
-                                        : 'border-[#544D49]/40 text-[#262626] hover:border-[#151414]'
-                                    }`}
-                                  >
-                                    {time(s.start)}
-                                  </button>
-                                )
-                              })}
-                            </div>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
 

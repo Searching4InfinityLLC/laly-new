@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties, type TransitionEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type TransitionEvent } from 'react'
 import { EMBER_WASH } from '@/lib/palettes'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import type { ChannelsContent } from '@/lib/types'
@@ -74,7 +74,49 @@ export function Channels({ content }: { content: ChannelsContent }) {
   // swipes its own scroll container), and three cards is the strip the mobile frame draws.
   const [pos, setPos] = useState(count)
   const [snap, setSnap] = useState(false)
-  const step = (by: number) => setPos((p) => p + by)
+  // pos mirrored in a ref: the fallback timer below fires from a closure a render or two old
+  const posRef = useRef(count)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const fallback = useRef<number | undefined>(undefined)
+  const home = (p: number) => (((p % count) + count) % count) + count
+
+  const move = (p: number) => {
+    posRef.current = p
+    setPos(p)
+  }
+
+  // Back into the middle copy, transitions off for that one frame. Called on transitionend, or by
+  // the fallback timer when that event never comes (retargeted mid-flight, crossed out of md, tab
+  // hidden) — without it the track would sit on an outer copy and the next few clicks run it off
+  // the end of the rendered cards into an empty frame.
+  const land = () => {
+    window.clearTimeout(fallback.current)
+    const p = posRef.current
+    if (p === home(p)) return
+    setSnap(true)
+    move(home(p))
+  }
+
+  const step = (by: number) => {
+    const to = posRef.current + by
+    const track = trackRef.current
+    // parseFloat reads the leading number of "0.9s" / "0s"; is-snapping and reduced motion both
+    // resolve to 0, and so does the phone, where the track isn't transformed at all
+    const ms = track ? parseFloat(getComputedStyle(track).transitionDuration) * 1000 : 0
+    if (!ms) {
+      // No transition means no transitionend: wrap now, or pos grows with every click and walks
+      // off the nine rendered cards. Same pixels either way, so nothing is seen to jump.
+      move(home(to))
+      return
+    }
+    // Clicks mid-flight retarget the slide rather than queue, so they are free — until the next one
+    // would land past the outer copies. That one is dropped: the track is already heading for the
+    // last real card, and the snap-back on landing hands it a fresh copy to walk into.
+    if (to < 0 || to >= count * 3) return
+    move(to)
+    window.clearTimeout(fallback.current)
+    fallback.current = window.setTimeout(land, ms + 100)
+  }
 
   // one frame with transitions off is all the snap needs; re-arm straight after
   useEffect(() => {
@@ -83,11 +125,11 @@ export function Channels({ content }: { content: ChannelsContent }) {
     return () => cancelAnimationFrame(id)
   }, [snap])
 
+  useEffect(() => () => window.clearTimeout(fallback.current), [])
+
   const onLanded = (e: TransitionEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget || e.propertyName !== 'transform') return
-    if (pos >= count && pos < count * 2) return
-    setSnap(true)
-    setPos(((pos % count) + count) % count + count)
+    land()
   }
 
   return (
@@ -128,6 +170,7 @@ export function Channels({ content }: { content: ChannelsContent }) {
                 have to move the track. --i is the transform's input; styles.css only applies it at
                 md+, where the phone's scroll is off and would otherwise fight it. */}
             <div
+              ref={trackRef}
               className={`channel-track flex gap-2 md:gap-12 ${snap ? 'is-snapping' : ''}`}
               style={{ '--i': pos } as CSSProperties}
               onTransitionEnd={onLanded}
@@ -140,7 +183,11 @@ export function Channels({ content }: { content: ChannelsContent }) {
                     // px 16 / py 40 on the phone, px 40 / py 64 on desktop. The gap between cards is real at
                     // every width now — with the cards flush the slide read as one long sheet moving
                     // rather than three objects passing.
-                    className={`w-[calc(100vw-2rem)] shrink-0 snap-center flex-col items-center gap-10 border border-[#3C3734] bg-[rgba(21,20,20,0.32)] px-4 py-10 md:w-full md:flex-row md:justify-center md:gap-20 md:px-10 md:py-16 ${
+                    // w-full is the track's width, i.e. the viewport's content box (its px-4 puts
+                    // the gutters back): the strip itself. 100vw counted the desktop scrollbar too,
+                    // so a narrow desktop window got cards ~15px wider than the strip, cut at both
+                    // edges by the centred snap.
+                    className={`w-full shrink-0 snap-center flex-col items-center gap-10 border border-[#3C3734] bg-[rgba(21,20,20,0.32)] px-4 py-10 md:flex-row md:justify-center md:gap-20 md:px-10 md:py-16 ${
                       copy === 1 ? 'flex' : 'hidden md:flex'
                     }`}
                     style={{ boxShadow: CARD_SHADOW }}

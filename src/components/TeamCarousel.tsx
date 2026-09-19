@@ -2,6 +2,7 @@
 
 import {
   type ReactNode,
+  type KeyboardEvent as ReactKeyboardEvent,
   type TouchEvent as ReactTouchEvent,
   useCallback,
   useEffect,
@@ -101,17 +102,33 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
     [current, members.length],
   )
 
-  // touch swipe (mobile has no arrows): left => next, right => prev
-  const touchX = useRef<number | null>(null)
+  // touch swipe (mobile has no visible arrows): left => next, right => prev.
+  // Only a swipe when the travel is mostly sideways — a phone scroll is never perfectly vertical, and
+  // checking dx alone flipped the member on any diagonal flick past the card. Nothing here calls
+  // preventDefault and the card keeps the default touch-action, so vertical scroll stays native.
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
   const onTouchStart = (e: ReactTouchEvent) => {
-    touchX.current = e.touches[0].clientX
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
   }
   const onTouchEnd = (e: ReactTouchEvent) => {
-    if (touchX.current === null) return
-    const dx = e.changedTouches[0].clientX - touchX.current
-    touchX.current = null
-    if (Math.abs(dx) < 40) return
+    if (touchStart.current === null) return
+    const dx = e.changedTouches[0].clientX - touchStart.current.x
+    const dy = e.changedTouches[0].clientY - touchStart.current.y
+    touchStart.current = null
+    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy) * 1.5) return
     advance(dx < 0 ? 'next' : 'prev')
+  }
+  // the browser can take a touch over for its own scroll; don't leave a stale start behind
+  const onTouchCancel = () => {
+    touchStart.current = null
+  }
+
+  // Arrow keys while focus is anywhere in the card (in practice, on one of the arrow buttons) — no
+  // extra tab stop of its own, the buttons already are the way in.
+  const onKeyDown = (e: ReactKeyboardEvent) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+    e.preventDefault()
+    advance(e.key === 'ArrowLeft' ? 'prev' : 'next')
   }
 
   const photoExit = direction === 'next' ? '-100%' : '100%'
@@ -126,9 +143,19 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
     // swipe lives on the whole card, not just the photo — the dark role bar swipes too (client note)
     <div
       className="section-media-reveal mt-8 text-left md:mx-auto md:mt-0 md:w-[600px]"
+      role="group"
+      aria-roledescription="carousel"
+      aria-label="Our team"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchCancel}
+      onKeyDown={onKeyDown}
     >
+      {/* the masked name/role swap is visual only — this tells a screen reader who is now showing */}
+      <p className="sr-only" aria-live="polite">
+        {`${members[current].name}, ${members[current].role}`}
+      </p>
+
       {/* mobile only — swipe affordance, sits above the card (no on-card arrows on small screens) */}
       <div className="mb-2 flex items-center justify-end gap-1.5 text-[#FF8A88] md:hidden">
         {/* Fira Code 400 / 10 / 100% / no tracking / #FF8A88 */}
@@ -199,9 +226,11 @@ export function TeamCarousel({ members, story }: { members: TeamMember[]; story:
             className="font-sans text-xl font-normal leading-[1.25] tracking-[-0.01em] text-[#262626] md:text-[32px] md:tracking-[-0.5px]"
             {...T_NAME}
           />
-          {/* on-card arrows — desktop only; mobile uses swipe + the SCROLL affordance above.
+          {/* on-card arrows — visible at md+ only; mobile uses swipe + the SCROLL affordance above.
+              Below md they stay in the DOM, visually hidden until keyboard-focused (see NavArrow),
+              so a keyboard or screen-reader user on a small window can still change member.
               px-2 is Figma's Navigator inset, on top of the overlay's own 32 */}
-          <div className="hidden items-end justify-between md:flex md:px-2">
+          <div className="flex items-end justify-between md:px-2">
             <NavArrow direction="prev" onClick={() => advance('prev')} />
             <NavArrow direction="next" onClick={() => advance('next')} />
           </div>
@@ -287,7 +316,12 @@ function NavArrow({ direction, onClick }: { direction: Dir; onClick: () => void 
       type="button"
       onClick={onClick}
       aria-label={direction === 'prev' ? 'Previous member' : 'Next member'}
-      className="inline-flex cursor-pointer items-center justify-center"
+      // below md: sr-only until keyboard focus reveals it in place (not on tap — there's nothing to
+      // tap on a phone, swipe covers that). ml-auto keeps a lone revealed Next on the right; at md+
+      // justify-between already puts it there.
+      className={`inline-flex cursor-pointer items-center justify-center max-md:sr-only max-md:focus-visible:not-sr-only ${
+        direction === 'next' ? 'ml-auto' : ''
+      }`}
     >
       <NavArrowIcon
         // Figma's Arrow Container is a 20px square (node 2483:702); was 40

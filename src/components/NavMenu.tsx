@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Icon } from '@/components/Icon'
 import { Button } from '@/components/ui/Button'
 import type { HeaderContent } from '@/lib/types'
@@ -20,10 +21,48 @@ import type { HeaderContent } from '@/lib/types'
 // version as spring(bounce .2, duration .4). Brief here is slower and smooth at both ends: 850ms
 // ease-in-out instead of a spring — no overshoot at all, since any overshoot IS the hard stop the
 // eye reads at the end. Slightly front-loaded (0.5,0 not 0.37,0) so the tap still feels answered.
+
+// Button renders its own <button> and takes no aria props or ref, so the MENU toggle is reached
+// through its wrapper — it is the wrapper's only direct <button>.
+const toggleButton = (root: HTMLElement | null) =>
+  root?.querySelector<HTMLButtonElement>(':scope > button') ?? null
+
 export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) {
   const [open, setOpen] = useState(false)
   const toggleRef = useRef<HTMLDivElement>(null)
   const sheetRef = useRef<HTMLElement>(null)
+  const sheetId = useId()
+  const pathname = usePathname()
+  // only socials with a real destination — an unset href used to render href="#" target="_blank",
+  // which opened a blank copy of the page in a new tab
+  const linkedSocials = socials.filter((s) => s.href)
+
+  // The link-click handler below covers navigating from the sheet, but Back/Forward never touch it —
+  // the header lives in the layout, so the sheet stayed down over the new page. The route itself is
+  // the signal.
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
+  // aria-expanded / aria-controls on the toggle — set on the DOM because Button doesn't take them.
+  useEffect(() => {
+    const btn = toggleButton(toggleRef.current)
+    btn?.setAttribute('aria-expanded', String(open))
+    btn?.setAttribute('aria-controls', sheetId)
+  }, [open, sheetId])
+
+  // Escape closes, and hands focus back to the toggle — the sheet goes inert on close, so focus left
+  // inside it would otherwise drop to <body>.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setOpen(false)
+      toggleButton(toggleRef.current)?.focus()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open])
 
   // Click anywhere that is not the sheet or the MENU toggle closes the panel. pointerdown rather
   // than click so the sheet starts leaving on press, and so a drag that ends inside the sheet does
@@ -103,56 +142,68 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
             bottoms out 24px above it — so the top inset is the 24 that is left, not another 20. */}
         <nav
           ref={sheetRef}
+          id={sheetId}
           aria-label="Primary"
-          className={`nav-sheet pointer-events-auto flex flex-col items-center gap-12 border-b border-[#544D49] bg-[#fffcf9] px-5 pt-11 pb-5 transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none sm:px-10 md:pt-6 ${
+          className={`nav-sheet pointer-events-auto border-b border-[#544D49] bg-[#fffcf9] transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none ${
             open ? 'translate-y-0' : '-translate-y-full'
           }`}
         >
-          {/* one handler on the wrapper instead of per link: the header lives in the layout, so a
-              route change never unmounts this and the panel would stay open behind the new page */}
-          {/* Stacked on a phone, one centred row 20 apart at md+ (Figma 3039:2055). The 430px frame
-              draws that row on a phone too, but it only fits at 430 — narrower phones wrap it, and
-              the stack is what shipped and works, so the row stays a desktop thing.
-              Figma keylines these pills #292624 where Button's outline variant ships #262626 — three
-              values on one channel, and overriding it here would be one arbitrary border-colour
-              utility fighting another for cascade order. Left alone. */}
+          {/* The sheet is ~344px under a 76px bar, which a landscape phone can't fit — so the content
+              scrolls inside the sheet once it runs past the viewport (100dvh - the bar - the 1px
+              keyline); when it fits, this box is exactly the old layout. The scroller is an inner box
+              rather than the nav so the nav's grain layer (::before, inset 0) still covers the whole
+              ground instead of scrolling away with the content. data-lenis-prevent keeps Lenis off
+              the wheel here, as in BookingDialog. */}
           <div
-            className="flex flex-col items-center gap-5 md:flex-row md:gap-5"
-            onClick={() => setOpen(false)}
+            data-lenis-prevent
+            className="flex max-h-[calc(100dvh-77px)] flex-col items-center gap-12 overflow-y-auto overscroll-contain px-5 pt-11 pb-5 sm:px-10 md:pt-6"
           >
-            {items.map((item) => (
-              <Button key={item.label} href={item.href}>
-                {item.label}
-              </Button>
-            ))}
-          </div>
-
-          {socials.length > 0 && (
-            <div className="flex items-center justify-center gap-3">
-              {socials.map((s) => (
-                <a
-                  key={s.platform}
-                  href={s.href ?? '#'}
-                  aria-label={s.platform}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {/* the ring is part of the svg (a 32x32 rect), so 24px here is Figma's whole
-                      24px button — no second border of our own */}
-                  <Icon
-                    name={s.platform}
-                    className="h-6 w-6 [&_rect]:stroke-[#292624] [&_path]:fill-[#292624]"
-                  />
-                </a>
+            {/* one handler on the wrapper instead of per link: the header lives in the layout, so a
+                route change never unmounts this and the panel would stay open behind the new page */}
+            {/* Stacked on a phone, one centred row 20 apart at md+ (Figma 3039:2055). The 430px frame
+                draws that row on a phone too, but it only fits at 430 — narrower phones wrap it, and
+                the stack is what shipped and works, so the row stays a desktop thing.
+                Figma keylines these pills #292624 where Button's outline variant ships #262626 — three
+                values on one channel, and overriding it here would be one arbitrary border-colour
+                utility fighting another for cascade order. Left alone. */}
+            <div
+              className="flex flex-col items-center gap-5 md:flex-row md:gap-5"
+              onClick={() => setOpen(false)}
+            >
+              {items.map((item) => (
+                <Button key={item.label} href={item.href}>
+                  {item.label}
+                </Button>
               ))}
             </div>
-          )}
 
-          {copyright && (
-            <p className="nav-copyright text-center font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#9F9188]">
-              {copyright}
-            </p>
-          )}
+            {linkedSocials.length > 0 && (
+              <div className="flex items-center justify-center gap-3">
+                {linkedSocials.map((s) => (
+                  <a
+                    key={s.platform}
+                    href={s.href}
+                    aria-label={s.platform}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {/* the ring is part of the svg (a 32x32 rect), so 24px here is Figma's whole
+                        24px button — no second border of our own */}
+                    <Icon
+                      name={s.platform}
+                      className="h-6 w-6 [&_rect]:stroke-[#292624] [&_path]:fill-[#292624]"
+                    />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {copyright && (
+              <p className="nav-copyright text-center font-sans text-xs leading-[1.25] tracking-[0.25px] text-[#6f645d]">
+                {copyright}
+              </p>
+            )}
+          </div>
         </nav>
       </div>
     </div>

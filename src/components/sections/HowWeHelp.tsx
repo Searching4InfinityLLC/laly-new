@@ -79,9 +79,19 @@ export default function HowWeHelp({ content }: { content: HowWeHelpContent }) {
                 // chips. Mobile: pt 32 / pb 48, and the border belongs to the stack, not the card.
                 className="relative flex flex-1 flex-col gap-10 overflow-hidden px-5 pt-8 pb-12 md:border md:border-[rgba(60,55,52,0.1)] md:pt-6 md:pb-10"
                 style={{
-                  backgroundImage: `linear-gradient(180deg, ${themed('#FFFCF9', '#151414')} ${accent.stop}, ${accent.wash} 100%)`,
+                  backgroundImage: `linear-gradient(180deg, #FFFCF9 ${accent.stop}, ${accent.wash} 100%)`,
                 }}
               >
+                {/* The dark wash as its own layer, cross-faded on opacity: a gradient cannot
+                    transition, so a themed() stop inside it snapped while the ground faded. */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, #151414 ${accent.stop}, ${accent.wash} 100%)`,
+                    opacity: 'var(--section-dark-progress, 0)',
+                  }}
+                />
                 <GridBackdrop />
 
                 <div className="relative flex w-full flex-col gap-5 md:gap-6">

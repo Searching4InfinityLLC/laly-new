@@ -116,7 +116,7 @@ await payload.create({
         pills: [
           { label: 'Google Ads' },
           { label: 'Microsoft Ads' },
-          { label: 'Tik Tok Ads' },
+          { label: 'TikTok Ads' },
           { label: 'Meta Ads' },
         ],
         // one sentence in three parts — the middle one is the bold Neue Haas run the designer put

@@ -70,12 +70,14 @@ export default function Footer() {
             >
               {footer.email}
             </a>
-            <a
-              href={`tel:${footer.phone.replace(/[^\d+]/g, '')}`}
-              className="font-sans text-xl leading-[1.25] tracking-[-0.01em] text-[#262626] transition-opacity hover:opacity-60"
-            >
-              {footer.phone}
-            </a>
+            {footer.phone && (
+              <a
+                href={`tel:${footer.phone.replace(/[^\d+]/g, '')}`}
+                className="font-sans text-xl leading-[1.25] tracking-[-0.01em] text-[#262626] transition-opacity hover:opacity-60"
+              >
+                {footer.phone}
+              </a>
+            )}
           </div>
         </div>
         </div>
