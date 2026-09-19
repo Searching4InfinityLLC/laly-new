@@ -54,11 +54,9 @@ export default function Contact({ content }: { content: ContactContent }) {
           {/* instance-only sizing, the shared Button keeps its own numbers:
               mobile  = 8.69 / 6.51 padding, 16px label, Drop shadow 0 1.09 2.17 @4%
               desktop = Large/Tertiary — 13.02 / 9.77 padding, 32px label, 0 3.26 9.77 @6% */}
-          {/* no scramble (client note: no hover effects on this button) */}
           <Button
             variant="solid"
             booking
-            scramble={false}
             href={buttons[1].href}
             className="bg-[#151414]! px-[8.69px]! py-[6.51px]! shadow-[0_1.09px_2.17px_0_rgba(16,24,40,0.04)]! md:px-[13.02px]! md:py-[9.77px]! md:shadow-[0_3.26px_9.77px_0_rgba(16,24,40,0.06)]! md:[&>span]:text-[32px]! md:[&>span]:leading-[40px]!"
           >
