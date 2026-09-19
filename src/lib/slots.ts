@@ -3,9 +3,11 @@
 // generator is the point — two copies of "business hours" drift, and the drift shows up as a booking
 // confirmed against a slot the picker never offered.
 //
-// ponytail: this is the STUB. It fabricates a plausible week instead of asking Google. Swapping in
-// the real thing means replacing busySlots() with a freebusy.query call and leaving everything else
-// alone — the shapes here are already the shapes Calendar returns.
+// Two layers: gridFor() is the business-hours grid (pure, sync), slotsFor() subtracts whatever the
+// agency calendar says is busy. With the Google env vars unset (src/lib/google.ts) nothing is
+// subtracted and every grid slot is offered — the stub the site shipped with.
+
+import { freeBusy, googleConfigured } from './google'
 
 // Agency-local business hours. Env so staging can widen them without a deploy.
 const TZ = process.env.BOOKING_TZ || 'America/New_York'
@@ -55,19 +57,12 @@ function toUtc(date: string, hour: number, minute: number): Date {
   return new Date(naive.getTime() - offsetAt(naive, TZ))
 }
 
-// No busy list. Every offered day returns the identical grid.
-//
-// This replaced a per-day pseudo-random one, and the reason is a UI reason, not a data one: a
-// different number of chips per date meant the block changed height on every date click, so the
-// picker jumped under the cursor. Constant hours means the layout is fixed and the client can keep
-// the previous day's chips on screen while the next day loads.
-//
-// When Google goes in, freebusy.query replaces this and the counts start varying for real — at
-// which point the chip area needs a min-height reserved for the busiest day, or the shift comes
-// straight back.
+// Every day draws the same grid; only Google's busy list makes the counts differ. The chip area in
+// BookingDialog.tsx reserves a full day's height for that reason — a day with fewer chips must not
+// make the block shrink and the picker jump under the cursor.
 
-/** Free 30-minute slots on `date` (YYYY-MM-DD), as UTC ISO strings. Past slots are dropped. */
-export function slotsFor(date: string): Slot[] {
+/** Business-hours 30-minute slots on `date` (YYYY-MM-DD), as UTC ISO strings. Past slots are dropped. */
+export function gridFor(date: string): Slot[] {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return []
 
   const all: Slot[] = []
@@ -89,12 +84,29 @@ export function slotsFor(date: string): Slot[] {
   return all.filter((s) => new Date(s.start).getTime() > floor)
 }
 
+/** Grid slots on `date` that the agency calendar has free. Throws if Google is configured but fails. */
+export async function slotsFor(date: string): Promise<Slot[]> {
+  const grid = gridFor(date)
+  if (grid.length === 0 || !googleConfigured()) return grid
+  // One query for the whole day rather than one per slot.
+  const busy = (await freeBusy(grid[0].start, grid[grid.length - 1].end)).map((b) => [
+    new Date(b.start).getTime(),
+    new Date(b.end).getTime(),
+  ])
+  // Half-open overlap: a meeting ending at 10:00 leaves the 10:00 slot free.
+  return grid.filter((s) => {
+    const a = new Date(s.start).getTime()
+    const z = new Date(s.end).getTime()
+    return !busy.some(([b0, b1]) => a < b1 && b0 < z)
+  })
+}
+
 /** Whether a specific ISO instant is still bookable. The race guard on POST. */
-export function isFree(startIso: string): boolean {
+export async function isFree(startIso: string): Promise<boolean> {
   const at = new Date(startIso)
   if (Number.isNaN(at.getTime())) return false
   // Derive the day in TZ rather than from the ISO string's UTC date — near midnight those differ,
   // and asking the wrong day would call every late slot free.
   const day = new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(at)
-  return slotsFor(day).some((s) => s.start === startIso)
+  return (await slotsFor(day)).some((s) => s.start === startIso)
 }

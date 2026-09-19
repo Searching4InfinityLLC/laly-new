@@ -61,8 +61,10 @@ export const HELP_ACCENTS = [
 ] as const
 
 // A colour that follows the shared section theme: `light` on the light ground, `dark` on the dark
-// one, blended on the same animated --section-dark-progress the ground itself fades on, so the two
-// can never drift. Outside a SectionTheme the variable is unset and this is just `light`.
+// one, keyed off the same --section-dark-progress as the ground. The progress flips 0/1; styles.css
+// transitions any element whose inline style reads it, on the ground's clock, so the two can never
+// drift. Don't put it inside a gradient — background-image cannot transition (see HowWeHelp).
+// Outside a SectionTheme the variable is unset and this is just `light`.
 export const themed = (light: string, dark: string) =>
   `color-mix(in srgb, ${light}, ${dark} calc(var(--section-dark-progress, 0) * 100%))`
 

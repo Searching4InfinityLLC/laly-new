@@ -317,13 +317,16 @@ html.lenis body {
    loader unmounts.
    Desktop: overflow clip. Touch: NOT clip — a clipped root stops iOS 26 Safari painting anything
    under its floating toolbar, and that strip showed the bare root background instead of the loader.
-   touch-action/overscroll hold the page there instead (Loader adds a touchmove block on top). */
-@media (pointer: fine) {
+   touch-action/overscroll hold the page there instead (Loader adds a touchmove block on top).
+   Only with scripting on: with JS dead Loader never unmounts, so the lock would outlive the wipe and
+   the page would never scroll again. (A browser too old for `scripting` just skips the pre-hydration
+   lock; Loader's own JS lock still holds it.) */
+@media (pointer: fine) and (scripting: enabled) {
   html:has(> body > .loader) {
     overflow: clip;
   }
 }
-@media (pointer: coarse) {
+@media (pointer: coarse) and (scripting: enabled) {
   html:has(> body > .loader),
   html:has(> body > .loader) body {
     touch-action: none;
@@ -848,8 +851,11 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
     clip-path: none;
     transition: none;
   }
+  /* opacity too: the hidden base state is opacity 0, and with the animation off nothing else would
+     ever lift it — reduced-motion readers lost the Strategy cards, the team and all of Contact */
   html.anim-sections-media .section-media-reveal,
   html.anim-sections-fadeup .section-media-reveal {
+    opacity: 1;
     transform: none;
   }
   html.anim-sections-fadeup .section-text-reveal {
@@ -1083,10 +1089,20 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
 .section-fade.is-visible {
   opacity: 1;
 }
-/* Without JS the observer never fires, so the section would sit at 0 forever. */
+/* Without JS the observer never fires, so the section would sit at 0 forever. Same for every other
+   element whose resting state is released by a class JS adds (preloader-done, is-visible,
+   is-media-visible): the hero copy and pills, the reveals, the cards. No JS -> show them as-is. */
 @media (scripting: none) {
-  .section-fade {
-    opacity: 1;
+  .section-fade,
+  .entry-copy,
+  .entry-fade,
+  .hero-pills > li,
+  .section-media-reveal,
+  .section-text-reveal,
+  .mobile-reveal,
+  .card-fade {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 /* Reduced motion: the component marks it visible on the first effect, so kill the ramp too. */
@@ -1173,10 +1189,13 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
 }
 /* Touch has no Lenis (SmoothScroll.tsx), so its stop() no longer holds the page, and iOS scrolls the
    document behind a modal dialog. Hide the root's overflow instead; contain keeps the form column's
-   scroll from chaining out to it. Desktop keeps Lenis' stop — hiding the scrollbar there shifts the page. */
-@media (pointer: coarse) {
+   scroll from chaining out to it. Desktop keeps Lenis' stop — hiding the scrollbar there shifts the page.
+   Reduced motion has no Lenis on desktop either, so it takes the same lock; the gutter stays reserved
+   so the page does not jump sideways when the scrollbar goes. */
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
   html:has(.booking-dialog[open]) {
     overflow: hidden;
+    scrollbar-gutter: stable;
   }
 }
 .booking-dialog [data-lenis-prevent] {
@@ -1404,7 +1423,6 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   position: relative;
   isolation: isolate;
   background-color: var(--section-light-ground);
-  transition: --section-dark-progress 350ms ease-in-out;
 }
 .section-theme::before {
   content: '';
@@ -1459,15 +1477,19 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   stroke: var(--panel-muted, #867a72);
   transition: stroke 350ms ease-in-out;
 }
+/* Text crosses over in 150ms centred on the ground's 350ms (delay 100ms), not across all of it:
+   repainting every glyph each frame was the single biggest cost of the theme switch (measured, a
+   4x-throttled phone: ~a third of the dropped frames), and mid-fade the text is grey on grey either
+   way. The grounds and surfaces keep the full 350ms. */
 .section-theme .theme-ink,
 .case-study,
 .case-study-body,
 .case-study span[style] {
-  transition: color 350ms ease-in-out, background-color 350ms ease-in-out,
+  transition: color 150ms ease-in-out 100ms, background-color 350ms ease-in-out,
     opacity 300ms ease-out;
 }
 .section-theme .theme-label {
-  transition: color 350ms ease-in-out, --x-translate 1s cubic-bezier(0.87, 0, 0.13, 1);
+  transition: color 150ms ease-in-out 100ms, --x-translate 1s cubic-bezier(0.87, 0, 0.13, 1);
 }
 .case-study {
   --case-fg: var(--case-light-fg);
@@ -1504,7 +1526,7 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   opacity: 1;
 }
 .section-theme .case-study-body {
-  transition: color 350ms ease-in-out, opacity 350ms ease-in-out;
+  transition: color 150ms ease-in-out 100ms, opacity 350ms ease-in-out;
 }
 .section-theme[data-theme='light'] .strategy-card {
   --pillar-current: var(--pillar-light);
@@ -1546,7 +1568,6 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
 .contact-theme {
   isolation: isolate;
   --contact-dark-progress: 0;
-  transition: --contact-dark-progress 350ms ease-in-out;
 }
 @property --contact-dark-progress {
   syntax: '<number>';
@@ -1577,9 +1598,45 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   --section-label: #ff6d6a;
   --grid-ink: rgba(231, 220, 212, 0.05); /* subtler than the light grid reads — lines glow on black */
 }
+/* The fade itself. --section-dark-progress / --contact-dark-progress used to be transitioned
+   directly. Being INHERITED custom properties, that restyled every element under the theme on every
+   frame of the 350ms — measured on a 4x-throttled phone: ~6x the style work of a plain scroll and
+   frames of 80ms+, right as the reader crosses into the dark section. Now the progress flips 0<->1
+   in one step and every consumer transitions its own property instead, on the same clock:
+     - the grain layers fade on `opacity`, which the compositor runs off the main thread
+     - flat grounds, surfaces and keylines on their colour properties
+     - inline themed() / var(--*-dark-progress) consumers (palettes.ts, HelpWidgets, BrandSystem,
+       SystemDeck) are caught by their style attribute, so a new one fades without being listed.
+       .system-card is left out: it already runs its own 800ms colour cycle. */
+.section-theme::before,
+.contact-theme::before,
+.section-theme .case-study::before,
+.results-stat::before {
+  transition: opacity 350ms ease-in-out;
+}
+.section-theme-content.theme-grid,
+.section-theme .theme-surface,
+.section-theme [class*='panel-border'] {
+  transition: background-color 350ms ease-in-out, border-color 350ms ease-in-out;
+}
+.results-stat-label {
+  transition: color 350ms ease-in-out;
+}
+.section-theme [style*='dark-progress']:not(.system-card) {
+  transition: color 350ms ease-in-out, background-color 350ms ease-in-out,
+    border-color 350ms ease-in-out, box-shadow 350ms ease-in-out, opacity 350ms ease-in-out;
+}
 @media (prefers-reduced-motion: reduce) {
   .section-theme,
   .section-theme::before,
+  .contact-theme::before,
+  .section-theme .case-study::before,
+  .results-stat::before,
+  .section-theme-content.theme-grid,
+  .section-theme .theme-surface,
+  .section-theme [class*='panel-border'],
+  .results-stat-label,
+  .section-theme [style*='dark-progress'],
   .section-theme .theme-ink,
   .section-theme .theme-label,
   .section-theme .case-study,

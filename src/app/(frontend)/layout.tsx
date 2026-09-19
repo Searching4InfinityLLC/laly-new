@@ -7,11 +7,19 @@ import Header from '@/components/Header'
 import { HeaderGround } from '@/components/HeaderGround'
 import { RouteTransition } from '@/components/RouteTransition'
 import { SmoothScroll } from '@/components/SmoothScroll'
+import { SITE_URL } from '@/lib/site'
 import './styles.css'
 
+// Pages set their own title/description; everything else here is inherited. The share image is
+// opengraph-image.tsx next to this file. Canonical './' resolves per route against metadataBase.
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: 'Laly Agency',
-  description: 'Laly Agency',
+  description:
+    'Optimize your workflows, build your brand, and scale your business with a tech-forward in-house marketing team.',
+  alternates: { canonical: './' },
+  openGraph: { type: 'website', siteName: 'Laly Agency', locale: 'en_US' },
+  twitter: { card: 'summary_large_image' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

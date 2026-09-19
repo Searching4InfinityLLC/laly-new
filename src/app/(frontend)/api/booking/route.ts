@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { isFree } from '@/lib/slots'
+import { googleConfigured, insertEvent } from '@/lib/google'
+import { SLOT_MINUTES, isFree } from '@/lib/slots'
 
 // Books a slot. The client validates too, but that is a courtesy to the typist — this is the trust
 // boundary, so nothing below trusts a single field that arrived in the body.
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
   const zip = str(body.zip)
   const business = str(body.business)
   const start = str(body.start)
+  const tz = str(body.tz)
 
   const bad =
     !firstName ||
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
     !business ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ||
     !/^\d{5}(-\d{4})?$/.test(zip) ||
-    [firstName, lastName, email, zip, business].some((v) => v.length > MAX)
+    [firstName, lastName, email, zip, business, tz].some((v) => v.length > MAX)
 
   if (bad) {
     return NextResponse.json({ error: 'Some of those details did not look right.' }, { status: 400 })
@@ -35,30 +37,64 @@ export async function POST(request: Request) {
 
   // The race: two people sit on the same chip, both press confirm. Availability is re-derived here
   // rather than trusted from the picker, so the second one is turned away instead of double-booking.
-  if (!isFree(start)) {
+  // ponytail: check-then-insert, not atomic — two confirms inside the same ~second can both pass.
+  // At this booking volume that is a manual reschedule, not worth a lock.
+  let free: boolean
+  try {
+    free = await isFree(start)
+  } catch (err) {
+    console.error('[booking] availability check failed:', err)
+    return NextResponse.json({ error: 'Could not reach the calendar. Try again shortly.' }, { status: 503 })
+  }
+  if (!free) {
     return NextResponse.json(
       { error: 'That time was taken while you were deciding. Pick another.' },
       { status: 409 },
     )
   }
 
-  // ponytail: STUB. Where the real thing goes, in this order:
-  //   1. Google Calendar events.insert with conferenceDataVersion=1 and a conferenceData
-  //      createRequest -> that response carries the Meet link. (Google Calendar, not the Meet API:
-  //      Meet v2 manages spaces and has no availability or scheduling.)
-  //   2. persist the lead — a Payload `bookings` collection, deliberately not added yet because it
-  //      needs `bun run generate:types` to typecheck and this machine cannot run the build.
-  // Until then the booking is logged and no invite is sent, so this must not claim one was.
-  console.info('[booking] stub — not yet sent to Google Calendar:', {
-    firstName,
-    lastName,
-    email,
-    zip,
-    business,
-    start,
-  })
+  // ponytail: the lead is not persisted anywhere but the calendar event — a Payload `bookings`
+  // collection is still to come (needs `bun run generate:types`, which this machine cannot run).
+  if (!googleConfigured()) {
+    // Stub path: Google env vars unset. Logged, no invite sent, so this must not claim one was.
+    console.info('[booking] stub — Google Calendar not configured:', {
+      firstName,
+      lastName,
+      email,
+      zip,
+      business,
+      start,
+      tz,
+    })
+    // `invited` is load-bearing, not decoration: the success screen words itself off it.
+    return NextResponse.json({ ok: true, meetUrl: null, invited: false })
+  }
 
-  // `invited` is load-bearing, not decoration: the success screen words itself off it, so while
-  // this is a stub the UI cannot claim an invite was sent. Flip it with the events.insert call.
-  return NextResponse.json({ ok: true, meetUrl: null, invited: false })
+  const name = `${firstName} ${lastName}`
+  try {
+    const { meetUrl } = await insertEvent({
+      summary: `Laly intro call — ${business}`,
+      description: [
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Business: ${business}`,
+        `ZIP: ${zip}`,
+        tz && `Their timezone: ${tz}`,
+        '',
+        'Booked through the website.',
+      ]
+        .filter((l) => l !== '')
+        .join('\n'),
+      start,
+      end: new Date(new Date(start).getTime() + SLOT_MINUTES * 60_000).toISOString(),
+      attendee: { email, displayName: name },
+    })
+    return NextResponse.json({ ok: true, meetUrl, invited: true })
+  } catch (err) {
+    console.error('[booking] events.insert failed:', err)
+    return NextResponse.json(
+      { error: 'Could not book that slot right now. Try again shortly.' },
+      { status: 502 },
+    )
+  }
 }

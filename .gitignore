@@ -21,6 +21,11 @@ next-env.d.ts
 .env*.local
 *.env
 
+# Google OAuth client downloads (client_secret_*.json from the Cloud console, or pasted copies).
+# They hold the client secret — the values belong in .env, the file in the bin.
+client_secret*.json
+paste_*.json
+
 # vercel
 .vercel
 
@@ -29,6 +34,10 @@ next-env.d.ts
 # HAR is a verbatim request/response dump and the next one saved from a logged-in tab would.
 # Never in public/ — that directory is served as-is.
 *.har
+
+# raw video masters. public/ is served as-is, so a .mov there is a 24 MB public download nothing
+# uses — the site ships the encoded .mp4 (public/whoweare/vjbrand.mp4).
+*.mov
 
 # misc
 *.tsbuildinfo

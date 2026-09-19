@@ -23,7 +23,7 @@ export const PAID_FAQ: { question: string; answer: string }[] = [
   {
     question: 'What paid ads platforms does Laly handle?',
     answer: answer(
-      'Laly primarily works through four different paid ads platforms: Google Ads, Meta Ads, Tik Tok Ads and Microsoft Advertising.',
+      'Laly primarily works through four different paid ads platforms: Google Ads, Meta Ads, TikTok Ads and Microsoft Advertising.',
       'Google Ads and Microsoft Advertising are search-based platforms, primarily reaching audiences on major search engines (Google and Bing, respectively). Meanwhile, Meta and TikTok Ads reach users on social media. Each platform has its own advantages, as well as potential shortcomings if used in the wrong way.',
       'We work closely with each of these platforms, but we don’t use them all equally. Every project is different, so we always scale our ad strategy responsively based on the client’s needs.',
     ),

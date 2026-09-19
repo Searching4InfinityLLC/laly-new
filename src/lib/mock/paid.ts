@@ -22,7 +22,7 @@ export const paid: PaidContent = {
   hero: {
     label: 'Pay Per Performance',
     heading: 'You only pay when we deliver.',
-    pills: ['Google Ads', 'Microsoft Ads', 'Tik Tok Ads', 'Meta Ads'],
+    pills: ['Google Ads', 'Microsoft Ads', 'TikTok Ads', 'Meta Ads'],
     description: {
       before:
         'We build your website, run your ads, handle your calls, filter your leads, and only send you the ones worth signing. ',

@@ -89,10 +89,10 @@ export const development: DevelopmentContent = {
       },
     ],
   },
-  // Figma 3292:4851 — the same closing band the other two pages use, and on this frame the designer
-  // left /paid-advertising's line rather than writing a development one. 458 is the Figma text
-  // width, and it is what breaks the line.
+  // Figma 3292:4851 — the same closing band the other two pages use. The frame still carried
+  // /paid-advertising's line (ad budget, leads); this is a development one of the same length, so
+  // the 458px Figma text width still breaks it into the same shape. Pending client sign-off.
   note: {
-    body: 'We’re looking for firms ready to scale. If you have the ad budget and want leads that actually convert, let’s talk.',
+    body: 'We’re looking for teams that have outgrown their tools. If your software is slowing the business down, let’s talk.',
   },
 }

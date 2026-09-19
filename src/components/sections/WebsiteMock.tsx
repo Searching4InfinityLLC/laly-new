@@ -38,7 +38,7 @@ export function WebsiteMock({ media, width }: { media: MediaDoc; width: number }
         aria-hidden
         className="button-press absolute left-[51.96%] top-[55.21%] flex h-[11.2%] w-[23.14%] items-center justify-center rounded-[1.18cqw] bg-[#D1CF95] font-display text-[1.47cqw] font-bold leading-none tracking-[-0.01em] text-white"
       >
-        Primary Action
+        Book a Call
       </div>
     </InView>
   )
