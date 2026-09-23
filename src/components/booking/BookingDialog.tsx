@@ -10,6 +10,7 @@ import { MaskText, type MaskTiming } from '@/components/ui/MaskText'
 import { Button } from '@/components/ui/Button'
 import { BOOKING_DIALOG_ID } from '@/lib/booking'
 import { getLenis } from '@/lib/lenis'
+import { trackMetaEvent } from '@/lib/meta-pixel'
 
 // The one booking flow behind every "LET'S BEGIN" / "BOOK A CALL" on the site. Mounted once in the
 // frontend layout; opened by Button's `booking` prop (see src/lib/booking.ts for why that indirection
@@ -396,6 +397,7 @@ export function BookingDialog() {
       if (!res.ok) throw new Error(data?.error ?? 'Could not book that slot.')
       setMeetUrl(data.meetUrl ?? null)
       setInvited(Boolean(data.invited))
+      trackMetaEvent('Schedule')
       animateTo(2)
     } catch (err) {
       // Almost always "someone took the slot while you were deciding" — the server re-checks.
