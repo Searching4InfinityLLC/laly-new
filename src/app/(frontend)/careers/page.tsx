@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import heroBg from '../../../../public/growwithus/Cta-Desktop.webp'
+import heroBg from '../../../../public/careers/hero.webp'
 import { CareersAbout } from '@/components/sections/CareersAbout'
 import { OpenRoles } from '@/components/sections/OpenRoles'
 import { ServiceHero } from '@/components/sections/ServiceHero'
@@ -20,9 +20,10 @@ export const revalidate = 3600
 // the hero's button scrolls to. Copy comes from the Pages 'careers' doc (falling back per block to
 // src/lib/mock/careers.ts); the roles are the Roles collection.
 //
-// The hero photo is the team shot from the home Contact band, a static import like the service
-// heroes' — at the hero's 20% it is a texture, and a careers page might as well be textured with the
-// people you'd work with.
+// The hero photo is the team shot from the home Contact band (public/growwithus/Cta-Desktop.webp),
+// pre-blurred and grained into public/careers/hero.webp to match the other heroes' out-of-focus
+// photos — baked into the file rather than a CSS filter, so the LCP image costs no paint-time blur.
+// A static import like theirs: at the hero's 20% it is a texture, not content.
 export default async function CareersPage() {
   const [careers, roles] = await Promise.all([getCareers(), getRoles()])
 

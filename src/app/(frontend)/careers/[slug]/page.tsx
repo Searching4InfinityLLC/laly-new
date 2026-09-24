@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import heroBg from '../../../../../public/growwithus/Cta-Desktop.webp'
+import heroBg from '../../../../../public/careers/hero.webp'
 import { ApplicationDialog } from '@/components/careers/ApplicationDialog'
 import { RoleDetail } from '@/components/sections/RoleDetail'
 import { ServiceHero } from '@/components/sections/ServiceHero'
