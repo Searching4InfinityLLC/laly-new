@@ -14,7 +14,8 @@ const PILL_BG =
 function RolePill({ label, index }: { label: string; index: number }) {
   return (
     <li
-      className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 font-display text-xs font-normal leading-[1.25] text-[#E7DCD4] shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]"
+      // ink follows the Strategy card's light/dark badge vars (styles.css, .strategy-card)
+      className="theme-ink flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 font-display text-xs font-normal leading-[1.25] text-[var(--pillar-badge-ink,#E7DCD4)] shadow-[0_1px_2px_0_rgba(16,24,40,0.04)]"
       style={{ backgroundImage: PILL_BG }}
     >
       <span
@@ -41,7 +42,8 @@ function RolePill({ label, index }: { label: string; index: number }) {
 
 // /careers "Open Roles" — the dark grain band the hero's "SEE OPEN ROLES" scrolls to (id="roles").
 // Each role is a Strategy glass card laid out as a row: what it is on the left, pay and the way in on
-// the right. The whole card is the link (the button's stretched ::before), the way the Strategy
+// the right. Colours read the page's shared theme vars, so the band fades in from cream with the
+// rest of the SectionThemeSequence. The whole card is the link (the button's stretched ::before), the way the Strategy
 // pillars make the whole card their arrow's hit area.
 export function OpenRoles({ content, roles }: { content: OpenRolesContent; roles: Role[] }) {
   const { label, heading, empty } = content
@@ -55,8 +57,8 @@ export function OpenRoles({ content, roles }: { content: OpenRolesContent; roles
     >
       <InView className="section-shell relative flex flex-col gap-10 px-5 sm:px-10 md:gap-12 md:px-20">
         <div className="flex flex-col gap-5 text-center md:gap-8">
-          <BracketLabel className="mx-auto w-44 text-[#ff6d6a] md:w-80">{label}</BracketLabel>
-          <h2 className="font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-6xl xl:text-7xl">
+          <BracketLabel className="theme-label mx-auto w-44 text-[var(--section-label,#ff6d6a)] md:w-80">{label}</BracketLabel>
+          <h2 className="theme-ink font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[var(--section-heading,#FCF7F3)] md:text-6xl xl:text-7xl">
             {heading.split('\n').map((line) => (
               <span key={line} className="block">
                 {line}
@@ -73,10 +75,10 @@ export function OpenRoles({ content, roles }: { content: OpenRolesContent; roles
               style={{ '--card-fg': '#FF6D6A', animationDelay: `${0.2 + i * 0.15}s` } as CSSProperties}
             >
               <div className="flex max-w-[720px] flex-col gap-3">
-                <h3 className="font-display text-4xl font-normal leading-[1.1] tracking-[-1px] text-[#FCF7F3] md:text-[44px]">
+                <h3 className="theme-ink font-display text-4xl font-normal leading-[1.1] tracking-[-1px] text-[var(--section-heading,#FCF7F3)] md:text-[44px]">
                   {role.title}
                 </h3>
-                <p className="font-sans text-lg leading-[1.3] text-[#E7DCD4] md:text-xl">
+                <p className="theme-ink font-sans text-lg leading-[1.3] text-[var(--section-body,#E7DCD4)] md:text-xl">
                   {role.summary}
                 </p>
                 <ul aria-label="Role details" className="mt-2 flex flex-wrap gap-x-2 gap-y-1.5">
@@ -104,7 +106,7 @@ export function OpenRoles({ content, roles }: { content: OpenRolesContent; roles
 
         {/* Always drawn, under however many roles there are — and alone when every role is closed,
             so an empty list still says something. */}
-        <p className="border border-dashed border-[#544D49] px-5 py-6 text-center font-sans text-lg text-[#E7DCD4]/60 md:px-8">
+        <p className="theme-ink border border-dashed border-[#544D49] px-5 py-6 text-center font-sans text-lg text-[var(--section-body,#E7DCD4)] opacity-60 md:px-8">
           {empty}
         </p>
       </InView>

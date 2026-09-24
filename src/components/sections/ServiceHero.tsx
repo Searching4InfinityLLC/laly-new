@@ -45,9 +45,8 @@ export function ServiceHero({
   // The phone keeps 32% — its band is far taller against the portrait, so the same crop reads
   // differently there and its own frame is signed off.
   objectPosition = 'object-[50%_32%] md:object-[50%_43%]',
-  // What the button does. Every service page opens the booking dialog (the default); /careers
-  // follows its href to the role list (`{}`), and a role page opens the application form
-  // (`{ dialog: id }`). Spread straight onto Button.
+  // What the button does. Every service page opens the booking dialog (the default); the careers
+  // pages pass `{}` so it follows its in-page href instead (#roles, #apply). Spread onto Button.
   cta = { booking: true },
   // /careers pages have no scratch band under the hero, so the hero takes its height instead:
   // standard hero + ScratchBand (131px desktop, 198px phone, measured on /branding), split evenly
@@ -58,7 +57,7 @@ export function ServiceHero({
   image: StaticImageData
   label: string // the section's accessible name; each page names its own service
   objectPosition?: string
-  cta?: { booking?: boolean; dialog?: string }
+  cta?: { booking?: boolean }
   tall?: boolean
 }) {
   return (

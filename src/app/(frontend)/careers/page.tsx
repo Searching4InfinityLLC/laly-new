@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import heroBg from '../../../../public/careers/hero.webp'
 import { CareersAbout } from '@/components/sections/CareersAbout'
+import Contact from '@/components/sections/Contact'
 import { OpenRoles } from '@/components/sections/OpenRoles'
 import { ServiceHero } from '@/components/sections/ServiceHero'
 import { SectionFade } from '@/components/ui/SectionFade'
-import { getCareers, getRoles } from '@/lib/cms'
+import { SectionThemeSequence } from '@/components/ui/SectionTheme'
+import { getCareers, getHome, getRoles } from '@/lib/cms'
 
 export const metadata: Metadata = {
   title: 'Careers | Laly Agency',
@@ -17,7 +19,9 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 // The hiring landing page: the service pages' hero, About Laly Agency, then the open roles, which
-// the hero's button scrolls to. Copy comes from the Pages 'careers' doc (falling back per block to
+// the hero's button scrolls to, closing on the home "Grow with us" Contact band like the service pages.
+// About → Open Roles → Contact run in the same scroll-driven cream→dark SectionThemeSequence those
+// pages use. Copy comes from the Pages 'careers' doc (falling back per block to
 // src/lib/mock/careers.ts); the roles are the Roles collection.
 //
 // The hero photo is the team shot from the home Contact band (public/growwithus/Cta-Desktop.webp),
@@ -25,7 +29,7 @@ export const revalidate = 3600
 // photos — baked into the file rather than a CSS filter, so the LCP image costs no paint-time blur.
 // A static import like theirs: at the hero's 20% it is a texture, not content.
 export default async function CareersPage() {
-  const [careers, roles] = await Promise.all([getCareers(), getRoles()])
+  const [careers, roles, { contact }] = await Promise.all([getCareers(), getRoles(), getHome()])
 
   return (
     <main>
@@ -38,10 +42,13 @@ export default async function CareersPage() {
         tall
         cta={{}}
       />
-      <SectionFade>
-        <CareersAbout content={careers.about} />
-      </SectionFade>
-      <OpenRoles content={careers.openRoles} roles={roles} />
+      <SectionThemeSequence
+        sections={[
+          { id: 'about', tone: 'cream', texture: 'grid', content: <CareersAbout content={careers.about} /> },
+          { id: 'roles', tone: 'dark', content: <OpenRoles content={careers.openRoles} roles={roles} /> },
+        ]}
+        contact={<SectionFade><Contact content={contact} /></SectionFade>}
+      />
     </main>
   )
 }

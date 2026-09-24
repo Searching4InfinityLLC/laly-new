@@ -1,4 +1,4 @@
-// Shared by BookingDialog and the careers ApplicationDialog — lifted out of the former verbatim.
+// Shared by BookingDialog and the careers ApplicationForm — lifted out of the former verbatim.
 
 // Underline-only field. The archived form frame (182:590) drew its inputs this way and it is the
 // only input treatment in the file that belongs to the marketing side — boxed shadcn inputs would

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useScramble } from '@/components/ui/ScrambleText'
-import { openBooking, openDialog } from '@/lib/booking'
+import { openBooking } from '@/lib/booking'
 import { getLenis } from '@/lib/lenis'
 
 // Presentational button primitive — styling + scramble-on-hover. No CMS logic.
@@ -61,9 +61,6 @@ type Props = {
   // wiring. Wins over `href`: every CTA passes both, and a stray CMS href must not quietly turn a
   // booking button into a link.
   booking?: boolean
-  // Opens the <dialog> with this id — `booking` for any other modal (the careers application form).
-  // A string for the same server-component reason `booking` is a flag.
-  dialog?: string
   type?: 'button' | 'submit'
   disabled?: boolean
 }
@@ -80,7 +77,6 @@ export function Button({
   altLabel,
   showAlt = false,
   booking = false,
-  dialog,
   type = 'button',
   disabled = false,
 }: Props) {
@@ -122,10 +118,12 @@ export function Button({
     const target = document.querySelector(href)
     if (!target) return
     e.preventDefault()
+    // Lenis honours the target's scroll-margin-top, so the scroll-mt-19 on #roles / #apply is what
+    // clears the fixed navbar — no offset here, or it doubles.
     lenis.scrollTo(target as HTMLElement)
   }
 
-  return href && !booking && !dialog ? (
+  return href && !booking ? (
     <Link
       href={href}
       aria-label={children}
@@ -141,7 +139,7 @@ export function Button({
       aria-label={current}
       className={cls}
       disabled={disabled}
-      onClick={booking ? openBooking : dialog ? () => openDialog(dialog) : onClick}
+      onClick={booking ? openBooking : onClick}
       onMouseEnter={onMouseEnter}
     >
       {label}

@@ -18,10 +18,12 @@ import {
 import { StrategyBlock } from '../blocks/strategy'
 import { WhoWeAreBlock } from '../blocks/whoWeAre'
 
-// Which routes a saved doc invalidates. Its own, always — plus both service pages when it's the home
-// doc, because they render the home contact block (see those page components).
+// Which routes a saved doc invalidates. Its own, always — plus the service pages and /careers when
+// it's the home doc, because they render the home contact block (see those page components). The
+// /careers/<slug> role pages render it too but aren't listed (the slugs live in another collection);
+// their hour-long ISR window picks a Contact edit up.
 const affects = (slug: string): string[] =>
-  slug === 'home' ? ['home', 'paid-advertising', 'branding', 'development'] : [slug]
+  slug === 'home' ? ['home', 'paid-advertising', 'branding', 'development', 'careers'] : [slug]
 
 export const Pages: CollectionConfig = {
   slug: 'pages',

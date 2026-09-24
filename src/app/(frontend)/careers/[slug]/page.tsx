@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import heroBg from '../../../../../public/careers/hero.webp'
-import { ApplicationDialog } from '@/components/careers/ApplicationDialog'
+import { ApplicationForm } from '@/components/careers/ApplicationForm'
+import Contact from '@/components/sections/Contact'
 import { RoleDetail } from '@/components/sections/RoleDetail'
 import { ServiceHero } from '@/components/sections/ServiceHero'
-import { APPLICATION_DIALOG_ID } from '@/lib/careers'
-import { getRole, getRoles } from '@/lib/cms'
+import { SectionFade } from '@/components/ui/SectionFade'
+import { SectionThemeSequence } from '@/components/ui/SectionTheme'
+import { getHome, getRole, getRoles } from '@/lib/cms'
 
 export const revalidate = 3600
 
@@ -25,10 +27,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // /careers/<slug> — one role: the shared ServiceHero (eyebrow, title, the role's tags plus pay as
-// the four pills, the summary, APPLY), the description with its sticky details panel, and the
-// application popup both APPLY buttons open. A closed or unknown slug 404s.
+// the four pills, the summary, APPLY), the description with its sticky details panel, the
+// application form both APPLY buttons scroll to, then the home "Grow with us" Contact band. The one
+// cream section sits in a SectionThemeSequence so it darkens as Contact arrives, as on the service
+// pages. A closed or unknown slug 404s.
 export default async function RolePage({ params }: Props) {
-  const role = await getRole((await params).slug)
+  const [role, { contact }] = await Promise.all([getRole((await params).slug), getHome()])
   if (!role) notFound()
 
   return (
@@ -39,16 +43,22 @@ export default async function RolePage({ params }: Props) {
           heading: role.title,
           pills: [...role.tags, role.pay].slice(0, 4),
           description: { before: role.summary },
-          button: { label: 'APPLY FOR THIS ROLE' },
+          // scrolls to the form under the description
+          button: { label: 'APPLY FOR THIS ROLE', href: '#apply' },
         }}
         image={heroBg}
         label={role.title}
         objectPosition="object-[50%_30%]"
         tall
-        cta={{ dialog: APPLICATION_DIALOG_ID }}
+        cta={{}}
       />
-      <RoleDetail role={role} />
-      <ApplicationDialog role={role} />
+      <SectionThemeSequence
+        sections={[
+          { id: 'role', tone: 'cream', texture: 'grid', content: <RoleDetail role={role} /> },
+          { id: 'apply', tone: 'cream', content: <ApplicationForm role={role} /> },
+        ]}
+        contact={<SectionFade><Contact content={contact} /></SectionFade>}
+      />
     </main>
   )
 }

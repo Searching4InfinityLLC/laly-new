@@ -1,7 +1,5 @@
-// Shared by the careers ApplicationDialog (client) and /api/careers/apply (server), so the two can't
+// Shared by the careers ApplicationForm (client) and /api/careers/apply (server), so the two can't
 // disagree about what a valid application is. No imports — both sides load this.
-
-export const APPLICATION_DIALOG_ID = 'application-dialog'
 
 // Where applications go, and the address the confirmation hands out for questions (client note).
 export const CAREERS_EMAIL = 'grow@laly.agency'

@@ -8,7 +8,7 @@ import {
 } from '@/lib/careers'
 import { getRole } from '@/lib/cms'
 
-// Receives the careers ApplicationDialog's multipart POST. Re-runs the client's validator — the
+// Receives the careers ApplicationForm's multipart POST. Re-runs the client's validator — the
 // browser's copy is a convenience, this is the trust boundary.
 //
 // DELIVERY IS NOT WIRED YET (UI first, action later). The plan: send one email to CAREERS_EMAIL

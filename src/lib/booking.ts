@@ -7,13 +7,7 @@
 export const BOOKING_DIALOG_ID = 'booking-dialog'
 
 export function openBooking() {
-  openDialog(BOOKING_DIALOG_ID)
-}
-
-// Same door for any other page-level <dialog> (the careers application form). Button's `dialog`
-// prop calls this with the id, for the same server-component reason `booking` is a flag.
-export function openDialog(id: string) {
-  const el = document.getElementById(id)
+  const el = document.getElementById(BOOKING_DIALOG_ID)
   // showModal (not `open = true`) is the whole reason this is a <dialog>: it puts the panel in the
   // browser's top layer, which escapes <header>'s z-50 stacking context, makes the rest of the page
   // inert, traps focus and wires ESC — all the things NavMenu.tsx hand-rolls for its sheet.
