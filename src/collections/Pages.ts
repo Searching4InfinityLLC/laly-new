@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { revalidatePages } from '../lib/revalidate'
 import { AboutBlock } from '../blocks/about'
 import { ChannelsBlock, CompoundBlock, PositioningBlock, SystemBlock } from '../blocks/branding'
+import { CareersAboutBlock, OpenRolesBlock } from '../blocks/careers'
 import { ContactBlock } from '../blocks/contact'
 import { HowWeHelpBlock, OurMethodBlock } from '../blocks/development'
 import { HeroBlock } from '../blocks/hero'
@@ -67,7 +68,7 @@ export const Pages: CollectionConfig = {
       index: true,
       admin: {
         description:
-          "The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising', 'branding' and 'development' are the ones that exist.",
+          "The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising', 'branding', 'development' and 'careers' are the ones that exist.",
       },
     },
     {
@@ -77,7 +78,7 @@ export const Pages: CollectionConfig = {
       minRows: 1,
       admin: {
         description:
-          'Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Our Method/Note on development).',
+          'Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Our Method/Note on development, Service Hero/Careers — About/Careers — Open Roles on careers). The roles on /careers are their own collection (Open Roles), not blocks.',
       },
       blocks: [
         HeroBlock,
@@ -98,6 +99,8 @@ export const Pages: CollectionConfig = {
         CompoundBlock,
         HowWeHelpBlock,
         OurMethodBlock,
+        CareersAboutBlock,
+        OpenRolesBlock,
       ],
     },
   ],

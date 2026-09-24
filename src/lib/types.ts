@@ -372,3 +372,40 @@ export type FooterContent = {
   phone?: string
   copyright: string
 }
+
+// --- /careers ------------------------------------------------------------------------------------
+
+// "About Laly Agency" — label/heading/copy over the three service cards. `body`'s \n\n are paragraph
+// gaps. Card colour comes from the card's position (HELP_ACCENTS), so the CMS holds copy only.
+export type CareersAboutContent = {
+  label: string
+  heading: string // \n is an authored break
+  body: string
+  services: { title: string; body: string }[]
+}
+
+// The copy around the role list. The roles themselves are the Roles collection, not this block.
+export type OpenRolesContent = {
+  label: string
+  heading: string
+  empty: string // the dashed line under the list
+}
+
+export type CareersContent = {
+  hero: PaidHeroContent
+  about: CareersAboutContent
+  openRoles: OpenRolesContent
+}
+
+// One job opening — a Roles collection doc, narrowed. `about`'s \n\n are paragraph gaps.
+export type Role = {
+  slug: string
+  title: string
+  summary: string
+  pay: string
+  tags: string[]
+  about: string
+  responsibilities: string[]
+  requirements: string[]
+  details: { label: string; value: string }[]
+}

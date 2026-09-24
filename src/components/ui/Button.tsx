@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useScramble } from '@/components/ui/ScrambleText'
-import { openBooking } from '@/lib/booking'
+import { openBooking, openDialog } from '@/lib/booking'
+import { getLenis } from '@/lib/lenis'
 
 // Presentational button primitive — styling + scramble-on-hover. No CMS logic.
 // Label is Chivo Mono (font-mono): mono keeps the decrypt width-stable, no jitter/overlap, so the
@@ -60,6 +61,9 @@ type Props = {
   // wiring. Wins over `href`: every CTA passes both, and a stray CMS href must not quietly turn a
   // booking button into a link.
   booking?: boolean
+  // Opens the <dialog> with this id — `booking` for any other modal (the careers application form).
+  // A string for the same server-component reason `booking` is a flag.
+  dialog?: string
   type?: 'button' | 'submit'
   disabled?: boolean
 }
@@ -76,6 +80,7 @@ export function Button({
   altLabel,
   showAlt = false,
   booking = false,
+  dialog,
   type = 'button',
   disabled = false,
 }: Props) {
@@ -108,8 +113,26 @@ export function Button({
   const cls =
     `${SHELL_BASE} ${VARIANTS[variant].shell} ${disabled ? 'cursor-not-allowed opacity-45' : ''} ${className}`.trim()
 
-  return href && !booking ? (
-    <Link href={href} aria-label={children} className={cls} onMouseEnter={onMouseEnter}>
+  // An in-page anchor ('#roles') glides there on Lenis instead of the browser's jump — Lenis owns
+  // scrollTop, so a native jump lands without the smooth scroll the rest of the site has. No Lenis
+  // (touch, reduced motion): fall through to the plain anchor.
+  const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const lenis = getLenis()
+    if (!href?.startsWith('#') || !lenis) return
+    const target = document.querySelector(href)
+    if (!target) return
+    e.preventDefault()
+    lenis.scrollTo(target as HTMLElement)
+  }
+
+  return href && !booking && !dialog ? (
+    <Link
+      href={href}
+      aria-label={children}
+      className={cls}
+      onMouseEnter={onMouseEnter}
+      onClick={onLinkClick}
+    >
       {label}
     </Link>
   ) : (
@@ -118,7 +141,7 @@ export function Button({
       aria-label={current}
       className={cls}
       disabled={disabled}
-      onClick={booking ? openBooking : onClick}
+      onClick={booking ? openBooking : dialog ? () => openDialog(dialog) : onClick}
       onMouseEnter={onMouseEnter}
     >
       {label}

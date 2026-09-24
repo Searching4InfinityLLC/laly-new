@@ -23,6 +23,8 @@
     "seed:branding": "bun scripts/seed-branding.ts",
     "//seed:development": "Seeds ONLY the development doc. No uploads — the one image on that page is a static import.",
     "seed:development": "bun scripts/seed-development.ts",
+    "//seed:careers": "Seeds the careers doc and upserts the Brand Strategist role by slug. Other roles untouched. Copy in src/lib/mock/careers.ts.",
+    "seed:careers": "bun scripts/seed-careers.ts",
     "//update:about": "Reorders the home About Us team and rewrites their role lines in place. Touches only that block's members; stops without writing if the names in the doc don't match.",
     "update:about": "bun scripts/update-about-team.ts",
     "//update:paid-faq": "Replaces ONLY the /paid-advertising FAQ rows (copy in src/lib/mock/paid-faq.ts). Other blocks untouched.",

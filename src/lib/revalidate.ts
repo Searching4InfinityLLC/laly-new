@@ -33,7 +33,7 @@ export const pathForSlug = (slug: string): string => (slug === 'home' ? '/' : `/
 
 // Every prerendered route. Media has no way to know which page embeds the file being saved, so it
 // purges the lot — four paths, and a purge is cheap next to serving a stale image url.
-export const PAGE_SLUGS = ['home', 'paid-advertising', 'branding', 'development']
+export const PAGE_SLUGS = ['home', 'paid-advertising', 'branding', 'development', 'careers']
 
 export async function revalidatePages(slugs: string[]): Promise<void> {
   const baseUrl = resolveBaseUrl()
