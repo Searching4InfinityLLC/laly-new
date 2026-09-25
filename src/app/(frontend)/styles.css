@@ -1534,6 +1534,11 @@ html.anim-sections-fadeup .reveal-gate.is-visible .section-text-reveal {
   --pillar-badge-ink: #443b43;
   --pillar-arrow: #716370;
   background-color: rgb(252 247 243 / 0.2);
+  /* The dark glass's 0.29 black top-left wash reads as a smudge on a light ground (review note), and
+     its white bottom-right light is invisible there. A faint warm-ink inset keeps a hint of depth. */
+  background-image:
+    linear-gradient(to bottom, rgb(84 77 73 / 0.04), transparent 12px),
+    linear-gradient(to right, rgb(84 77 73 / 0.04), transparent 12px);
 }
 .section-theme .strategy-card {
   transition: background-color 350ms ease-in-out, border-color 300ms ease-out,
