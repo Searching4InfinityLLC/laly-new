@@ -57,7 +57,10 @@ export function RoleDetail({ role }: { role: Role }) {
   return (
     <section
       aria-label={`${role.title} — job description`}
-      className="relative w-full overflow-hidden bg-[#FCF7F3] py-16 md:py-28"
+      // overflow-clip, not overflow-hidden: hidden makes the section a scroll container, and a sticky
+      // child sticks to its nearest scroll container — one that never scrolls, so the panel rode
+      // away with the page. clip crops the same without becoming one.
+      className="relative w-full overflow-clip bg-[#FCF7F3] py-16 md:py-28"
     >
       <GridBackdrop />
       <div className="section-shell relative grid gap-12 px-5 sm:px-10 md:grid-cols-[minmax(0,1fr)_360px] md:gap-16 md:px-20 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-24">
@@ -107,7 +110,7 @@ export function RoleDetail({ role }: { role: Role }) {
               href="#apply"
               className="w-full py-2.5 [&>span]:text-lg"
             >
-              APPLY
+              APPLY NOW
             </Button>
           </div>
         </aside>

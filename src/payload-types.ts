@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     pages: Page;
     roles: Role;
+    applications: Application;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -81,6 +82,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     roles: RolesSelect<false> | RolesSelect<true>;
+    applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -991,6 +993,38 @@ export interface Role {
   createdAt: string;
 }
 /**
+ * Everyone who applied through the site. Files are in the email sent to the careers inbox. Delete an application to let that person apply to the same role again.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: string;
+  status: 'new' | 'reviewing' | 'interview' | 'rejected' | 'hired';
+  roleTitle: string;
+  roleSlug: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  linkedin?: string | null;
+  portfolioUrl?: string | null;
+  /**
+   * Names only — the files are attached to the email.
+   */
+  files?:
+    | {
+        name?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Internal notes for the team. Never shown to the applicant.
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
@@ -1012,6 +1046,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'roles';
         value: string | Role;
+      } | null)
+    | ({
+        relationTo: 'applications';
+        value: string | Application;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1594,6 +1632,29 @@ export interface RolesSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications_select".
+ */
+export interface ApplicationsSelect<T extends boolean = true> {
+  status?: T;
+  roleTitle?: T;
+  roleSlug?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  linkedin?: T;
+  portfolioUrl?: T;
+  files?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
