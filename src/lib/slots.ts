@@ -3,20 +3,32 @@
 // generator is the point — two copies of "business hours" drift, and the drift shows up as a booking
 // confirmed against a slot the picker never offered.
 //
-// Two layers: gridFor() is the business-hours grid (pure, sync), slotsFor() subtracts whatever the
-// agency calendar says is busy. With the Google env vars unset (src/lib/google.ts) nothing is
-// subtracted and every grid slot is offered — the stub the site shipped with.
+// When Google is configured, open hours come from the SAME agency calendar as bookings: any event
+// whose title starts with BOOKING_AVAILABLE_PREFIX (default `[Available]`) is a bookable window.
+// Recurring weekly events cover the normal week; a one-off event covers a special day. Set those
+// events to Show as: Free so freeBusy does not mark the whole window busy. Real meetings stay Busy
+// and are subtracted. No `[Available]` events on a day → fall back to the env business-hours grid
+// (BOOKING_OPEN_HOUR / CLOSE_HOUR), so an empty calendar still offers the old stub hours.
+//
+// With the Google env vars unset (src/lib/google.ts) only the env grid is offered.
 
-import { freeBusy, googleConfigured } from './google'
+import { freeBusy, googleConfigured, listEvents } from './google'
+import type { CalEvent } from './google'
 
-// Agency-local business hours. Env so staging can widen them without a deploy.
+// Agency-local fallback hours when the calendar has no Available windows that day.
 const TZ = process.env.BOOKING_TZ || 'America/New_York'
 const OPEN_HOUR = Number(process.env.BOOKING_OPEN_HOUR ?? 9)
 const CLOSE_HOUR = Number(process.env.BOOKING_CLOSE_HOUR ?? 17)
 const LUNCH_HOUR = 12
 export const SLOT_MINUTES = 30
 
+// Title prefix for open-hours events on GOOGLE_CALENDAR_ID. Case-insensitive; trailing text is fine
+// (`[Available] Mon–Fri`). Change only if the agency already uses a different convention.
+const AVAILABLE_PREFIX = (process.env.BOOKING_AVAILABLE_PREFIX || '[Available]').trim().toLowerCase()
+
 export type Slot = { start: string; end: string }
+
+type Interval = { start: number; end: number }
 
 // How far `tz` is from UTC at a given instant, in ms. Intl is the only thing in the platform that
 // knows the IANA rules, so this reads the wall clock it would print and diffs it against the instant.
@@ -57,11 +69,73 @@ function toUtc(date: string, hour: number, minute: number): Date {
   return new Date(naive.getTime() - offsetAt(naive, TZ))
 }
 
-// Every day draws the same grid; only Google's busy list makes the counts differ. The chip area in
-// BookingDialog.tsx reserves a full day's height for that reason — a day with fewer chips must not
-// make the block shrink and the picker jump under the cursor.
+function nextDay(date: string): string {
+  const d = new Date(`${date}T12:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + 1)
+  return d.toISOString().slice(0, 10)
+}
 
-/** Business-hours 30-minute slots on `date` (YYYY-MM-DD), as UTC ISO strings. Past slots are dropped. */
+function leadFloor(): number {
+  // An hour of lead time. Offering a call that starts in four minutes is how you book a no-show.
+  return Date.now() + 60 * 60_000
+}
+
+/** Drop slots that start too soon. Shared by the env grid and calendar windows. */
+function afterLead(slots: Slot[]): Slot[] {
+  const floor = leadFloor()
+  return slots.filter((s) => new Date(s.start).getTime() > floor)
+}
+
+/**
+ * Clip a Calendar event to [dayStart, dayEnd). Timed events use dateTime; all-day use date
+ * (end.date exclusive, per Google). Returns null when the event does not overlap the day.
+ */
+function clipEvent(e: CalEvent, dayStart: number, dayEnd: number): Interval | null {
+  let start: number
+  let end: number
+  if (e.start.dateTime && e.end.dateTime) {
+    start = new Date(e.start.dateTime).getTime()
+    end = new Date(e.end.dateTime).getTime()
+  } else if (e.start.date && e.end.date) {
+    // All-day dates are civil dates in the calendar — interpret midnight in the agency zone so a
+    // "whole day Available" matches the day the picker asked for.
+    start = toUtc(e.start.date, 0, 0).getTime()
+    end = toUtc(e.end.date, 0, 0).getTime()
+  } else {
+    return null
+  }
+  const a = Math.max(start, dayStart)
+  const z = Math.min(end, dayEnd)
+  if (!(a < z)) return null
+  return { start: a, end: z }
+}
+
+function isAvailableEvent(e: CalEvent): boolean {
+  return (e.summary ?? '').trim().toLowerCase().startsWith(AVAILABLE_PREFIX)
+}
+
+/**
+ * Half-hour slots on `date` that sit fully inside at least one window. Walks agency-local wall
+ * clock so alignment matches the env grid (and the chips the dialog already expects).
+ */
+function slotsInsideWindows(date: string, windows: Interval[]): Slot[] {
+  if (windows.length === 0) return []
+  const all: Slot[] = []
+  const step = SLOT_MINUTES * 60_000
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += SLOT_MINUTES) {
+      const start = toUtc(date, h, m)
+      const a = start.getTime()
+      const z = a + step
+      if (windows.some((w) => a >= w.start && z <= w.end)) {
+        all.push({ start: start.toISOString(), end: new Date(z).toISOString() })
+      }
+    }
+  }
+  return afterLead(all)
+}
+
+/** Env business-hours 30-minute slots on `date` (YYYY-MM-DD), as UTC ISO strings. */
 export function gridFor(date: string): Slot[] {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return []
 
@@ -76,29 +150,53 @@ export function gridFor(date: string): Slot[] {
       })
     }
   }
-
-  // An hour of lead time. Offering a call that starts in four minutes is how you book a no-show.
-  // The picker only offers days from tomorrow on, so this trims nothing today — it is the guard for
-  // a hand-crafted request hitting the API directly, which is exactly where isFree() is called from.
-  const floor = Date.now() + 60 * 60_000
-  return all.filter((s) => new Date(s.start).getTime() > floor)
+  return afterLead(all)
 }
 
-/** Grid slots on `date` that the agency calendar has free. Throws if Google is configured but fails. */
-export async function slotsFor(date: string): Promise<Slot[]> {
-  const grid = gridFor(date)
-  if (grid.length === 0 || !googleConfigured()) return grid
-  // One query for the whole day rather than one per slot.
-  const busy = (await freeBusy(grid[0].start, grid[grid.length - 1].end)).map((b) => [
-    new Date(b.start).getTime(),
-    new Date(b.end).getTime(),
-  ])
+function subtractBusy(slots: Slot[], busy: Interval[]): Slot[] {
   // Half-open overlap: a meeting ending at 10:00 leaves the 10:00 slot free.
-  return grid.filter((s) => {
+  return slots.filter((s) => {
     const a = new Date(s.start).getTime()
     const z = new Date(s.end).getTime()
-    return !busy.some(([b0, b1]) => a < b1 && b0 < z)
+    return !busy.some((b) => a < b.end && b.start < z)
   })
+}
+
+/**
+ * Bookable slots on `date`. Throws if Google is configured but the calendar call fails.
+ * Calendar Available windows win when present; otherwise the env grid. Busy meetings always peel off.
+ */
+export async function slotsFor(date: string): Promise<Slot[]> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return []
+  if (!googleConfigured()) return gridFor(date)
+
+  const dayStart = toUtc(date, 0, 0)
+  const dayEnd = toUtc(nextDay(date), 0, 0)
+  const dayStartIso = dayStart.toISOString()
+  const dayEndIso = dayEnd.toISOString()
+
+  const [events, busyRaw] = await Promise.all([
+    listEvents(dayStartIso, dayEndIso),
+    freeBusy(dayStartIso, dayEndIso),
+  ])
+
+  const windows: Interval[] = []
+  for (const e of events) {
+    if (e.status === 'cancelled') continue
+    if (!isAvailableEvent(e)) continue
+    const iv = clipEvent(e, dayStart.getTime(), dayEnd.getTime())
+    if (iv) windows.push(iv)
+  }
+
+  // Available windows that day → carve chips from them. None → env grid (migration / stub hours).
+  const grid = windows.length > 0 ? slotsInsideWindows(date, windows) : gridFor(date)
+  if (grid.length === 0) return []
+
+  const busy = busyRaw.map((b) => ({
+    start: new Date(b.start).getTime(),
+    end: new Date(b.end).getTime(),
+  }))
+  return subtractBusy(grid, busy)
 }
 
 /** Whether a specific ISO instant is still bookable. The race guard on POST. */

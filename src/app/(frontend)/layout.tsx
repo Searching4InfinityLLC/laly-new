@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { fontVariables } from '@/app/(frontend)/components/Fonts'
 import { BookingDialog } from '@/components/booking/BookingDialog'
 import { Loader } from '@/components/Loader'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { HeaderGround } from '@/components/HeaderGround'
+import { MetaPixel } from '@/components/MetaPixel'
 import { RouteTransition } from '@/components/RouteTransition'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { SITE_URL } from '@/lib/site'
@@ -37,6 +39,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: "history.scrollRestoration='manual'" }} />
       </head>
       <body className="relative min-h-screen antialiased font-sans">
+        {/* Suspense: MetaPixel reads useSearchParams for SPA PageView re-fires. */}
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
         <SmoothScroll />
         <Loader />
         <RouteTransition />

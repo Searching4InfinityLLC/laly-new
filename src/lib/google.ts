@@ -50,15 +50,18 @@ async function accessToken(): Promise<string> {
   return cached.token
 }
 
-async function call<T>(path: string, body: unknown): Promise<T> {
+async function call<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
   const res = await fetch(`${API}${path}`, {
-    method: 'POST',
-    headers: { authorization: `Bearer ${await accessToken()}`, 'content-type': 'application/json' },
-    body: JSON.stringify(body),
+    method,
+    headers: {
+      authorization: `Bearer ${await accessToken()}`,
+      ...(body !== undefined ? { 'content-type': 'application/json' } : {}),
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
     cache: 'no-store',
   })
   const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(`google ${path}: ${res.status} ${data.error?.message ?? ''}`)
+  if (!res.ok) throw new Error(`google ${path}: ${res.status} ${data.error?.message ?? data.error ?? ''}`)
   return data as T
 }
 
@@ -67,7 +70,7 @@ export async function freeBusy(timeMin: string, timeMax: string): Promise<Busy[]
   const id = process.env.GOOGLE_CALENDAR_ID ?? ''
   const data = await call<{
     calendars: Record<string, { busy?: Busy[]; errors?: { reason: string }[] }>
-  }>('/freeBusy', { timeMin, timeMax, items: [{ id }] })
+  }>('POST', '/freeBusy', { timeMin, timeMax, items: [{ id }] })
   const cal = data.calendars[id]
   // A calendar the token cannot see comes back 200 with an `errors` entry and no busy list. Reading
   // that as "no busy" would offer every slot on a calendar nobody is checking, so it throws instead.
@@ -75,6 +78,35 @@ export async function freeBusy(timeMin: string, timeMax: string): Promise<Busy[]
     throw new Error(`google freeBusy: ${cal?.errors?.map((e) => e.reason).join(', ') ?? 'calendar missing'}`)
   }
   return cal.busy ?? []
+}
+
+export type CalEvent = {
+  summary?: string
+  status?: string
+  // "transparent" = Show as Free in Calendar. Availability windows must be Free so freeBusy
+  // does not treat them as booked; other meetings stay opaque (Busy).
+  transparency?: string
+  start: { dateTime?: string; date?: string }
+  end: { dateTime?: string; date?: string }
+}
+
+/**
+ * Events on the agency calendar in [timeMin, timeMax), expanded to instances.
+ * Used to find `[Available]` windows on the same calendar as bookings.
+ */
+export async function listEvents(timeMin: string, timeMax: string): Promise<CalEvent[]> {
+  const params = new URLSearchParams({
+    timeMin,
+    timeMax,
+    singleEvents: 'true',
+    orderBy: 'startTime',
+    maxResults: '250',
+  })
+  const data = await call<{ items?: CalEvent[] }>(
+    'GET',
+    `/calendars/${calendarId()}/events?${params}`,
+  )
+  return data.items ?? []
 }
 
 type NewEvent = {
@@ -93,7 +125,7 @@ export async function insertEvent(e: NewEvent): Promise<{ meetUrl: string | null
   const data = await call<{
     hangoutLink?: string
     conferenceData?: { entryPoints?: { entryPointType: string; uri: string }[] }
-  }>(`/calendars/${calendarId()}/events?conferenceDataVersion=1&sendUpdates=all`, {
+  }>('POST', `/calendars/${calendarId()}/events?conferenceDataVersion=1&sendUpdates=all`, {
     summary: e.summary,
     description: e.description,
     start: { dateTime: e.start },
