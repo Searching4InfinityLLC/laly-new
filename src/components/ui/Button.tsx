@@ -111,14 +111,20 @@ export function Button({
 
   // An in-page anchor ('#roles') glides there on Lenis instead of the browser's jump — Lenis owns
   // scrollTop, so a native jump lands without the smooth scroll the rest of the site has. No Lenis
-  // (touch, reduced motion): fall through to the plain anchor.
+  // (touch, reduced motion): fall through to the plain anchor. An anchor to a <dialog> ('#apply' on
+  // /careers/<slug>) opens it instead.
   const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const lenis = getLenis()
-    if (!href?.startsWith('#') || !lenis) return
+    if (!href?.startsWith('#')) return
     const target = document.querySelector(href)
-    if (!target) return
+    if (target instanceof HTMLDialogElement) {
+      e.preventDefault()
+      if (!target.open) target.showModal()
+      return
+    }
+    const lenis = getLenis()
+    if (!target || !lenis) return
     e.preventDefault()
-    // Lenis honours the target's scroll-margin-top, so the scroll-mt-19 on #roles / #apply is what
+    // Lenis honours the target's scroll-margin-top, so the scroll-mt-19 on #roles is what
     // clears the fixed navbar — no offset here, or it doubles.
     lenis.scrollTo(target as HTMLElement)
   }

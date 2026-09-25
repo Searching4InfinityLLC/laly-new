@@ -24,10 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // /careers/<slug> — one role: the shared ServiceHero (eyebrow, title, the role's tags plus pay as
-// the four pills, the summary, APPLY), the description with its sticky details panel, the
-// application form both APPLY buttons scroll to. No Contact band — the form is the page's CTA, so the
-// sections render as plain cream .section-theme markup (no SectionThemeSequence). A closed or unknown
-// slug 404s.
+// the four pills, the summary, APPLY), then the description with its sticky details panel. Both
+// APPLY buttons open the application form's dialog (#apply). No Contact band — the form is the page's
+// CTA — so the description renders as plain cream .section-theme markup. A closed or unknown slug 404s.
 export default async function RolePage({ params }: Props) {
   const role = await getRole((await params).slug)
   if (!role) notFound()
@@ -40,7 +39,7 @@ export default async function RolePage({ params }: Props) {
           heading: role.title,
           pills: [...role.tags, role.pay].slice(0, 4),
           description: { before: role.summary },
-          // scrolls to the form under the description
+          // opens the application dialog
           button: { label: 'APPLY', href: '#apply' },
         }}
         image={heroBg}
@@ -53,10 +52,8 @@ export default async function RolePage({ params }: Props) {
         <div data-section-tone="cream" className="section-theme-content theme-grid">
           <RoleDetail role={role} />
         </div>
-        <div data-section-tone="cream" className="section-theme-content">
-          <ApplicationForm role={role} />
-        </div>
       </div>
+      <ApplicationForm role={role} />
     </main>
   )
 }

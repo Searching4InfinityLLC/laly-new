@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type DragEvent } from 'react'
+import { useEffect, useRef, useState, type DragEvent } from 'react'
 import { BracketLabel } from '@/components/ui/BracketLabel'
 import { Button } from '@/components/ui/Button'
 import {
@@ -13,13 +13,13 @@ import {
 import { getLenis } from '@/lib/lenis'
 import type { Role } from '@/lib/types'
 
-// The application form on /careers/<slug>, inline under the job description (id="apply") — both
-// APPLY buttons on the page scroll here. A plain single-column form (client note: "a standard form,
-// start fresh"): boxed fields with their labels above, one drop zone for every document, one submit.
-// Nothing beside it — the description above already says what the role is.
-//
-// It is the last section of the page (no Contact band below). The copy around the fields reads the
-// theme vars; the fields stay cream boxes.
+// The application form on /careers/<slug>, in a modal <dialog id="apply"> so applying never means
+// scrolling past the description. Both APPLY buttons are plain '#apply' links; Button opens a dialog
+// target instead of scrolling to it, and a deep link to /careers/<slug>#apply opens it on load.
+// The shell is the booking dialog's (.booking-dialog in styles.css: top layer, focus trap, ESC,
+// backdrop-click dismiss, the same enter/exit). A plain single-column form (client note: "a standard
+// form, start fresh"): boxed fields with their labels above, one drop zone for every document, one
+// submit. Closing keeps what was typed; a sent application stays on its confirmation.
 //
 // No confirmation email goes to the applicant (client note); the confirmation that replaces the form
 // is the receipt, and it hands out the careers inbox for questions instead.
@@ -80,7 +80,9 @@ function ErrorText({ id, children }: { id: string; children?: string }) {
 }
 
 export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }) {
-  const ref = useRef<HTMLElement>(null)
+  const ref = useRef<HTMLDialogElement>(null)
+  const scroller = useRef<HTMLDivElement>(null)
+  const downOnBackdrop = useRef(false)
   const [text, setText] = useState<ApplicationText>(EMPTY)
   const [files, setFiles] = useState<File[]>([])
   const [errors, setErrors] = useState<ApplicationErrors>({})
@@ -105,15 +107,25 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
     setErrors((e) => ({ ...e, files: undefined }))
   }
 
-  // The confirmation is far shorter than the form, so bring the section's top back into view. Lenis
-  // owns scrollTop when it is running; the section's scroll-mt-19 clears the fixed navbar either way.
-  const toTop = () => {
+  // Lenis keeps driving the page under a top-layer dialog, so park it while this is open (as
+  // BookingDialog does). A deep link to #apply opens it on arrival.
+  useEffect(() => {
     const el = ref.current
     if (!el) return
-    const lenis = getLenis()
-    if (lenis) lenis.scrollTo(el)
-    else el.scrollIntoView({ block: 'start' })
-  }
+    const onClose = () => getLenis()?.start()
+    const obs = new MutationObserver(() => el.open && getLenis()?.stop())
+    obs.observe(el, { attributes: true, attributeFilter: ['open'] })
+    el.addEventListener('close', onClose)
+    if (location.hash === '#apply') el.showModal()
+    return () => {
+      obs.disconnect()
+      el.removeEventListener('close', onClose)
+      getLenis()?.start()
+    }
+  }, [])
+
+  // The confirmation is far shorter than the form, so bring the card's top back into view.
+  const toTop = () => scroller.current?.scrollTo({ top: 0 })
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -147,14 +159,25 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
   }
 
   return (
-    <section
+    <dialog
       ref={ref}
       id="apply"
       aria-labelledby="application-heading"
-      // scroll-mt clears the fixed 76px navbar for a plain (no-Lenis) anchor jump
-      className="relative w-full scroll-mt-19 bg-[#FCF7F3] px-5 py-16 sm:px-10 md:py-28"
+      className="booking-dialog"
+      // backdrop click dismisses, but only a press that started there (see BookingDialog)
+      onPointerDown={(e) => {
+        downOnBackdrop.current = e.target === ref.current
+      }}
+      onClick={(e) => {
+        if (e.target === ref.current && downOnBackdrop.current) ref.current?.close()
+      }}
     >
-      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-10 md:gap-12">
+      <div className="relative flex max-h-[88svh] w-full flex-col border border-[#544D49] bg-[#fffcf9] md:max-h-[88dvh] md:max-w-[1120px]">
+      <div
+        ref={scroller}
+        data-lenis-prevent
+        className="flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto px-5 pt-14 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-10 md:gap-10 md:px-16 md:pt-12 md:pb-12"
+      >
         <div className="flex flex-col gap-5 text-center md:gap-6">
           <BracketLabel className="theme-label mx-auto w-44 text-[var(--section-label,#867A72)] md:w-80">
             {done ? 'Sent' : 'Apply'}
@@ -162,7 +185,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
           <h2
             id="application-heading"
             aria-live="polite"
-            className="theme-ink font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[var(--section-heading,#262626)] md:text-[64px]"
+            className="theme-ink font-display text-[40px] font-normal leading-[1.1] tracking-[-1px] text-[var(--section-heading,#262626)] md:text-[48px]"
           >
             {done ? 'Application received!' : `Apply for ${role.title}`}
           </h2>
@@ -196,7 +219,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
             </div>
           </div>
         ) : (
-          <form onSubmit={submit} noValidate className="flex flex-col gap-6">
+          <form onSubmit={submit} noValidate className="grid gap-6 md:grid-cols-2 md:gap-x-8">
             {TEXT_FIELDS.map((f) => {
               const id = `application-${f.key}`
               const error = errors[f.key]
@@ -223,11 +246,13 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
               )
             })}
 
-            <FileDrop files={files} error={errors.files} onChange={changeFiles} />
+            <div className="md:col-span-2">
+              <FileDrop files={files} error={errors.files} onChange={changeFiles} />
+            </div>
 
             {/* The portfolio's other door: most strategists' work lives on a site or a deck link,
                 and a big PDF would not fit the upload cap anyway. */}
-            <div>
+            <div className="md:col-span-2">
               <Label htmlFor="application-portfolioUrl" required={false}>
                 Portfolio link
               </Label>
@@ -247,7 +272,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
             </div>
 
             {failed && (
-              <p role="alert" className="theme-ink font-sans text-lg text-[var(--section-heading,#151414)]">
+              <p role="alert" className="theme-ink font-sans text-lg md:col-span-2 text-[var(--section-heading,#151414)]">
                 {failed}
                 {failed && !failed.includes(CAREERS_EMAIL) && (
                   <>
@@ -266,14 +291,24 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
               variant="primary"
               type="submit"
               disabled={submitting}
-              className="mt-2 w-full py-3 [&>span]:text-lg"
+              className="mt-2 w-full py-3 md:col-span-2 [&>span]:text-lg"
             >
               {submitting ? 'SENDING…' : 'SUBMIT APPLICATION'}
             </Button>
           </form>
         )}
       </div>
-    </section>
+        {/* the booking dialog's CLOSE pill; last in the DOM so tabbing starts on the form */}
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={() => ref.current?.close()}
+          className="absolute right-4 top-3 z-20 cursor-pointer rounded-full bg-[#151414] px-2.5 py-1 font-fira text-sm text-[#fcf7f3] transition-opacity hover:opacity-80 md:right-8 md:top-8"
+        >
+          CLOSE
+        </button>
+      </div>
+    </dialog>
   )
 }
 
@@ -309,7 +344,7 @@ function FileDrop({ files, error, onChange }: { files: File[]; error?: string; o
           setOver(false)
           add(e.dataTransfer.files)
         }}
-        className={`mt-2 flex min-h-48 cursor-pointer flex-col items-center justify-center gap-3 border-dashed text-center has-[:focus-visible]:border-[#ff6d6a] ${BOX} ${
+        className={`mt-2 flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 border-dashed text-center has-[:focus-visible]:border-[#ff6d6a] ${BOX} ${
           over ? 'border-[#ff6d6a]' : boxBorder(error)
         }`}
       >

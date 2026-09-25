@@ -48,7 +48,8 @@ function Bullets({ items }: { items: string[] }) {
 
 // The body of /careers/<slug>, under the shared ServiceHero: the description on the left, a sticky
 // "Position details" panel on the right that keeps the apply button in reach the whole way down.
-// Below md the panel drops under the description and becomes the page's closing call to action.
+// Below md the panel drops under the description and becomes the page's closing call to action; the
+// hero's APPLY covers the top.
 //
 // The panel is the booking dialog's recap rail in reverse — same Fira labels over New Spirit values —
 // on a square card closing on the site's #544D49 keyline.
@@ -85,8 +86,7 @@ export function RoleDetail({ role }: { role: Role }) {
         {/* top-[100px]: the fixed 76px navbar plus a 24px breath. Sticky works under Lenis because
             Lenis scrolls the real document rather than transforming a wrapper. */}
         <aside className="md:sticky md:top-[100px] md:self-start">
-                    {/* theme-surface: the What You Get panel treatment, so the card darkens with the ground
-              as Contact arrives */}
+          {/* theme-surface: the What You Get panel treatment */}
           <div className="theme-surface flex flex-col gap-8 border border-[var(--panel-border,#544D49)] bg-[#FFFCF9] px-5 py-8 md:px-8 md:py-10">
             <h2 className="theme-ink font-display text-[28px] font-medium leading-[1.1] tracking-[-0.5px] text-[var(--panel-heading,#262626)] md:text-[32px]">
               Position details
@@ -101,7 +101,7 @@ export function RoleDetail({ role }: { role: Role }) {
                 ))}
               </dl>
             )}
-            {/* scrolls to the form under the description (ApplicationForm, id="apply") */}
+            {/* opens the application dialog (ApplicationForm, id="apply") */}
             <Button
               variant="primary"
               href="#apply"
