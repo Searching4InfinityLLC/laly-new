@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState, type DragEvent } from 'react'
-import { BracketLabel } from '@/components/ui/BracketLabel'
 import { Button } from '@/components/ui/Button'
 import {
   CAREERS_EMAIL,
@@ -179,9 +178,6 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
         className="flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto px-5 pt-14 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-10 md:gap-10 md:px-16 md:pt-12 md:pb-12"
       >
         <div className="flex flex-col gap-5 text-center md:gap-6">
-          <BracketLabel className="theme-label mx-auto w-44 text-[var(--section-label,#867A72)] md:w-80">
-            {done ? 'Sent' : 'Apply'}
-          </BracketLabel>
           <h2
             id="application-heading"
             aria-live="polite"
@@ -213,7 +209,9 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
               .
             </p>
             <div className="mt-4">
-              <Button variant="outline" href="/careers#roles">
+              {/* close first: the dialog sits in the top layer and would ride over /careers while the
+                  route changes underneath it */}
+              <Button variant="outline" href="/careers#roles" onClick={() => ref.current?.close()}>
                 SEE OTHER ROLES
               </Button>
             </div>

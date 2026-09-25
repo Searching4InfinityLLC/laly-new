@@ -113,7 +113,10 @@ export function Button({
   // scrollTop, so a native jump lands without the smooth scroll the rest of the site has. No Lenis
   // (touch, reduced motion): fall through to the plain anchor. An anchor to a <dialog> ('#apply' on
   // /careers/<slug>) opens it instead.
+  // onClick runs first on every link, in-page or not — e.g. closing the dialog the link sits in before
+  // the route changes under it.
   const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    onClick?.()
     if (!href?.startsWith('#')) return
     const target = document.querySelector(href)
     if (target instanceof HTMLDialogElement) {
