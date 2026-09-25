@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
 import { CareersAbout } from '@/components/sections/CareersAbout'
-import Contact from '@/components/sections/Contact'
 import Hero from '@/components/sections/Hero'
 import { OpenRoles } from '@/components/sections/OpenRoles'
-import { SectionFade } from '@/components/ui/SectionFade'
 import { SectionThemeSequence } from '@/components/ui/SectionTheme'
 import { getCareers, getHome, getRoles } from '@/lib/cms'
 
@@ -17,10 +15,10 @@ export const metadata: Metadata = {
 // (Roles / Pages afterChange hooks), so the hour is only the backstop.
 export const revalidate = 3600
 
-// The hiring landing page: the home hero (careers copy over home's image marquee), About Laly Agency, then the open roles, which
-// the hero's button scrolls to, closing on the home "Grow with us" Contact band like the service pages.
-// About → Open Roles → Contact run in the same scroll-driven SectionThemeSequence those pages use,
-// inverted: About starts dark and both turn white as Open Roles comes in. Copy comes from the Pages 'careers' doc (falling back per block to
+// The hiring landing page: the home hero (careers copy over home's image marquee), About Laly Agency,
+// then the open roles the hero's button scrolls to. No Contact band — the roles are the CTA. About →
+// Open Roles run in the service pages' scroll-driven SectionThemeSequence, inverted: About starts
+// dark and both turn white as Open Roles comes in. Copy comes from the Pages 'careers' doc (falling back per block to
 // src/lib/mock/careers.ts); the roles are the Roles collection.
 //
 // The careers doc's hero label and pills have no slot in the home hero, so they don't render here.
@@ -46,7 +44,6 @@ export default async function CareersPage() {
           { id: 'about', tone: 'dark', texture: 'grid', content: <CareersAbout content={careers.about} /> },
           { id: 'roles', tone: 'white', content: <OpenRoles content={careers.openRoles} roles={roles} /> },
         ]}
-        contact={<SectionFade><Contact content={home.contact} /></SectionFade>}
       />
     </main>
   )

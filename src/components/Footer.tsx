@@ -20,16 +20,11 @@ export default function Footer() {
           />
         </a>
 
-        {/* NAV and CONTACT are one block on mobile — 80 between the two groups, 20 under them.
-            The wrapper dissolves at md+ so the desktop four-column row is unchanged. */}
-        {/* mobile: one column, 80 between the groups, 20 under. desktop: its own space-between row
-            that fills the middle of the footer, 48 under. */}
+        {/* NAV, SERVICES and CONTACT. mobile: one column, 80 between the groups, 20 under.
+            desktop: their own space-between row filling the middle of the footer, 48 under. */}
         <div className="flex flex-col items-center gap-20 pb-5 md:flex-1 md:flex-row md:items-start md:justify-between md:gap-0 md:px-2 md:pb-12">
-        {/* 32 from the title to the list, 12 between links.
-            HIDDEN (client note): the pages it links to are not ready. display:none rather than
-            deleted, so bringing it back is swapping `hidden` for `flex`. SERVICES and CONTACT keep
-            their md:flex-1 and share the row. */}
-        <nav className="hidden flex-col items-center gap-8 md:flex-1">
+        {/* 32 from the title to the list, 12 between links. */}
+        <nav aria-label="Footer" className="flex flex-col items-center gap-8 md:flex-1">
           <p className="font-mono text-lg font-normal uppercase leading-[1.4] tracking-[0.2em] text-[#867A72]">[ Nav ]</p>
           <div className="flex flex-col items-center gap-3">
             {footer.nav.map((link) => (
@@ -44,8 +39,8 @@ export default function Footer() {
           </div>
         </nav>
 
-        {/* Same treatment as NAV and CONTACT — title, 32 to the list, 12 between links. With NAV
-            hidden the desktop row reads logo | SERVICES | CONTACT | copyright. */}
+        {/* Same treatment as NAV and CONTACT — title, 32 to the list, 12 between links. Desktop row:
+            logo | NAV | SERVICES | CONTACT | copyright. */}
         <nav aria-label="Services" className="flex flex-col items-center gap-8 md:flex-1">
           <p className="font-mono text-lg font-normal uppercase leading-[1.4] tracking-[0.2em] text-[#867A72]">[ Services ]</p>
           <div className="flex flex-col items-center gap-3">

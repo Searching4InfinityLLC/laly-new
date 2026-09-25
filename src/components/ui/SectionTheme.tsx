@@ -35,10 +35,11 @@ export function SectionTheme({ before, after, returnToLight, contact }: {
 
 // Only light/dark boundaries change the shared theme. Adjacent sections with matching tones
 // keep it, even when a short viewport never shows half of a tall section at once.
-// The last section also goes black as Contact arrives ("black above Contact").
+// The last section also goes black as Contact arrives ("black above Contact"). No `contact`
+// (/careers): nothing follows, so the last section keeps its own tone to the end.
 export function SectionThemeSequence({ sections, contact }: {
   sections: ThemeSection[]
-  contact: ReactNode
+  contact?: ReactNode
 }) {
   const container = useRef<HTMLDivElement>(null)
   const contactRef = useRef<HTMLDivElement>(null)
@@ -49,7 +50,7 @@ export function SectionThemeSequence({ sections, contact }: {
   useEffect(() => {
     const root = container.current
     const contactEl = contactRef.current
-    if (!root || !contactEl) return
+    if (!root) return
     const elements = Array.from(root.querySelectorAll<HTMLElement>(':scope > [data-section-tone]'))
     let frame = 0
     const reached = (section: HTMLElement) => {
@@ -66,7 +67,7 @@ export function SectionThemeSequence({ sections, contact }: {
         if ((next === 'dark') !== (previous === 'dark') && reached(element)) tone = next
       })
       setPhase(tone)
-      setContactReached(reached(contactEl))
+      setContactReached(!!contactEl && reached(contactEl))
       setUnderBar(root.getBoundingClientRect().top <= BAR)
     }
     const schedule = () => {
@@ -75,7 +76,7 @@ export function SectionThemeSequence({ sections, contact }: {
     const resize = new ResizeObserver(schedule)
     elements.forEach(element => resize.observe(element))
     resize.observe(root)
-    resize.observe(contactEl)
+    if (contactEl) resize.observe(contactEl)
     update()
     window.addEventListener('scroll', schedule, { passive: true })
     window.addEventListener('resize', schedule)
@@ -96,14 +97,14 @@ export function SectionThemeSequence({ sections, contact }: {
           <div
             key={section.id}
             data-section-tone={section.tone}
-            className={`section-theme-content${section.texture === 'grid' ? ' theme-grid' : ''}${index === sections.length - 1 ? ' contact-theme' : ''}`}
+            className={`section-theme-content${section.texture === 'grid' ? ' theme-grid' : ''}${contact && index === sections.length - 1 ? ' contact-theme' : ''}`}
             data-contact-theme={index === sections.length - 1 && contactReached ? 'black' : 'current'}
           >
             {section.content}
           </div>
         ))}
       </div>
-      <div ref={contactRef}>{contact}</div>
+      {contact && <div ref={contactRef}>{contact}</div>}
     </>
   )
 }
