@@ -459,12 +459,9 @@ export function BookingDialog() {
         if (e.target === ref.current && downOnBackdrop.current) close()
       }}
     >
-      {/* Height is FIXED, not content-driven: the three steps are different lengths, and letting
-          the card resize under them makes the whole panel jump every time you advance. Sized to
-          the tallest step (details, five fields); the form column scrolls inside it. The dvh caps
-          keep it on screen on short viewports, where the fixed height would otherwise overflow. */}
+      {/* Keep the card height steady across steps. The form column scrolls inside it. */}
       {ready && (
-        <div className="relative flex h-[88svh] max-h-[88svh] w-full flex-col overflow-hidden border border-[#544D49] bg-[#fffcf9] md:h-[640px] md:max-h-[88dvh] md:max-w-[1120px] md:flex-row">
+        <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden border border-[#544D49] bg-[#fffcf9] md:h-[640px] md:max-h-[88dvh] md:max-w-[1120px] md:flex-row">
           {/* form column */}
           <div
             data-lenis-prevent

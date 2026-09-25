@@ -171,7 +171,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
         if (e.target === ref.current && downOnBackdrop.current) ref.current?.close()
       }}
     >
-      <div className="relative flex max-h-[88svh] w-full flex-col border border-[#544D49] bg-[#fffcf9] md:max-h-[88dvh] md:max-w-[1120px]">
+      <div className="relative flex h-[100dvh] w-full flex-col border border-[#544D49] bg-[#fffcf9] md:h-auto md:max-h-[88dvh] md:max-w-[1120px]">
       <div
         ref={scroller}
         data-lenis-prevent
