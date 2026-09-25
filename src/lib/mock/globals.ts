@@ -25,9 +25,11 @@ export const header: HeaderContent = {
 
 // Stand-in for the Footer global until Payload exists.
 export const footer: FooterContent = {
-  // The NAV column is hidden (Footer.tsx) but still in the HTML, so it only lists routes that exist —
-  // crawlers follow display:none links. Add Services / About / Contact back with their pages.
-  nav: [{ label: 'Home', href: '/' }],
+  // Only routes that exist. Add About / Contact with their pages.
+  nav: [
+    { label: 'Home', href: '/' },
+    { label: 'Careers', href: '/careers' },
+  ],
   services: SERVICES,
   email: 'grow@laly.agency',
   // phone: unset until the real number is handed over — the (555) placeholder was a live tel: link.

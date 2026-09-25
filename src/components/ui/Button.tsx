@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useScramble } from '@/components/ui/ScrambleText'
 import { openBooking } from '@/lib/booking'
+import { getLenis } from '@/lib/lenis'
 
 // Presentational button primitive — styling + scramble-on-hover. No CMS logic.
 // Label is Chivo Mono (font-mono): mono keeps the decrypt width-stable, no jitter/overlap, so the
@@ -108,8 +109,37 @@ export function Button({
   const cls =
     `${SHELL_BASE} ${VARIANTS[variant].shell} ${disabled ? 'cursor-not-allowed opacity-45' : ''} ${className}`.trim()
 
+  // An in-page anchor ('#roles') glides there on Lenis instead of the browser's jump — Lenis owns
+  // scrollTop, so a native jump lands without the smooth scroll the rest of the site has. No Lenis
+  // (touch, reduced motion): fall through to the plain anchor. An anchor to a <dialog> ('#apply' on
+  // /careers/<slug>) opens it instead.
+  // onClick runs first on every link, in-page or not — e.g. closing the dialog the link sits in before
+  // the route changes under it.
+  const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    onClick?.()
+    if (!href?.startsWith('#')) return
+    const target = document.querySelector(href)
+    if (target instanceof HTMLDialogElement) {
+      e.preventDefault()
+      if (!target.open) target.showModal()
+      return
+    }
+    const lenis = getLenis()
+    if (!target || !lenis) return
+    e.preventDefault()
+    // Lenis honours the target's scroll-margin-top, so the scroll-mt-19 on #roles is what
+    // clears the fixed navbar — no offset here, or it doubles.
+    lenis.scrollTo(target as HTMLElement)
+  }
+
   return href && !booking ? (
-    <Link href={href} aria-label={children} className={cls} onMouseEnter={onMouseEnter}>
+    <Link
+      href={href}
+      aria-label={children}
+      className={cls}
+      onMouseEnter={onMouseEnter}
+      onClick={onLinkClick}
+    >
       {label}
     </Link>
   ) : (

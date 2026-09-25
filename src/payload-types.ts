@@ -70,6 +70,8 @@ export interface Config {
     users: User;
     media: Media;
     pages: Page;
+    roles: Role;
+    applications: Application;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -79,6 +81,8 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    roles: RolesSelect<false> | RolesSelect<true>;
+    applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -170,11 +174,11 @@ export interface Page {
    */
   title: string;
   /**
-   * The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising', 'branding' and 'development' are the ones that exist.
+   * The route. The home page is 'home'; every other doc is served at /<slug> — 'paid-advertising', 'branding', 'development' and 'careers' are the ones that exist.
    */
   slug: string;
   /**
-   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Our Method/Note on development).
+   * Pages render these by type, not by the order below — section order is fixed in code, so dragging rows here changes nothing on the site. Deleting a row does: that section falls back to its placeholder copy. The list offers every block in the project; each page only reads the ones it renders (Hero/Who We Are/Strategy/About/Contact/Note on home, Service Hero/Guarantee/What You Get/Results/Pricing/FAQ/Note on paid-advertising, Service Hero/Positioning/The System/The Channels/The Compound Effect/Pricing/FAQ/Note on branding, Service Hero/How We Help/Our Method/Note on development, Service Hero/Careers — About/Careers — Open Roles on careers). The roles on /careers are their own collection (Open Roles), not blocks.
    */
   content: (
     | HeroBlock
@@ -195,6 +199,8 @@ export interface Page {
     | CompoundBlock
     | HowWeHelpBlock
     | OurMethodBlock
+    | CareersAboutBlock
+    | OpenRolesBlock
   )[];
   updatedAt: string;
   createdAt: string;
@@ -868,6 +874,158 @@ export interface OurMethodBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CareersAboutBlock".
+ */
+export interface CareersAboutBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the page.
+   */
+  label: string;
+  /**
+   * Press Enter for an authored line break.
+   */
+  heading: string;
+  /**
+   * Leave a blank line between paragraphs.
+   */
+  body: string;
+  /**
+   * The cards under the copy, left to right. The card colour comes from its position.
+   */
+  services: {
+    title: string;
+    body: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'careersAbout';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OpenRolesBlock".
+ */
+export interface OpenRolesBlock {
+  /**
+   * Bare text. The [ brackets ] and uppercasing are added by the page.
+   */
+  label: string;
+  /**
+   * The roles themselves are managed under Collections → Open Roles, not here.
+   */
+  heading: string;
+  /**
+   * The dashed line under the list, e.g. "More roles will appear here as they open."
+   */
+  empty: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'openRoles';
+}
+/**
+ * Every open role is listed on /careers and has its own page at /careers/<slug>. Set Status to Closed to take a role down without losing its copy.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles".
+ */
+export interface Role {
+  id: string;
+  /**
+   * e.g. "Brand Strategist".
+   */
+  title: string;
+  /**
+   * The URL: /careers/<slug>. Lowercase words joined by hyphens, e.g. "brand-strategist". Changing it breaks any ad already pointing at the old one.
+   */
+  slug: string;
+  /**
+   * Closed roles leave the list and their page 404s.
+   */
+  status: 'open' | 'closed';
+  /**
+   * Lower numbers list first.
+   */
+  order?: number | null;
+  /**
+   * One sentence. Shown on the role card on /careers and under the heading on the role page.
+   */
+  summary: string;
+  /**
+   * As it should read, e.g. "$40–$50/hour".
+   */
+  pay: string;
+  /**
+   * Short facts, e.g. Remote / 1099 Contractor / 20–25 hrs/week. The pay is added after these automatically, so the hero holds four pills.
+   */
+  tags: {
+    label: string;
+    id?: string | null;
+  }[];
+  /**
+   * "About the role". Leave a blank line between paragraphs.
+   */
+  about: string;
+  /**
+   * "What you’ll do" — one bullet per row, top to bottom.
+   */
+  responsibilities: {
+    text: string;
+    id?: string | null;
+  }[];
+  /**
+   * "What we’re looking for" — one bullet per row, top to bottom.
+   */
+  requirements: {
+    text: string;
+    id?: string | null;
+  }[];
+  /**
+   * The "Position details" panel beside the description, e.g. Compensation / Location / Hours.
+   */
+  details?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Everyone who applied through the site. Files are in the email sent to the careers inbox. Delete an application to let that person apply to the same role again.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: string;
+  status: 'new' | 'reviewing' | 'interview' | 'rejected' | 'hired';
+  roleTitle: string;
+  roleSlug: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  linkedin?: string | null;
+  portfolioUrl?: string | null;
+  /**
+   * Names only — the files are attached to the email.
+   */
+  files?:
+    | {
+        name?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Internal notes for the team. Never shown to the applicant.
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -884,6 +1042,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'roles';
+        value: string | Role;
+      } | null)
+    | ({
+        relationTo: 'applications';
+        value: string | Application;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -996,6 +1162,8 @@ export interface PagesSelect<T extends boolean = true> {
         compound?: T | CompoundBlockSelect<T>;
         howWeHelp?: T | HowWeHelpBlockSelect<T>;
         ourMethod?: T | OurMethodBlockSelect<T>;
+        careersAbout?: T | CareersAboutBlockSelect<T>;
+        openRoles?: T | OpenRolesBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1397,6 +1565,98 @@ export interface OurMethodBlockSelect<T extends boolean = true> {
       };
   id?: T;
   blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CareersAboutBlock_select".
+ */
+export interface CareersAboutBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  body?: T;
+  services?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OpenRolesBlock_select".
+ */
+export interface OpenRolesBlockSelect<T extends boolean = true> {
+  label?: T;
+  heading?: T;
+  empty?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles_select".
+ */
+export interface RolesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  status?: T;
+  order?: T;
+  summary?: T;
+  pay?: T;
+  tags?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  about?: T;
+  responsibilities?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  requirements?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  details?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications_select".
+ */
+export interface ApplicationsSelect<T extends boolean = true> {
+  status?: T;
+  roleTitle?: T;
+  roleSlug?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  linkedin?: T;
+  portfolioUrl?: T;
+  files?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

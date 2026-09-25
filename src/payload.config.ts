@@ -8,6 +8,8 @@ import sharp from 'sharp'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Roles } from './collections/Roles'
+import { Applications } from './collections/Applications'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -17,7 +19,7 @@ export default buildConfig({
     // Payload writes to <baseDir>/app/(payload)/admin/importMap.js
     importMap: { baseDir: path.resolve(dirname) },
   },
-  collections: [Users, Media, Pages],
+  collections: [Users, Media, Pages, Roles, Applications],
   // No `editor` on purpose. Nothing in src/lib/types.ts is rich text — every field across all six
   // sections is a plain string or textarea — so no richText field exists to need one, and Payload
   // only throws MissingEditorProp when it meets one. @payloadcms/richtext-lexical stays installed but

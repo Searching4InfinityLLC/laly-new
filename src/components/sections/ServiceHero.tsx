@@ -45,11 +45,20 @@ export function ServiceHero({
   // The phone keeps 32% — its band is far taller against the portrait, so the same crop reads
   // differently there and its own frame is signed off.
   objectPosition = 'object-[50%_32%] md:object-[50%_43%]',
+  // What the button does. Every service page opens the booking dialog (the default); the careers
+  // pages pass `{}` so it follows its in-page href instead (#roles, #apply). Spread onto Button.
+  cta = { booking: true },
+  // /careers pages have no scratch band under the hero, so the hero takes its height instead:
+  // standard hero + ScratchBand (131px desktop, 198px phone, measured on /branding), split evenly
+  // between top and bottom padding so the copy stays centred in the taller band.
+  tall = false,
 }: {
   content: PaidHeroContent
   image: StaticImageData
   label: string // the section's accessible name; each page names its own service
   objectPosition?: string
+  cta?: { booking?: boolean }
+  tall?: boolean
 }) {
   return (
     // .hero-dark is the header's only cue: styles.css flips the shared cream navbar to
@@ -59,7 +68,11 @@ export function ServiceHero({
       // Figma frame: px 48, pt 0, pb 160, with the header's own 20px padding + 160 gap putting the
       // copy 188px down. The navbar is fixed and out of flow here, so that 188 has to be padding.
       // Mobile (2234:3799): px 20, pb 112, and 20 pad + 28 logo + 112 gap = the copy 160px down.
-      className="hero-dark relative flex w-full flex-col overflow-hidden border-b border-[#544D49] bg-[#292624] px-5 pt-[160px] pb-28 sm:px-10 md:px-12 md:pt-[188px] md:pb-40"
+      className={`hero-dark relative flex w-full flex-col overflow-hidden border-b border-[#544D49] bg-[#292624] px-5 sm:px-10 md:px-12 ${
+        tall
+          ? 'pt-[259px] pb-[211px] md:pt-[254px] md:pb-[225px]'
+          : 'pt-[160px] pb-28 md:pt-[188px] md:pb-40'
+      }`}
     >
       {/* 20% is the design's own opacity — the photo is a texture, not a subject, so it is
           decorative (empty alt) and carries no blur placeholder cost worth paying. */}
@@ -159,7 +172,7 @@ export function ServiceHero({
               so it is overridden on the instance exactly like the home hero's CTA. */}
           <Button
             variant="primary"
-            booking
+            {...cta}
             href={content.button.href}
             className="[&>span]:text-lg [&>span]:tracking-[-1px] md:[&>span]:text-xl md:[&>span]:leading-[25px]"
           >

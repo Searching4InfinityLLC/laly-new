@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import type {
   AboutBlock,
+  CareersAboutBlock,
   ChannelsBlock,
   CompoundBlock,
   ContactBlock,
@@ -11,11 +12,13 @@ import type {
   HowWeHelpBlock,
   Media,
   NoteBlock,
+  OpenRolesBlock,
   OurMethodBlock,
   PaidHeroBlock,
   PositioningBlock,
   PricingBlock,
   ResultsBlock,
+  Role as RoleDoc,
   StrategyBlock,
   SystemBlock,
   WhatYouGetBlock,
@@ -24,6 +27,8 @@ import type {
 import type {
   AboutContent,
   BrandingContent,
+  CareersAboutContent,
+  CareersContent,
   CaseStudy,
   ChannelSlide,
   ChannelsContent,
@@ -39,6 +44,7 @@ import type {
   MediaDoc,
   MethodStep,
   NoteContent,
+  OpenRolesContent,
   OurMethodContent,
   PaidContent,
   PaidHeroContent,
@@ -47,6 +53,7 @@ import type {
   PricingContent,
   PricingTier,
   ResultsContent,
+  Role,
   ServicePillar,
   StrategyContent,
   SystemCard,
@@ -60,6 +67,7 @@ import { home } from '@/lib/mock/home'
 import { paid } from '@/lib/mock/paid'
 import { branding } from '@/lib/mock/branding'
 import { development } from '@/lib/mock/development'
+import { careers, roles as mockRoles } from '@/lib/mock/careers'
 
 // Payload's generated types are permissive where our render contract is not: upload relations are
 // `string | Media` depending on query depth, and every non-required scalar is `T | null | undefined`.
@@ -586,4 +594,91 @@ export async function getDevelopment(): Promise<DevelopmentContent> {
     console.error('[cms] pages/development query failed — falling back to mock:', err)
     return development
   }
+}
+
+// --- /careers ------------------------------------------------------------------------------------
+
+// Card colour is the card's position (HELP_ACCENTS), so this maps copy and nothing else.
+export function toCareersAboutContent(block: CareersAboutBlock): CareersAboutContent | null {
+  const services = (block.services ?? []).filter((c) => c.title && c.body).map((c) => ({ title: c.title, body: c.body }))
+  if (!block.label || !block.heading || !block.body || services.length === 0) return null
+  return { label: block.label, heading: block.heading, body: block.body, services }
+}
+
+export function toOpenRolesContent(block: OpenRolesBlock): OpenRolesContent | null {
+  if (!block.label || !block.heading || !block.empty) return null
+  return { label: block.label, heading: block.heading, empty: block.empty }
+}
+
+// Three blocks: the shared Service Hero plus this page's own two. The role list is NOT here — it is
+// the Roles collection (getRoles below), so adding a role never means editing this doc.
+export async function getCareers(): Promise<CareersContent> {
+  try {
+    const blocks = await findBlocks('careers')
+    const hero = blocks.find((b) => b.blockType === 'paidHero')
+    const about = blocks.find((b) => b.blockType === 'careersAbout')
+    const openRoles = blocks.find((b) => b.blockType === 'openRoles')
+
+    const slug = 'careers'
+    return {
+      hero: orMock(slug, 'paidHero', hero && toPaidHeroContent(hero), careers.hero),
+      about: orMock(slug, 'careersAbout', about && toCareersAboutContent(about), careers.about),
+      openRoles: orMock(
+        slug,
+        'openRoles',
+        openRoles && toOpenRolesContent(openRoles),
+        careers.openRoles,
+      ),
+    }
+  } catch (err) {
+    console.error('[cms] pages/careers query failed — falling back to mock:', err)
+    return careers
+  }
+}
+
+// A doc missing any required copy is dropped rather than rendered half-empty — the same rule the
+// block mappers apply to their rows.
+export function toRole(doc: RoleDoc): Role | null {
+  const tags = (doc.tags ?? []).map((t) => t.label).filter(Boolean)
+  const responsibilities = (doc.responsibilities ?? []).map((r) => r.text).filter(Boolean)
+  const requirements = (doc.requirements ?? []).map((r) => r.text).filter(Boolean)
+  if (!doc.slug || !doc.title || !doc.summary || !doc.pay || !doc.about) return null
+  return {
+    slug: doc.slug,
+    title: doc.title,
+    summary: doc.summary,
+    pay: doc.pay,
+    tags,
+    about: doc.about,
+    responsibilities,
+    requirements,
+    details: (doc.details ?? [])
+      .filter((d) => d.label && d.value)
+      .map((d) => ({ label: d.label, value: d.value })),
+  }
+}
+
+// Open roles only, in the admin's order. Falls back to the mock only when the query throws: an empty
+// result is a real answer (every role closed) and must render as an empty list, not as a role the
+// agency has taken down.
+export async function getRoles(): Promise<Role[]> {
+  try {
+    const payload = await getPayload({ config })
+    const { docs } = await payload.find({
+      collection: 'roles',
+      where: { status: { equals: 'open' } },
+      sort: ['order', 'createdAt'],
+      depth: 0,
+      pagination: false,
+    })
+    return docs.map(toRole).filter(isPresent)
+  } catch (err) {
+    console.error('[cms] roles query failed — falling back to mock:', err)
+    return mockRoles
+  }
+}
+
+export async function getRole(slug: string): Promise<Role | null> {
+  const all = await getRoles()
+  return all.find((r) => r.slug === slug) ?? null
 }

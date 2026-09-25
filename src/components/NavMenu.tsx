@@ -145,7 +145,8 @@ export function NavMenu({ nav: items, socials = [], copyright }: HeaderContent) 
           id={sheetId}
           aria-label="Primary"
           className={`nav-sheet pointer-events-auto border-b border-[#544D49] bg-[#fffcf9] transition-transform duration-[850ms] ease-[cubic-bezier(0.5,0,0.2,1)] motion-reduce:transition-none ${
-            open ? 'translate-y-0' : '-translate-y-full'
+            // Clear the clipping edge by 2px so the closed sheet leaves no hairline under the bar.
+            open ? 'translate-y-0' : '-translate-y-[calc(100%+2px)]'
           }`}
         >
           {/* The sheet is ~344px under a 76px bar, which a landscape phone can't fit — so the content

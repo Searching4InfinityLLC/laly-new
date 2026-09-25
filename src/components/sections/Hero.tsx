@@ -13,13 +13,18 @@ import type { HeroContent } from '@/lib/types'
 // Desc = New Spirit (font-sans) 400 / 20px mobile, 28px desktop / 125% leading / center / #4A4A4A.
 // Entry: Loader.tsx sets `preloader-done` as its 1.2s exit wipe starts. Heading waits 0.8s, so it
 // begins shortly before the wipe clears.
-export default function Hero({ content }: { content: HeroContent }) {
+// /careers reuses it with its own copy and label, and booking off so the button follows its href.
+export default function Hero({ content, label = 'Home', booking = true }: {
+  content: HeroContent
+  label?: string
+  booking?: boolean
+}) {
   const { heading, description, button, slides } = content
   const rows = heading.split('\n').map((line) => line.trim()).filter(Boolean)
 
   return (
     <section
-      aria-label="Home"
+      aria-label={label}
       // Figma's frame holds the navbar, which is fixed here and out of flow — so the frame's gap
       // between navbar and copy has to carry the navbar's own 76px: 76 + 80 mobile, 76 + 48 desktop.
       // Sides 20/48, bottom 48/112. Closes on a 1px keyline.
@@ -81,7 +86,7 @@ export default function Hero({ content }: { content: HeroContent }) {
               overridden here rather than moving every other button on the page */}
           <Button
             variant="primary"
-            booking
+            booking={booking}
             href={button.href}
             className="md:[&>span]:text-xl md:[&>span]:leading-[25px]"
           >

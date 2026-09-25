@@ -4,4 +4,4 @@
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.laly.agency').replace(/\/$/, '')
 
 // The routes that exist. Shared by the sitemap; add a page here when it ships.
-export const ROUTES = ['/', '/paid-advertising', '/branding', '/development'] as const
+export const ROUTES = ['/', '/paid-advertising', '/branding', '/development', '/careers'] as const
