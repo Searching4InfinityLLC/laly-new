@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
-import heroBg from '../../../../public/careers/hero.webp'
 import { CareersAbout } from '@/components/sections/CareersAbout'
 import Contact from '@/components/sections/Contact'
+import Hero from '@/components/sections/Hero'
 import { OpenRoles } from '@/components/sections/OpenRoles'
-import { ServiceHero } from '@/components/sections/ServiceHero'
 import { SectionFade } from '@/components/ui/SectionFade'
 import { SectionThemeSequence } from '@/components/ui/SectionTheme'
 import { getCareers, getHome, getRoles } from '@/lib/cms'
@@ -18,36 +17,36 @@ export const metadata: Metadata = {
 // (Roles / Pages afterChange hooks), so the hour is only the backstop.
 export const revalidate = 3600
 
-// The hiring landing page: the service pages' hero, About Laly Agency, then the open roles, which
+// The hiring landing page: the home hero (careers copy over home's image marquee), About Laly Agency, then the open roles, which
 // the hero's button scrolls to, closing on the home "Grow with us" Contact band like the service pages.
-// About → Open Roles → Contact run in the same scroll-driven cream→dark SectionThemeSequence those
-// pages use. Copy comes from the Pages 'careers' doc (falling back per block to
+// About → Open Roles → Contact run in the same scroll-driven SectionThemeSequence those pages use,
+// inverted: About starts dark and both turn white as Open Roles comes in. Copy comes from the Pages 'careers' doc (falling back per block to
 // src/lib/mock/careers.ts); the roles are the Roles collection.
 //
-// The hero photo is the team shot from the home Contact band (public/growwithus/Cta-Desktop.webp),
-// pre-blurred and grained into public/careers/hero.webp to match the other heroes' out-of-focus
-// photos — baked into the file rather than a CSS filter, so the LCP image costs no paint-time blur.
-// A static import like theirs: at the hero's 20% it is a texture, not content.
+// The careers doc's hero label and pills have no slot in the home hero, so they don't render here.
 export default async function CareersPage() {
-  const [careers, roles, { contact }] = await Promise.all([getCareers(), getRoles(), getHome()])
+  const [careers, roles, home] = await Promise.all([getCareers(), getRoles(), getHome()])
+  const { heading, description, button } = careers.hero
 
   return (
     <main>
-      {/* cta={{}}: the button follows its href ('#roles') instead of opening the booking dialog */}
-      <ServiceHero
-        content={careers.hero}
-        image={heroBg}
+      {/* booking off: the button follows its href ('#roles') instead of opening the booking dialog */}
+      <Hero
+        content={{
+          heading,
+          description: description.before + (description.emphasis ?? '') + (description.after ?? ''),
+          button,
+          slides: home.hero.slides,
+        }}
         label="Careers"
-        objectPosition="object-[50%_30%]"
-        tall
-        cta={{}}
+        booking={false}
       />
       <SectionThemeSequence
         sections={[
-          { id: 'about', tone: 'cream', texture: 'grid', content: <CareersAbout content={careers.about} /> },
-          { id: 'roles', tone: 'dark', content: <OpenRoles content={careers.openRoles} roles={roles} /> },
+          { id: 'about', tone: 'dark', texture: 'grid', content: <CareersAbout content={careers.about} /> },
+          { id: 'roles', tone: 'white', content: <OpenRoles content={careers.openRoles} roles={roles} /> },
         ]}
-        contact={<SectionFade><Contact content={contact} /></SectionFade>}
+        contact={<SectionFade><Contact content={home.contact} /></SectionFade>}
       />
     </main>
   )

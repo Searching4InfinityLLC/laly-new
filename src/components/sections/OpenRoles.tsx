@@ -40,10 +40,10 @@ function RolePill({ label, index }: { label: string; index: number }) {
   )
 }
 
-// /careers "Open Roles" — the dark grain band the hero's "SEE OPEN ROLES" scrolls to (id="roles").
+// /careers "Open Roles" — the white band the hero's "SEE OPEN ROLES" scrolls to (id="roles").
 // Each role is a Strategy glass card laid out as a row: what it is on the left, pay and the way in on
-// the right. Colours read the page's shared theme vars, so the band fades in from cream with the
-// rest of the SectionThemeSequence. The whole card is the link (the button's stretched ::before), the way the Strategy
+// the right. Colours read the page's shared theme vars, so the band (and About above it) fades from dark to white with
+// the rest of the SectionThemeSequence. The whole card is the link (the button's stretched ::before), the way the Strategy
 // pillars make the whole card their arrow's hit area.
 export function OpenRoles({ content, roles }: { content: OpenRolesContent; roles: Role[] }) {
   const { label, heading, empty } = content

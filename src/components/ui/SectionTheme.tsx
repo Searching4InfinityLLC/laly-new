@@ -8,6 +8,9 @@ type SectionTone = 'cream' | 'dark' | 'white'
 // edge past (100 - 35)% of the section's own height, capped at the screen. Chosen with the review
 // selector that used to sit bottom-left; that selector is gone and this is the signed-off value.
 const INTERSECTION = 0.35
+// The fixed navbar's height (header h-19). The bar only takes the dark theme once the sequence has
+// scrolled up under it, so a sequence that opens dark (/careers) leaves the bar cream over the hero.
+const BAR = 76
 
 export type ThemeSection = {
   id: string
@@ -41,6 +44,7 @@ export function SectionThemeSequence({ sections, contact }: {
   const contactRef = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState<SectionTone>(sections[0]?.tone ?? 'cream')
   const [contactReached, setContactReached] = useState(false)
+  const [underBar, setUnderBar] = useState(false)
 
   useEffect(() => {
     const root = container.current
@@ -63,6 +67,7 @@ export function SectionThemeSequence({ sections, contact }: {
       })
       setPhase(tone)
       setContactReached(reached(contactEl))
+      setUnderBar(root.getBoundingClientRect().top <= BAR)
     }
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update)
@@ -86,7 +91,7 @@ export function SectionThemeSequence({ sections, contact }: {
 
   return (
     <>
-      <div ref={container} className="section-theme" data-theme={phase === 'dark' ? 'dark' : 'light'} data-ground={phase}>
+      <div ref={container} className="section-theme" data-theme={phase === 'dark' ? 'dark' : 'light'} data-ground={phase} data-under-bar={underBar || undefined}>
         {sections.map((section, index) => (
           <div
             key={section.id}

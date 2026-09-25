@@ -3,7 +3,7 @@ import { GridBackdrop } from '@/components/ui/GridBackdrop'
 import { InView } from '@/components/ui/InView'
 import type { CareersAboutContent } from '@/lib/types'
 
-// /careers "About Laly Agency" — the cream band under the hero. Nothing here is a new pattern: the
+// /careers "About Laly Agency" — the dark band under the hero (white once Open Roles arrives). Nothing here is a new pattern: the
 // eyebrow/heading/copy stack is the one every section uses, and the three service cards are the
 // /paid-advertising Results cards.
 //

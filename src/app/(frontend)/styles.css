@@ -134,7 +134,7 @@ header,
   transition: stroke 350ms ease-in-out, fill 350ms ease-in-out;
 }
 /* its own rule so the open-menu rule below can win: this selector outranks it otherwise */
-body:has(.section-theme[data-theme='dark']):not([data-menu-open]) header {
+body:has(.section-theme[data-theme='dark'][data-under-bar]):not([data-menu-open]) header {
   border-color: #3c3734; /* Figma 3544:4750 */
 }
 /* Bar keyline (#544D49 light, Figma 3038:1659). With the sheet down, bar and sheet are one block in
@@ -143,22 +143,22 @@ body:has(.section-theme[data-theme='dark']):not([data-menu-open]) header {
 body[data-menu-open] header {
   border-color: transparent;
 }
-body:has(.section-theme[data-theme='dark']) header .logo-dark {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) header .logo-dark {
   opacity: 0;
 }
-body:has(.section-theme[data-theme='dark']) header .logo-light {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) header .logo-light {
   opacity: 1;
 }
-body:has(.section-theme[data-theme='dark']) header button,
-body:has(.section-theme[data-theme='dark']) .nav-sheet a {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) header button,
+body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-sheet a {
   border-color: #fffcf9;
   color: #fffcf9;
 }
-body:has(.section-theme[data-theme='dark']) header button:hover,
-body:has(.section-theme[data-theme='dark']) .nav-sheet a:hover {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) header button:hover,
+body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-sheet a:hover {
   background-color: rgb(255 255 255 / 0.1);
 }
-body:has(.section-theme[data-theme='dark']) .nav-sheet {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-sheet {
   border-color: #3c3734;
 }
 /* The dark bar and sheet carry the grain (Figma 3544:4750 / 3544:4852 — #151414 under the noise),
@@ -182,25 +182,25 @@ header::before,
   position: relative;
   isolation: isolate;
 }
-body:has(.section-theme[data-theme='dark']) header::before,
-body:has(.section-theme[data-theme='dark']) .nav-sheet::before {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) header::before,
+body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-sheet::before {
   opacity: 1;
 }
 /* the transparent dark-hero bar stays see-through — its grain would paint over the hero photo */
 body:has(.hero-dark):not([data-past-hero]):not([data-menu-open]) header::before {
   opacity: 0;
 }
-body:has(.section-theme[data-theme='dark']) .nav-sheet svg rect {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-sheet svg rect {
   stroke: #fffcf9;
 }
-body:has(.section-theme[data-theme='dark']) .nav-sheet svg path {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-sheet svg path {
   fill: #fffcf9;
 }
-body:has(.section-theme[data-theme='dark']) .nav-copyright {
+body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-copyright {
   color: #d1c1b7; /* mobile frame; desktop draws #baa99e */
 }
 @media (min-width: 72rem) {
-  body:has(.section-theme[data-theme='dark']) .nav-copyright {
+  body:has(.section-theme[data-theme='dark'][data-under-bar]) .nav-copyright {
     color: #baa99e;
   }
 }

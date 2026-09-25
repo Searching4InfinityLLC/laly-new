@@ -5,10 +5,9 @@ import { BracketLabel } from '@/components/ui/BracketLabel'
 import { Button } from '@/components/ui/Button'
 import {
   CAREERS_EMAIL,
-  FILE_FIELDS,
+  FILE_EXT,
   type ApplicationErrors,
   type ApplicationText,
-  type FileKey,
   validateApplication,
 } from '@/lib/careers'
 import { getLenis } from '@/lib/lenis'
@@ -16,18 +15,16 @@ import type { Role } from '@/lib/types'
 
 // The application form on /careers/<slug>, inline under the job description (id="apply") — both
 // APPLY buttons on the page scroll here. A plain single-column form (client note: "a standard form,
-// start fresh"): boxed fields with their labels above, the documents as file rows, one submit.
+// start fresh"): boxed fields with their labels above, one drop zone for every document, one submit.
 // Nothing beside it — the description above already says what the role is.
 //
-// It is the last section of the page's SectionThemeSequence, so it goes black as Contact arrives
-// (the service pages' "black above Contact"). The copy around the fields reads the theme vars; the
-// fields stay cream boxes, which read on either ground.
+// It is the last section of the page (no Contact band below). The copy around the fields reads the
+// theme vars; the fields stay cream boxes.
 //
 // No confirmation email goes to the applicant (client note); the confirmation that replaces the form
 // is the receipt, and it hands out the careers inbox for questions instead.
 
 const EMPTY: ApplicationText = { name: '', email: '', phone: '', linkedin: '', portfolioUrl: '' }
-const NO_FILES: Record<FileKey, File | null> = { resume: null, coverLetter: null, portfolio: null }
 
 type TextKey = keyof ApplicationText
 
@@ -85,7 +82,7 @@ function ErrorText({ id, children }: { id: string; children?: string }) {
 export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }) {
   const ref = useRef<HTMLElement>(null)
   const [text, setText] = useState<ApplicationText>(EMPTY)
-  const [files, setFiles] = useState<Record<FileKey, File | null>>(NO_FILES)
+  const [files, setFiles] = useState<File[]>([])
   const [errors, setErrors] = useState<ApplicationErrors>({})
   const [submitting, setSubmitting] = useState(false)
   const [failed, setFailed] = useState<string | null>(null)
@@ -93,9 +90,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
 
   const setValue = (key: TextKey, v: string) => {
     setText((t) => ({ ...t, [key]: v }))
-    // the portfolio link also answers the portfolio file's "attach one" error
-    if (errors[key] || (key === 'portfolioUrl' && errors.portfolio))
-      setErrors((e) => ({ ...e, [key]: undefined, ...(key === 'portfolioUrl' ? { portfolio: undefined } : {}) }))
+    if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }))
   }
 
   // Re-check a field on blur, but only one with something in it — tabbing past an empty field on the
@@ -105,9 +100,9 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
     setErrors((e) => ({ ...e, [key]: validateApplication(text, files)[key] }))
   }
 
-  const setFile = (key: FileKey, file: File | null) => {
-    setFiles((f) => ({ ...f, [key]: file }))
-    setErrors((e) => ({ ...e, [key]: undefined, files: undefined }))
+  const changeFiles = (next: File[]) => {
+    setFiles(next)
+    setErrors((e) => ({ ...e, files: undefined }))
   }
 
   // The confirmation is far shorter than the form, so bring the section's top back into view. Lenis
@@ -138,7 +133,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
       const body = new FormData()
       body.set('role', role.slug)
       for (const [k, v] of Object.entries(text)) body.set(k, v.trim())
-      for (const [k, f] of Object.entries(files)) if (f) body.set(k, f)
+      for (const f of files) body.append('files', f)
       const res = await fetch('/api/careers/apply', { method: 'POST', body })
       const data = await res.json().catch(() => null)
       if (!res.ok) throw new Error(data?.error ?? 'Something went wrong sending your application.')
@@ -173,7 +168,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
           </h2>
           {!done && (
             <p className="theme-ink font-sans text-lg leading-[1.3] text-[var(--section-body,#4A4A4A)] md:text-xl">
-              A few details and three documents. Takes about two minutes.
+              A few details and your documents. Takes about two minutes.
             </p>
           )}
         </div>
@@ -228,18 +223,7 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
               )
             })}
 
-            {FILE_FIELDS.map((f) => (
-              <FileRow
-                key={f.key}
-                id={`application-${f.key}`}
-                label={f.label}
-                hint={f.hint}
-                accept={f.ext.map((x) => `.${x}`).join(',')}
-                file={files[f.key]}
-                error={errors[f.key]}
-                onChange={(file) => setFile(f.key, file)}
-              />
-            ))}
+            <FileDrop files={files} error={errors.files} onChange={changeFiles} />
 
             {/* The portfolio's other door: most strategists' work lives on a site or a deck link,
                 and a big PDF would not fit the upload cap anyway. */}
@@ -262,9 +246,9 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
               <ErrorText id="application-portfolioUrl-error">{errors.portfolioUrl}</ErrorText>
             </div>
 
-            {(errors.files || failed) && (
+            {failed && (
               <p role="alert" className="theme-ink font-sans text-lg text-[var(--section-heading,#151414)]">
-                {errors.files ?? failed}
+                {failed}
                 {failed && !failed.includes(CAREERS_EMAIL) && (
                   <>
                     {' '}
@@ -293,92 +277,82 @@ export function ApplicationForm({ role }: { role: Pick<Role, 'slug' | 'title'> }
   )
 }
 
-// A file field in the same box as the text inputs: a "Choose file" chip, then the file's name (or
-// the accepted types). The real <input type=file> is visually hidden but focusable, and the whole
-// box is its <label>, so click, keyboard and drag-and-drop all land on the one control.
-function FileRow({
-  id,
-  label,
-  hint,
-  accept,
-  file,
-  error,
-  onChange,
-}: {
-  id: string
-  label: string
-  hint: string
-  accept: string
-  file: File | null
-  error?: string
-  onChange: (file: File | null) => void
-}) {
-  const input = useRef<HTMLInputElement>(null)
+// Every document in one big drop zone (resume, cover letter, work samples). The real multi-file
+// <input> is visually hidden but focusable, and the whole zone is its <label>, so click, keyboard and
+// drag-and-drop all land on the one control. Picks add to the list rather than replace it, so files
+// from two folders can go in; each chosen file gets its own remove button underneath.
+function FileDrop({ files, error, onChange }: { files: File[]; error?: string; onChange: (files: File[]) => void }) {
   const [over, setOver] = useState(false)
+  const id = 'application-files'
 
-  const onDrop = (e: DragEvent) => {
-    e.preventDefault()
-    setOver(false)
-    const dropped = e.dataTransfer.files?.[0]
-    if (dropped) onChange(dropped)
+  // same name and size = the same file picked twice
+  const add = (picked: FileList | null) => {
+    if (!picked?.length) return
+    const fresh = Array.from(picked).filter((p) => !files.some((f) => f.name === p.name && f.size === p.size))
+    onChange([...files, ...fresh])
   }
 
   return (
     <div>
       <Label id={`${id}-label`} required>
-        {label}
+        Resume, cover letter &amp; work samples
       </Label>
-      <div className="mt-2 flex items-stretch gap-2">
-        <label
-          htmlFor={id}
-          onDragOver={(e) => {
-            e.preventDefault()
-            setOver(true)
+      <label
+        htmlFor={id}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setOver(true)
+        }}
+        onDragLeave={() => setOver(false)}
+        onDrop={(e: DragEvent) => {
+          e.preventDefault()
+          setOver(false)
+          add(e.dataTransfer.files)
+        }}
+        className={`mt-2 flex min-h-48 cursor-pointer flex-col items-center justify-center gap-3 border-dashed text-center has-[:focus-visible]:border-[#ff6d6a] ${BOX} ${
+          over ? 'border-[#ff6d6a]' : boxBorder(error)
+        }`}
+      >
+        <span className="rounded-full border-[0.5px] border-[#262626] px-3 py-1 font-fira text-sm text-[#262626]">
+          Choose files
+        </span>
+        <span className="font-sans text-base text-[#867a72]">
+          or drop them here. PDF, DOC, slides, images or ZIP, up to 4 MB together.
+        </span>
+        <input
+          id={id}
+          type="file"
+          multiple
+          accept={FILE_EXT.map((x) => `.${x}`).join(',')}
+          aria-labelledby={`${id}-label`}
+          aria-describedby={error ? `${id}-error` : undefined}
+          aria-invalid={error ? true : undefined}
+          className="sr-only"
+          onChange={(e) => {
+            add(e.target.files)
+            e.target.value = '' // so re-picking a removed file fires onChange again
           }}
-          onDragLeave={() => setOver(false)}
-          onDrop={onDrop}
-          className={`flex min-w-0 flex-1 cursor-pointer items-center gap-3 has-[:focus-visible]:border-[#ff6d6a] ${BOX} ${
-            over ? 'border-[#ff6d6a]' : boxBorder(error)
-          }`}
-        >
-          <span className="shrink-0 rounded-full border-[0.5px] border-[#262626] px-2.5 py-0.5 font-fira text-sm text-[#262626]">
-            Choose file
-          </span>
-          <span className="min-w-0 flex-1 truncate">
-            {file ? (
-              <>
+        />
+      </label>
+      {files.length > 0 && (
+        <ul className="mt-2 flex flex-col gap-2">
+          {files.map((file) => (
+            <li key={`${file.name}-${file.size}`} className="flex items-stretch gap-2">
+              <span className={`min-w-0 flex-1 truncate ${BOX} border-[#544D49]/35`}>
                 {file.name} <span className="font-fira text-xs text-[#867a72]">{mb(file.size)}</span>
-              </>
-            ) : (
-              <span className="font-sans text-base text-[#867a72]">{hint}</span>
-            )}
-          </span>
-          <input
-            ref={input}
-            id={id}
-            type="file"
-            accept={accept}
-            aria-labelledby={`${id}-label`}
-            aria-describedby={error ? `${id}-error` : undefined}
-            aria-invalid={error ? true : undefined}
-            className="sr-only"
-            onChange={(e) => onChange(e.target.files?.[0] ?? null)}
-          />
-        </label>
-        {file && (
-          <button
-            type="button"
-            aria-label={`Remove ${label.toLowerCase()}`}
-            onClick={() => {
-              onChange(null)
-              if (input.current) input.current.value = ''
-            }}
-            className="shrink-0 cursor-pointer border border-[#544D49]/35 px-3 font-fira text-sm text-[#867a72] transition-colors hover:border-[#151414] hover:text-[#151414]"
-          >
-            ✕
-          </button>
-        )}
-      </div>
+              </span>
+              <button
+                type="button"
+                aria-label={`Remove ${file.name}`}
+                onClick={() => onChange(files.filter((f) => f !== file))}
+                className="shrink-0 cursor-pointer border border-[#544D49]/35 px-3 font-fira text-sm text-[#867a72] transition-colors hover:border-[#151414] hover:text-[#151414]"
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       <ErrorText id={`${id}-error`}>{error}</ErrorText>
     </div>
   )
